@@ -1,0 +1,6 @@
+---
+Checks: "*,
+-llvmlibc-*, -llvm-header-guard"
+WarningsAsErrors: ""
+HeaderFilterRegex: "src"
+FormatStyle: none
