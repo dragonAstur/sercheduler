@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "nlohmann/json.hpp"
 namespace sercheduler {
 
 /**
@@ -17,18 +19,14 @@ struct Workflow {};
  * @brief
  */
 struct Task {
-    int id;
-    std::string name;
-    std::vector<std::shared_ptr<Task>> parents;
-    std::vector<std::shared_ptr<Task>> children;
-    double runtime;
+  int id;
+  std::string name;
+  std::vector<std::shared_ptr<Task>> parents;
+  std::vector<std::shared_ptr<Task>> children;
+  double runtime;
+};
 
-
-} __attribute__((aligned(128))) ;
-
-
-void sayHello();
+std::vector<std::shared_ptr<Task>> ParseJsonWorkflow(const nlohmann::json& j);
 
 }  // namespace sercheduler
-#endif //SERCHEDULER_PARSER_WORKFLOWPARSER_HPP
-
+#endif  // SERCHEDULER_PARSER_WORKFLOWPARSER_HPP
