@@ -8,6 +8,7 @@ Checks: >
   performance-*,
   portability-*,
   readability-*,
+  llvm-*,
   -google-readability-braces-around-statements,
   -google-readability-namespace-comments,
   -google-runtime-references,
