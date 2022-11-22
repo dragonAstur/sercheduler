@@ -11,6 +11,7 @@ include_directories(src/ include/ apps/)
 
 # library header files
 set(HEADER_FILES
+        include/sercheduler/workflow.h
         include/sercheduler/parser/workflow_parser.h
 )
 
@@ -19,11 +20,10 @@ set(SOURCE_FILES
         src/parser/workflow_parser.cc
 )
 
-
 # test files
-set(TEST_FILES 
+set(TEST_FILES
         test/parser/workflow_parser_test.cc
-        test/hello_test.cpp)
+)
 
 add_library(sercheduler STATIC ${SOURCE_FILES} ${HEADER_FILES})
 
@@ -31,12 +31,10 @@ add_library(sercheduler STATIC ${SOURCE_FILES} ${HEADER_FILES})
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Dependencies
-
 include(FetchContent)
 
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 FetchContent_MakeAvailable(json)
-
 
 target_link_libraries(sercheduler PRIVATE nlohmann_json::nlohmann_json)
 
@@ -52,35 +50,31 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-
-
 add_executable(
-  sercheduler_test
-  ${SOURCE_FILES}
-  ${HEADER_FILES}
-  ${TEST_FILES}
+        sercheduler_test
+        ${SOURCE_FILES}
+        ${HEADER_FILES}
+        ${TEST_FILES}
 )
 enable_testing()
+
 # add_test(HelloTest test)
 # set_tests_properties(HelloTest PROPERTIES
-#                 ENVIRONMENT
-#                 DATADIR=${CMAKE_CURRENT_SOURCE_DIR}/tests/data/)
+# ENVIRONMENT
+# DATADIR=${CMAKE_CURRENT_SOURCE_DIR}/tests/data/)
 target_link_libraries(
-  sercheduler_test
-  GTest::gtest_main
-  sercheduler
+        sercheduler_test
+        GTest::gtest_main
+        sercheduler
 )
 
 include(GoogleTest)
 
+gtest_discover_tests(sercheduler_test)
 
-gtest_add_tests(TARGET      sercheduler_test
-                TEST_SUFFIX .noArgs
-                TEST_LIST   noArgsTests
-)
-set_tests_properties(${noArgsTests} PROPERTIES
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test/)
-
-
-
-
+# gtest_add_tests(TARGET      sercheduler_test
+# TEST_SUFFIX .noArgs
+# TEST_LIST   noArgsTests
+# )
+# set_tests_properties(${noArgsTests} PROPERTIES
+# WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test/)

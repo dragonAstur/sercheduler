@@ -6,12 +6,12 @@
 
 // Check the correct parse of a workflow from json
 TEST(WorkflowParserTest, ParseFromJson) {
-  std::ifstream i("data/workflow_test.json");
+  std::ifstream i("../data/test/workflow_test.json");
   nlohmann::json j;
   i >> j;
 
   auto result = sercheduler::ParseJsonWorkflow(j);
 
-  EXPECT_EQ(result.size(), 20);
+  EXPECT_EQ(result.size(), 10);
   i.close();
 }

@@ -2,16 +2,18 @@
 #include <vector>
 
 #include "sercheduler/parser/workflow_parser.h"
+#include "sercheduler/workflow.h"
 
 namespace sercheduler {
-std::vector<std::shared_ptr<Task>> ParseJsonWorkflow(const nlohmann::json& j) {
+std::vector<Task> ParseJsonWorkflow(const nlohmann::json& j) {
   auto tasks_json = j.at("workflow").at("tasks");
-  std::vector<std::shared_ptr<Task>> tasks(tasks_json.size());
+  std::vector<Task> tasks;
 
   for (const auto& task_j : tasks_json) {
     Task task;
+    task.name = task_j["name"].get<std::string>();
 
-    // tasks.push_back(std::shared_ptr<Task>(&task));
+    tasks.push_back(task);
   }
   return tasks;
 }
