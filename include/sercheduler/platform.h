@@ -1,0 +1,4 @@
+#ifndef SERCHEDULER_PLATFORM_H
+#define SERCHEDULER_PLATFORM_H
+struct Platform {};
+#endif  // SERCHEDULER_PLATFORM_H

@@ -22,6 +22,11 @@ struct Task {
   double runtime;
 };
 
+struct Host {
+  int id;
+  int flops;
+};
+
 }  // namespace sercheduler
 
 #endif  // SERCHEDULER_WORKFLOW_H

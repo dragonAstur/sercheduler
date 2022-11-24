@@ -13,11 +13,13 @@ include_directories(src/ include/ apps/)
 set(HEADER_FILES
         include/sercheduler/workflow.h
         include/sercheduler/parser/workflow_parser.h
+        include/sercheduler/scheduler.h
 )
 
 # source files
 set(SOURCE_FILES
         src/parser/workflow_parser.cc
+        src/scheduler.cc
 )
 
 # test files
