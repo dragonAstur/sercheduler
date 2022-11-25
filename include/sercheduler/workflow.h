@@ -25,6 +25,7 @@ struct Task {
 struct Host {
   int id;
   int flops;
+  int cores;
 };
 
 }  // namespace sercheduler

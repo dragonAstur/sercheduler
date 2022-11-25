@@ -9,22 +9,27 @@ project(
 
 include_directories(src/ include/ apps/)
 
+set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+
 # library header files
 set(HEADER_FILES
         include/sercheduler/workflow.h
         include/sercheduler/parser/workflow_parser.h
         include/sercheduler/scheduler.h
+        include/sercheduler/platform.h
 )
 
 # source files
 set(SOURCE_FILES
         src/parser/workflow_parser.cc
         src/scheduler.cc
+        src/platform.cc
 )
 
 # test files
 set(TEST_FILES
         test/parser/workflow_parser_test.cc
+        test/platform_test.cc
 )
 
 add_library(sercheduler STATIC ${SOURCE_FILES} ${HEADER_FILES})
