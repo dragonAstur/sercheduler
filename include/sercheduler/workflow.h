@@ -19,12 +19,28 @@ struct Task {
   std::string name;
   std::vector<Task> parents;
   std::vector<Task> children;
+  std::vector<TaskFile> input_files;
+  std::vector<TaskFile> output_files;
+  double output_data;
+
   double runtime;
 };
 
+struct TaskFile {
+  std::string name;
+  std::string direction;
+  double size;
+};
+
+/**
+ * @brief Defines a vm machine
+ *
+ *
+ */
 struct Host {
   int id;
-  int flops;
+  std::string name;
+  double flops;
   int cores;
 };
 

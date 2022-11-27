@@ -1,5 +1,5 @@
-#ifndef SERCHEDULER_PLATFORM_H
-#define SERCHEDULER_PLATFORM_H
+#ifndef SERCHEDULER_SCHEDULE_PLATFORM_H
+#define SERCHEDULER_SCHEDULE_PLATFORM_H
 #include <string>
 #include <vector>
 
@@ -26,12 +26,12 @@ struct Platform {
  */
 std::vector<std ::vector<double>> CalculateComputationMatrix(
     const std::vector<Task>& tasks, const std::vector<Host>& hosts,
-    int reference_flops);
+    double reference_flops);
 
 std::vector<std ::vector<double>> CalculateNetworkMatrix(
-    std::vector<Task>& tasks, std::vector<Host>& hosts, int reference_speed);
+    std::vector<Task>& tasks, double reference_speed);
 
 Platform CreatePlatform(std::vector<Task>& tasks, std::vector<Host>& hosts,
-                        int reference_flops, int reference_speed);
+                        double reference_flops, double reference_speed);
 }  // namespace sercheduler
-#endif  // SERCHEDULER_PLATFORM_H
+#endif  // SERCHEDULER_SCHEDULE_PLATFORM_H

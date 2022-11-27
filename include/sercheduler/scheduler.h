@@ -2,7 +2,7 @@
 #define SERCHEDULER_SCHEDULER_H
 #include <vector>
 
-#include "sercheduler/platform.h"
+#include "sercheduler/schedule_platform.h"
 #include "sercheduler/workflow.h"
 namespace sercheduler {
 class Scheduler {

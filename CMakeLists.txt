@@ -16,20 +16,20 @@ set(HEADER_FILES
         include/sercheduler/workflow.h
         include/sercheduler/parser/workflow_parser.h
         include/sercheduler/scheduler.h
-        include/sercheduler/platform.h
+        include/sercheduler/schedule_platform.h
 )
 
 # source files
 set(SOURCE_FILES
         src/parser/workflow_parser.cc
         src/scheduler.cc
-        src/platform.cc
+        src/schedule_platform.cc
 )
 
 # test files
 set(TEST_FILES
         test/parser/workflow_parser_test.cc
-        test/platform_test.cc
+        test/schedule_platform_test.cc
 )
 
 add_library(sercheduler STATIC ${SOURCE_FILES} ${HEADER_FILES})
@@ -72,6 +72,7 @@ enable_testing()
 target_link_libraries(
         sercheduler_test
         GTest::gtest_main
+        GTest::gmock
         sercheduler
 )
 

@@ -1,10 +1,10 @@
-#include "sercheduler/platform.h"
+#include "sercheduler/schedule_platform.h"
 
 namespace sercheduler {
 
 std::vector<std ::vector<double>> CalculateComputationMatrix(
     const std::vector<Task>& tasks, const std::vector<Host>& hosts,
-    int reference_flops) {
+    double reference_flops) {
   std::vector<std ::vector<double>> computation_matrix(
       tasks.size(), std::vector<double>(hosts.size()));
 
