@@ -28,8 +28,14 @@ std::vector<std ::vector<double>> CalculateComputationMatrix(
     const std::vector<Task>& tasks, const std::vector<Host>& hosts,
     double reference_flops);
 
+/**
+ * @brief Given a workflow calculate all bits to transmit
+ * The diagonal represents staging files.
+ * @param tasks
+ * @return std::vector<std ::vector<double>>
+ */
 std::vector<std ::vector<double>> CalculateNetworkMatrix(
-    std::vector<Task>& tasks, double reference_speed);
+    std::vector<Task>& tasks);
 
 Platform CreatePlatform(std::vector<Task>& tasks, std::vector<Host>& hosts,
                         double reference_flops, double reference_speed);

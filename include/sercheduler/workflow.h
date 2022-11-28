@@ -1,6 +1,7 @@
 
 #ifndef SERCHEDULER_WORKFLOW_H
 #define SERCHEDULER_WORKFLOW_H
+#include <memory>
 #include <string>
 #include <vector>
 namespace sercheduler {
@@ -10,6 +11,11 @@ namespace sercheduler {
  *
  */
 struct Workflow {};
+struct TaskFile {
+  std::string name;
+  std::string direction;
+  double size;
+};
 
 /**
  * @brief
@@ -17,19 +23,12 @@ struct Workflow {};
 struct Task {
   int id;
   std::string name;
-  std::vector<Task> parents;
-  std::vector<Task> children;
+  double runtime;
+  std::vector<Task*> parents;
+  std::vector<Task*> children;
   std::vector<TaskFile> input_files;
   std::vector<TaskFile> output_files;
   double output_data;
-
-  double runtime;
-};
-
-struct TaskFile {
-  std::string name;
-  std::string direction;
-  double size;
 };
 
 /**

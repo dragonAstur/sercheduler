@@ -21,13 +21,19 @@ TEST(WorkflowParserTest, ParseFromJson) {
   EXPECT_STREQ(task4.name.c_str(), "task04");
   EXPECT_EQ(task4.runtime, 13);
   EXPECT_EQ(task4.id, 3);
-  EXPECT_EQ(task4.parents[0].name, "task01");
-  EXPECT_EQ(task4.parents[0].id, 0);
-  ASSERT_EQ(task4.children.size(), 2);
-  EXPECT_EQ(task4.children[0].name, "task08");
-  EXPECT_EQ(task4.children[0].id, 7);
+  EXPECT_EQ(task4.parents[0]->name, "task01");
+  EXPECT_EQ(task4.parents[0]->id, 0);
+  // Parent should update the references
+  EXPECT_EQ(task4.parents[0]->children[0]->id, 1);
 
-  // Check if the task have
+  ASSERT_EQ(task4.children.size(), 2);
+  EXPECT_EQ(task4.children[0]->name, "task08");
+  EXPECT_EQ(task4.children[0]->id, 7);
+
+  // Check if the children update the parents
+
+  auto const& task1 = result[0];
+  EXPECT_EQ(task1.children[0]->parents[0]->id, 0);
 
   i.close();
 }

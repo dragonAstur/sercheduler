@@ -21,4 +21,20 @@ std::vector<std ::vector<double>> CalculateComputationMatrix(
   return computation_matrix;
 }
 
+std::vector<std ::vector<double>> CalculateNetworkMatrix(
+    std::vector<Task>& tasks) {
+  std::vector<std::vector<double>> network_matrix(
+      tasks.size(), std::vector<double>(tasks.size()));
+
+  for (const auto& task : tasks) {
+    double coms_inter_tasks = 0;
+
+    for (const auto& parent : task.parents) {
+      // network_matrix[parent->id]
+    }
+  }
+
+  return network_matrix;
+}
+
 }  // namespace sercheduler

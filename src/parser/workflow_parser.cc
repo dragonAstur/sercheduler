@@ -33,11 +33,11 @@ std::vector<Task> ParseJsonWorkflow(const nlohmann::json& j) {
 
     for (const auto& child : task_j["children"]) {
       auto child_id = name_to_id[child.get<std::string>()];
-      task.children.push_back(tasks[child_id]);
+      task.children.emplace_back(&tasks[child_id]);
     }
     for (const auto& parent : task_j["parents"]) {
       auto parent_id = name_to_id[parent.get<std::string>()];
-      task.parents.push_back(tasks[parent_id]);
+      task.parents.emplace_back(&tasks[parent_id]);
     }
     ++i;
   }
