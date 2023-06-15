@@ -42,27 +42,27 @@
                     {
                         "link": "output",
                         "name": "file_task1_task2.txt",
-                        "size": 20000000
+                        "sizeInBytes": 20000000
                     },
                     {
                         "link": "output",
                         "name": "file_task1_task3.txt",
-                        "size": 12000000
+                        "sizeInBytes": 12000000
                     },
                     {
                         "link": "output",
                         "name": "file_task1_task4.txt",
-                        "size": 8000000
+                        "sizeInBytes": 8000000
                     },
                     {
                         "link": "output",
                         "name": "file_task1_task5.txt",
-                        "size": 12000000
+                        "sizeInBytes": 12000000
                     },
                     {
                         "link": "output",
                         "name": "file_task1_task6.txt",
-                        "size": 16000000
+                        "sizeInBytes": 16000000
                     }
                 ]
             },
@@ -81,17 +81,17 @@
                     {
                         "link": "input",
                         "name": "file_task1_task2.txt",
-                        "size": 18000000
+                        "sizeInBytes": 18000000
                     },
                     {
                         "link": "output",
                         "name": "file_task2_task8.txt",
-                        "size": 20000000
+                        "sizeInBytes": 20000000
                     },
                     {
                         "link": "output",
                         "name": "file_task2_task9.txt",
-                        "size": 16000000
+                        "sizeInBytes": 16000000
                     }
                 ]
             },
@@ -109,12 +109,12 @@
                     {
                         "link": "input",
                         "name": "file_task1_task3.txt",
-                        "size": 12000000
+                        "sizeInBytes": 12000000
                     },
                     {
                         "link": "output",
                         "name": "file_task3_task7.txt",
-                        "size": 24000000
+                        "sizeInBytes": 24000000
                     }
                 ]
             },
@@ -133,17 +133,17 @@
                     {
                         "link": "input",
                         "name": "file_task1_task4.txt",
-                        "size": 8000000
+                        "sizeInBytes": 8000000
                     },
                     {
                         "link": "output",
                         "name": "file_task4_task8.txt",
-                        "size": 28000000
+                        "sizeInBytes": 28000000
                     },
                     {
                         "link": "output",
                         "name": "file_task4_task9.txt",
-                        "size": 24000000
+                        "sizeInBytes": 24000000
                     }
                 ]
             },
@@ -161,12 +161,12 @@
                     {
                         "link": "input",
                         "name": "file_task1_task5.txt",
-                        "size": 12000000
+                        "sizeInBytes": 12000000
                     },
                     {
                         "link": "output",
                         "name": "file_task5_task9.txt",
-                        "size": 12000000
+                        "sizeInBytes": 12000000
                     }
                 ]
             },
@@ -184,12 +184,12 @@
                     {
                         "link": "input",
                         "name": "file_task1_task6.txt",
-                        "size": 16000000
+                        "sizeInBytes": 16000000
                     },
                     {
                         "link": "output",
                         "name": "file_task6_task8.txt",
-                        "size": 16000000
+                        "sizeInBytes": 16000000
                     }
                 ]
             },
@@ -207,12 +207,12 @@
                     {
                         "link": "input",
                         "name": "file_task3_task7.txt",
-                        "size": 24000000
+                        "sizeInBytes": 24000000
                     },
                     {
                         "link": "output",
                         "name": "file_task7_task10.txt",
-                        "size": 16000000
+                        "sizeInBytes": 16000000
                     }
                 ]
             },
@@ -232,22 +232,22 @@
                     {
                         "link": "input",
                         "name": "file_task2_task8.txt",
-                        "size": 20000000
+                        "sizeInBytes": 20000000
                     },
                     {
                         "link": "input",
                         "name": "file_task4_task8.txt",
-                        "size": 28000000
+                        "sizeInBytes": 28000000
                     },
                     {
                         "link": "input",
                         "name": "file_task6_task8.txt",
-                        "size": 16000000
+                        "sizeInBytes": 16000000
                     },
                     {
                         "link": "output",
                         "name": "file_task8_task10.txt",
-                        "size": 12000000
+                        "sizeInBytes": 12000000
                     }
                 ]
             },
@@ -267,22 +267,22 @@
                     {
                         "link": "input",
                         "name": "file_task2_task9.txt",
-                        "size": 16000000
+                        "sizeInBytes": 16000000
                     },
                     {
                         "link": "input",
                         "name": "file_task4_task9.txt",
-                        "size": 24000000
+                        "sizeInBytes": 24000000
                     },
                     {
                         "link": "input",
                         "name": "file_task5_task9.txt",
-                        "size": 12000000
+                        "sizeInBytes": 12000000
                     },
                     {
                         "link": "output",
                         "name": "file_task9_task10.txt",
-                        "size": 16000000
+                        "sizeInBytes": 16000000
                     }
                 ]
             },
@@ -300,17 +300,17 @@
                     {
                         "link": "input",
                         "name": "file_task7_task10.txt",
-                        "size": 16000000
+                        "sizeInBytes": 16000000
                     },
                     {
                         "link": "input",
                         "name": "file_task8_task10.txt",
-                        "size": 12000000
+                        "sizeInBytes": 12000000
                     },
                     {
                         "link": "input",
                         "name": "file_task9_task10.txt",
-                        "size": 16000000
+                        "sizeInBytes": 16000000
                     }
                 ]
             }

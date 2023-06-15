@@ -52,4 +52,9 @@ public class Task {
   public List<Task> getChildren() {
     return children;
   }
+
+
+  public List<Task> getParents() {
+    return parents;
+  }
 }
