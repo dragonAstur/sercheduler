@@ -1,5 +1,7 @@
 package com.uniovi.sercheduler.dao;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Defines a file used in a task.
  *
@@ -7,4 +9,4 @@ package com.uniovi.sercheduler.dao;
  * @param name Name of the file.
  * @param size How many bytes the files has.
  */
-public record TaskFileDao(String link, String name, Long size) {}
+public record TaskFileDao(String link, String name, @JsonProperty("sizeInBytes") Long size) {}
