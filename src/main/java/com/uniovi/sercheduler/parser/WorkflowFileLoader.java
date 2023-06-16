@@ -40,6 +40,21 @@ public class WorkflowFileLoader implements WorkflowLoader {
    */
   @Override
   public Map<String, Task> load(WorkflowDao workflowDao) {
+
+    /*
+    We need to generate a map that given a task says the children it has because in some
+    cases this information is missing from the original json so is not reliable.
+    */
+
+    // Contains the children(value) of each task(key) is the reverse of the parents map.
+    var childrenMap =
+        workflowDao.tasks().stream()
+            .map(t -> new Pair<>(t.name(), t.parents()))
+            .flatMap(pair -> pair.value().stream().map(parent -> new Pair<>(parent, pair.key())))
+            .collect(
+                Collectors.groupingBy(
+                    Pair::key, HashMap::new, Collectors.mapping(Pair::value, Collectors.toList())));
+
     Map<String, Task> workflowTmp =
         workflowDao.tasks().stream()
             .map(
@@ -77,7 +92,10 @@ public class WorkflowFileLoader implements WorkflowLoader {
             t -> {
               var task = workflowTmp.get(t.name());
               var parents = t.parents().stream().map(workflowTmp::get).toList();
-              var children = t.children().stream().map(workflowTmp::get).toList();
+              var children =
+                  childrenMap.getOrDefault(t.name(), Collections.emptyList()).stream()
+                      .map(workflowTmp::get)
+                      .toList();
 
               task.setParents(parents);
               task.setChildren(children);

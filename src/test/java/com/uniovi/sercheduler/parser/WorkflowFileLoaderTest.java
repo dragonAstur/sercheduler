@@ -54,15 +54,50 @@ public class WorkflowFileLoaderTest {
   @Test
   void loadMontage() throws IOException{
 
-
     var workflowJson = new ClassPathResource("montage.json").getFile();
     var workflowDao = workflowFileLoader.readFromFile(workflowJson);
     var workflow = workflowFileLoader.load(workflowDao);
     assertEquals(58, workflow.size());
 
+  }
 
+  @Test
+  void load1000genome() throws IOException{
 
+    var workflowJson = new ClassPathResource("1000genome.json").getFile();
+    var workflowDao = workflowFileLoader.readFromFile(workflowJson);
+    var workflow = workflowFileLoader.load(workflowDao);
+    assertEquals(52, workflow.size());
 
   }
 
+  @Test
+  void loadCycles() throws IOException{
+
+    var workflowJson = new ClassPathResource("cycles.json").getFile();
+    var workflowDao = workflowFileLoader.readFromFile(workflowJson);
+    var workflow = workflowFileLoader.load(workflowDao);
+    assertEquals(67, workflow.size());
+
+  }
+
+  @Test
+  void loadSoyKb() throws IOException{
+
+    var workflowJson = new ClassPathResource("soykb.json").getFile();
+    var workflowDao = workflowFileLoader.readFromFile(workflowJson);
+    var workflow = workflowFileLoader.load(workflowDao);
+    assertEquals(96, workflow.size());
+
+  }
+
+  @Test
+  void loadSraSearch() throws IOException{
+
+    var workflowJson = new ClassPathResource("srasearch.json").getFile();
+    var workflowDao = workflowFileLoader.readFromFile(workflowJson);
+    var workflow = workflowFileLoader.load(workflowDao);
+    assertEquals(22, workflow.size());
+
+  }
 }
