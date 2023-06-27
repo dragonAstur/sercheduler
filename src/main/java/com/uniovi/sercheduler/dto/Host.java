@@ -31,6 +31,9 @@ public class Host {
     return name;
   }
 
+  public Long getFlops() {
+    return flops;
+  }
 
   public Long getDiskSpeed() {
     return diskSpeed;
