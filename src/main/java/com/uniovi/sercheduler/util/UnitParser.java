@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UnitParser {
 
-  static final String UNIT_REGEX = "(\\d+)\\s*([A-z]+)";
+  static final String UNIT_REGEX = "(\\d+[\\\\.\\d+]*)\\s*([A-z]+)";
 
   /**
    * Generates a numeric response from a human-readable format.
@@ -25,9 +25,9 @@ public class UnitParser {
     if (!matches) {
       throw new ParseUnitsException(units);
     }
-    var number = Long.parseLong(matcher.group(1));
+    var number = Double.valueOf(matcher.group(1));
     var unit = matcher.group(2);
 
-    return (number * Units.valueOf(unit).unitBase);
+    return (long) (number * Units.valueOf(unit).unitBase);
   }
 }

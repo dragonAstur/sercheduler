@@ -41,6 +41,10 @@ public class Task {
     return name;
   }
 
+  public Double getRuntime() {
+    return runtime;
+  }
+
   public void setParents(List<Task> parents) {
     this.parents = parents;
   }
@@ -56,5 +60,13 @@ public class Task {
 
   public List<Task> getParents() {
     return parents;
+  }
+
+  public FileList getInput() {
+    return input;
+  }
+
+  public FileList getOutput() {
+    return output;
   }
 }

@@ -17,4 +17,12 @@ public class FileList {
     this.files = files;
     this.sizeInBits = sizeInBits;
   }
+
+  public List<TaskFile> getFiles() {
+    return files;
+  }
+
+  public Long getSizeInBits() {
+    return sizeInBits;
+  }
 }

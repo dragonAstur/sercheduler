@@ -1,5 +1,7 @@
 package com.uniovi.sercheduler.dto;
 
+import java.util.Objects;
+
 /** Defines a file of a task. */
 public class TaskFile {
 
@@ -22,5 +24,37 @@ public class TaskFile {
 
   public Long getSize() {
     return size;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    TaskFile taskFile = (TaskFile) o;
+
+    if (!Objects.equals(name, taskFile.name)) {
+      return false;
+    }
+    if (link != taskFile.link) {
+      return false;
+    }
+    return Objects.equals(size, taskFile.size);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = name != null ? name.hashCode() : 0;
+    result = 31 * result + (link != null ? link.hashCode() : 0);
+    result = 31 * result + (size != null ? size.hashCode() : 0);
+    return result;
   }
 }
