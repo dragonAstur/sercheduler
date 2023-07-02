@@ -1,11 +1,15 @@
 package com.uniovi.sercheduler.service;
 
 import com.uniovi.sercheduler.dto.Host;
+import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import java.util.Map;
 
+/**
+ * Implementation for calculating the makespan using DNC model.
+ */
 public class MakespanCalculatorSimple extends MakespanCalculator {
-  public MakespanCalculatorSimple(Map<String, Host> hosts, Map<String, Task> tasks) {
-    super(hosts, tasks);
+  public MakespanCalculatorSimple(InstanceData instanceData) {
+    super(instanceData);
   }
 }

@@ -1,7 +1,9 @@
 package com.uniovi.sercheduler.service;
 
+import static com.uniovi.sercheduler.util.LoadTestInstanceData.loadCalculatorTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.parser.HostFileLoader;
 import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowFileLoader;
@@ -36,16 +38,7 @@ public class MakespanCalculatorTest {
     // Given a workflow of 5 tasks
     // Given a hosts list of 3
 
-    HostLoader hostLoader = new HostFileLoader(new UnitParser());
-    WorkflowLoader workflowLoader = new WorkflowFileLoader();
-
-    var hostsJson = new ClassPathResource("calculator/hosts.json").getFile();
-    var hostsDao = hostLoader.readFromFile(hostsJson);
-    var hosts = hostLoader.load(hostsDao);
-
-    var workflowJson = new ClassPathResource("calculator/workflow.json").getFile();
-    var workflowDao = workflowLoader.readFromFile(workflowJson);
-    var workflow = workflowLoader.load(workflowDao);
+    InstanceData instanceData = loadCalculatorTest();
 
     // Then
 
@@ -61,28 +54,20 @@ public class MakespanCalculatorTest {
             new AbstractMap.SimpleEntry<>(
                 "task05", Map.of("HostA", 8D, "HostB", 4D, "HostC", 3.2D)));
 
-    MakespanCalculator makespanCalculator = new MakespanCalculatorSimple(hosts, workflow);
+    MakespanCalculator makespanCalculator = new MakespanCalculatorSimple(instanceData);
     var result = makespanCalculator.calculateComputationMatrix(new UnitParser().parseUnits("1Gf"));
 
     assertEquals(expected, result);
   }
+
 
   @Test
   void calculateNetworkMatrix() throws IOException {
 
     // Given a workflow of 5 tasks
     // Given a hosts list of 3
+    InstanceData instanceData = loadCalculatorTest();
 
-    HostLoader hostLoader = new HostFileLoader(new UnitParser());
-    WorkflowLoader workflowLoader = new WorkflowFileLoader();
-
-    var hostsJson = new ClassPathResource("calculator/hosts.json").getFile();
-    var hostsDao = hostLoader.readFromFile(hostsJson);
-    var hosts = hostLoader.load(hostsDao);
-
-    var workflowJson = new ClassPathResource("calculator/workflow.json").getFile();
-    var workflowDao = workflowLoader.readFromFile(workflowJson);
-    var workflow = workflowLoader.load(workflowDao);
 
     var expected =
         Map.ofEntries(
@@ -95,7 +80,7 @@ public class MakespanCalculatorTest {
                 "task05",
                 Map.of("task02", 160000000L, "task03", 192000000L, "task04", 224000000L, "task05", 0L)));
 
-    MakespanCalculator makespanCalculator = new MakespanCalculatorSimple(hosts, workflow);
+    MakespanCalculator makespanCalculator = new MakespanCalculatorSimple(instanceData);
     Map<String, Map<String, Long>> result = makespanCalculator.calculateNetworkMatrix();
 
     assertEquals(expected, result);
