@@ -1,10 +1,17 @@
 package com.uniovi.sercheduler.commands;
 
+import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowLoader;
+import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
+import com.uniovi.sercheduler.service.PlanGenerator;
+import com.uniovi.sercheduler.util.UnitParser;
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.Random;
+import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
@@ -29,12 +36,16 @@ public class EvaluateCommand {
    *
    * @param hostsFile Relative or Absolute path to the hosts file.
    * @param workflowFile Relative or Absolute path to the workflow file.
+   * @param executions Number of schedule to generate
+   * @param seed Random seed to choose.
    * @return The text to print at the end.
    */
   @Command(command = "evaluate")
   public String evaluate(
       @Option(shortNames = 'H', required = true) String hostsFile,
-      @Option(shortNames = 'W', required = true) String workflowFile) {
+      @Option(shortNames = 'W', required = true) String workflowFile,
+      @Option(shortNames = 'E', defaultValue = "1000") Integer executions,
+      @Option(shortNames = 'S', defaultValue = "1") Long seed) {
     Instant start = Instant.now();
 
     LOG.info("Loading {} host file", hostsFile);
@@ -44,10 +55,31 @@ public class EvaluateCommand {
     LOG.info("Loading {} workflow file", workflowFile);
     var workflow = workflowLoader.load(workflowLoader.readFromFile(new File(workflowFile)));
     LOG.info("Loaded workflow with {} tasks", workflow.size());
+    var instanceData = new InstanceData(workflow, hosts);
+
+    var fitnessCalculator = new FitnessCalculatorSimple(instanceData);
+    var planGenerator = new PlanGenerator(new Random(seed), instanceData);
+
+    var computationMatrix =
+        fitnessCalculator.calculateComputationMatrix(new UnitParser().parseUnits("441Gf"));
+    var networkMatrix = fitnessCalculator.calculateNetworkMatrix();
+
+    var bestSchedule =
+        IntStream.range(0, executions)
+            .unordered()
+            .parallel()
+            .mapToObj(u -> planGenerator.generatePlan())
+            .map(p -> fitnessCalculator.calculateFitness(p, computationMatrix, networkMatrix))
+            .min(Comparator.comparing(f -> f.fitness().get("makespan")))
+            .orElseThrow();
+
+    LOG.info(
+        "Evaluation complete, the workflow is going to take {} seconds",
+        bestSchedule.fitness().get("makespan"));
 
     Instant finish = Instant.now();
 
     var timeElapsed = Duration.between(start, finish);
-    return String.format("Evaluation done, it took %d", timeElapsed.getSeconds());
+    return String.format("Evaluation done, it took %d", timeElapsed.toSeconds());
   }
 }

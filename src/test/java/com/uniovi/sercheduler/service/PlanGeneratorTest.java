@@ -8,35 +8,35 @@ import java.util.List;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
-class ScheduleGeneratorTest {
+class PlanGeneratorTest {
 
   @Test
-  void generateSchedule() {
+  void generatePlan() {
     InstanceData instanceData = LoadTestInstanceData.loadCalculatorTest();
 
-    ScheduleGenerator scheduleGenerator = new ScheduleGenerator(new Random(1L), instanceData);
+    PlanGenerator planGenerator = new PlanGenerator(new Random(1L), instanceData);
 
     var expected =
         List.of(
-            new SchedulePair(
-                instanceData.workflow().get("task01"), instanceData.hosts().get("HostB")),
-            new SchedulePair(
-                instanceData.workflow().get("task04"), instanceData.hosts().get("HostB")),
-            new SchedulePair(
-                instanceData.workflow().get("task03"), instanceData.hosts().get("HostC")),
-            new SchedulePair(
-                instanceData.workflow().get("task02"), instanceData.hosts().get("HostA")),
-            new SchedulePair(
+            new PlanPair(
+                instanceData.workflow().get("task01"), instanceData.hosts().get("HostC")),
+            new PlanPair(
+                instanceData.workflow().get("task03"), instanceData.hosts().get("HostB")),
+            new PlanPair(
+                instanceData.workflow().get("task02"), instanceData.hosts().get("HostC")),
+            new PlanPair(
+                instanceData.workflow().get("task04"), instanceData.hosts().get("HostC")),
+            new PlanPair(
                 instanceData.workflow().get("task05"), instanceData.hosts().get("HostC")));
 
-    var result = scheduleGenerator.generateSchedule();
+    var result = planGenerator.generatePlan();
 
     assertEquals(expected, result);
 
     // Now ge need to generate 1000 schedules to verify we always have topology order.
 
     for (int i = 0; i < 1000; i++) {
-      result = scheduleGenerator.generateSchedule();
+      result = planGenerator.generatePlan();
       assertEquals("task01", result.get(0).task().getName());
       assertEquals("task05", result.get(result.size()-1).task().getName());
     }
