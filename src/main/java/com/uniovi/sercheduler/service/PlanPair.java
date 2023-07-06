@@ -9,4 +9,4 @@ import com.uniovi.sercheduler.dto.Task;
  * @param task Task to schedule.
  * @param host Host to execute the task with.
  */
-public record SchedulePair(Task task, Host host) {}
+public record PlanPair(Task task, Host host) {}

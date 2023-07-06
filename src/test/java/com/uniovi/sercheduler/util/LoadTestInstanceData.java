@@ -11,15 +11,24 @@ import org.springframework.core.io.ClassPathResource;
 public class LoadTestInstanceData {
 
   public static InstanceData loadCalculatorTest() {
+    return loadTestJson("calculator/hosts.json", "calculator/workflow.json");
+  }
+
+
+  public static InstanceData loadFitnessTest() {
+    return loadTestJson("hosts_test.json", "workflow_test.json");
+  }
+
+  private static InstanceData loadTestJson(String hostFile, String workflowFile) {
     try {
       HostLoader hostLoader = new HostFileLoader(new UnitParser());
       WorkflowLoader workflowLoader = new WorkflowFileLoader();
 
-      var hostsJson = new ClassPathResource("calculator/hosts.json").getFile();
+      var hostsJson = new ClassPathResource(hostFile).getFile();
       var hostsDao = hostLoader.readFromFile(hostsJson);
       var hosts = hostLoader.load(hostsDao);
 
-      var workflowJson = new ClassPathResource("calculator/workflow.json").getFile();
+      var workflowJson = new ClassPathResource(workflowFile).getFile();
       var workflowDao = workflowLoader.readFromFile(workflowJson);
       var workflow = workflowLoader.load(workflowDao);
 
@@ -29,3 +38,4 @@ public class LoadTestInstanceData {
     }
   }
 }
+

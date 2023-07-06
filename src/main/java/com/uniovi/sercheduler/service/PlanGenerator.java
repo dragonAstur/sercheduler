@@ -3,14 +3,13 @@ package com.uniovi.sercheduler.service;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 /** Generator of possible schedules for workflows. */
-public class ScheduleGenerator {
+public class PlanGenerator {
 
   Random random;
   InstanceData instanceData;
@@ -21,7 +20,7 @@ public class ScheduleGenerator {
    * @param random Random generator to use.
    * @param instanceData Infrastructure to use,
    */
-  public ScheduleGenerator(Random random, InstanceData instanceData) {
+  public PlanGenerator(Random random, InstanceData instanceData) {
     this.random = random;
     this.instanceData = instanceData;
   }
@@ -31,20 +30,19 @@ public class ScheduleGenerator {
    *
    * @param instanceData Infrastructure to use,
    */
-  public ScheduleGenerator(InstanceData instanceData) {
+  public PlanGenerator(InstanceData instanceData) {
     this.random = new Random();
     this.instanceData = instanceData;
   }
 
   /**
-   * Generates a random schedule, but always in topology order.
+   * Generates a random plan, but always in topology order.
    *
-   * @return A list of schedule pairs.
+   * @return A list of plan pairs.
    */
-  public List<SchedulePair> generateSchedule() {
-    // TODO: Generates the support structures.
+  public List<PlanPair> generatePlan() {
 
-    List<SchedulePair> schedule = new ArrayList<>();
+    List<PlanPair> plan = new ArrayList<>();
 
     var parentStatus =
         instanceData.workflow().values().stream()
@@ -64,12 +62,10 @@ public class ScheduleGenerator {
 
     for (int i = 0; i < instanceData.workflow().size(); i++) {
       // Get a random task from the pool of possible
-      Collections.shuffle(tasksToExplore, random);
-      var taskToExplore = tasksToExplore.remove(0);
+      var taskToExplore = tasksToExplore.remove(random.nextInt(0, tasksToExplore.size()));
 
       // We get a random host and create the schedule pair.
-      schedule.add(
-          new SchedulePair(taskToExplore, hostsNames.get(random.nextInt(0, hostsNames.size()))));
+      plan.add(new PlanPair(taskToExplore, hostsNames.get(random.nextInt(0, hostsNames.size()))));
 
       // We need to remove the task from the parent list of non schedule parents.
       for (var child : taskToExplore.getChildren()) {
@@ -80,6 +76,6 @@ public class ScheduleGenerator {
       }
     }
 
-    return schedule;
+    return plan;
   }
 }

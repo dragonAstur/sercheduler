@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.dao;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import java.util.List;
 
 /**
@@ -16,4 +17,4 @@ public record TaskDao(
     String name,
     List<String> parents,
     List<String> children,
-    Double runtime) {}
+    @JsonAlias("runtimeInSeconds") Double runtime) {}

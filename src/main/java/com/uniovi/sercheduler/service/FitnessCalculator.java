@@ -4,12 +4,13 @@ import com.uniovi.sercheduler.dto.Host;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.dto.TaskFile;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** Abstract class for defining the process of calculating a makespan from a solution. */
-public abstract class MakespanCalculator {
+public abstract class FitnessCalculator {
 
   InstanceData instanceData;
 
@@ -18,7 +19,7 @@ public abstract class MakespanCalculator {
    *
    * @param instanceData Infrastructure to use.
    */
-  protected MakespanCalculator(InstanceData instanceData) {
+  protected FitnessCalculator(InstanceData instanceData) {
     this.instanceData = instanceData;
   }
 
@@ -93,8 +94,99 @@ public abstract class MakespanCalculator {
   public Map<String, Map<String, Long>> calculateNetworkMatrix() {
 
     return instanceData.workflow().values().stream()
-        .map(MakespanCalculator::calculateTasksCommns)
-        .map(MakespanCalculator::calculateStaging)
+        .map(FitnessCalculator::calculateTasksCommns)
+        .map(FitnessCalculator::calculateStaging)
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  public abstract FitnessInfo calculateFitness(
+      List<PlanPair> plan,
+      Map<String, Map<String, Double>> computationMatrix,
+      Map<String, Map<String, Long>> networkMatrix);
+
+  /**
+   * Calculates the eft of a given task.
+   *
+   * @param task Task to execute.
+   * @param host Where does the task run.
+   * @param computationMatrix How much time it takes in each host.
+   * @param networkMatrix The bits to transfer from each task.
+   * @param schedule The schedule to update.
+   * @param available When each machine is available.
+   * @return Information about the executed task.
+   */
+  public TaskCosts calculateEft(
+      Task task,
+      Host host,
+      Map<String, Map<String, Double>> computationMatrix,
+      Map<String, Map<String, Long>> networkMatrix,
+      Map<String, TaskSchedule> schedule,
+      Map<String, Double> available) {
+    var parentsInfo = findTaskCommunications(task, host, schedule, networkMatrix);
+    var taskCommunications = parentsInfo.taskCommunications();
+    Double diskReadStaging =
+        networkMatrix.get(task.getName()).get(task.getName()) / host.getDiskSpeed().doubleValue();
+    Double diskWrite = task.getOutput().getSizeInBits() / host.getDiskSpeed().doubleValue();
+
+    Double eft =
+        diskReadStaging
+            + diskWrite
+            + computationMatrix.get(task.getName()).get(host.getName())
+            + Math.max(available.getOrDefault(host.getName(), 0D), parentsInfo.maxEst())
+            + taskCommunications;
+
+    return new TaskCosts(diskReadStaging, diskWrite, eft, taskCommunications);
+  }
+
+  /**
+   * Find the time it takes to transfer all information between the task and it's parents.
+   *
+   * @param task Task to check.
+   * @param host The host where it's going to run.
+   * @param schedule The schedule to check the parents' info.
+   * @param networkMatrix Bits to transfer between tasks.
+   * @return Information about parents.
+   */
+  public ParentsInfo findTaskCommunications(
+      Task task,
+      Host host,
+      Map<String, TaskSchedule> schedule,
+      Map<String, Map<String, Long>> networkMatrix) {
+
+    double taskCommunications = 0D;
+    double maxEst = 0D;
+    for (var parent : task.getParents()) {
+      var parentHost = schedule.get(parent.getName()).host();
+
+      var slowestSpeed = findHostSpeed(host, parentHost);
+
+      taskCommunications +=
+          networkMatrix.get(task.getName()).get(parent.getName()) / slowestSpeed.doubleValue();
+      maxEst = Math.max(maxEst, schedule.get(parent.getName()).eft());
+    }
+
+    return new ParentsInfo(maxEst, taskCommunications);
+  }
+
+  /**
+   * Finds the transfer speed between two hosts. Normally is going to be the slowest one from all
+   * mediums.
+   *
+   * @param host Target host.
+   * @param parentHost Source Host.
+   * @return The speed in bits per second.
+   */
+  public Long findHostSpeed(Host host, Host parentHost) {
+    // If the parent and the current host are the same we should return the disk
+    // speed
+    if (host.getName().equals(parentHost.getName())) {
+      return host.getDiskSpeed();
+    }
+
+    // we need to find which network is worse
+    var bandwidth = Math.min(host.getNetworkSpeed(), parentHost.getNetworkSpeed());
+
+    // We need to do the minimum between bandwidth and parent disk
+    return Math.min(bandwidth, parentHost.getDiskSpeed());
   }
 }
