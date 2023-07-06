@@ -16,8 +16,21 @@ Then you can run:
 ```bash
 java -jar target/sercheduler-0.0.1-SNAPSHOT.jar evaluate \
   --workflowFile workflowFile \
-  --hostsFile hostsFile
+  --hostsFile hostsFile \
+  --seed seed \
+  --executions executions \
+  --fitness [simple,heft]
 
+```
+
+## Example
+
+```bash
+java -jar target/sercheduler-0.0.1-SNAPSHOT.jar evaluate --workflowFile src/test/resources/montage.json \
+--hostsFile  src/test/resources/hosts_test.json \
+ --seed 1 \
+ --executions 1000000 \
+ --fitness heft
 ```
 
 ### Reference Documentation

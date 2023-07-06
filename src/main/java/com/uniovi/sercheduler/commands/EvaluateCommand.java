@@ -3,6 +3,8 @@ package com.uniovi.sercheduler.commands;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowLoader;
+import com.uniovi.sercheduler.service.FitnessCalculator;
+import com.uniovi.sercheduler.service.FitnessCalculatorHeft;
 import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 import com.uniovi.sercheduler.service.PlanGenerator;
 import com.uniovi.sercheduler.util.UnitParser;
@@ -45,7 +47,8 @@ public class EvaluateCommand {
       @Option(shortNames = 'H', required = true) String hostsFile,
       @Option(shortNames = 'W', required = true) String workflowFile,
       @Option(shortNames = 'E', defaultValue = "1000") Integer executions,
-      @Option(shortNames = 'S', defaultValue = "1") Long seed) {
+      @Option(shortNames = 'S', defaultValue = "1") Long seed,
+      @Option(shortNames = 'F', defaultValue = "simple") String fitness) {
     Instant start = Instant.now();
 
     LOG.info("Loading {} host file", hostsFile);
@@ -57,7 +60,7 @@ public class EvaluateCommand {
     LOG.info("Loaded workflow with {} tasks", workflow.size());
     var instanceData = new InstanceData(workflow, hosts);
 
-    var fitnessCalculator = new FitnessCalculatorSimple(instanceData);
+    var fitnessCalculator = chooseFitness(fitness, instanceData);
     var planGenerator = new PlanGenerator(new Random(seed), instanceData);
 
     var computationMatrix =
@@ -81,5 +84,13 @@ public class EvaluateCommand {
 
     var timeElapsed = Duration.between(start, finish);
     return String.format("Evaluation done, it took %d", timeElapsed.toSeconds());
+  }
+
+  private FitnessCalculator chooseFitness(String fitness, InstanceData instanceData) {
+    return switch (fitness) {
+      case "simple" -> new FitnessCalculatorSimple(instanceData);
+      case "heft" -> new FitnessCalculatorHeft(instanceData);
+      default -> throw new IllegalStateException("Unexpected value: " + fitness);
+    };
   }
 }

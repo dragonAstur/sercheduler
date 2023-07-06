@@ -119,6 +119,36 @@ public class FitnessCalculatorTest {
     assertEquals(210D, result.fitness().get("makespan"));
   }
 
+
+  @Test
+  void CalculateFitnessHeft() {
+
+    InstanceData instanceData = loadFitnessTest();
+    FitnessCalculator fitnessCalculator = new FitnessCalculatorHeft(instanceData);
+    var computationMatrix =
+        fitnessCalculator.calculateComputationMatrix(new UnitParser().parseUnits("441Gf"));
+    var networkMatrix = fitnessCalculator.calculateNetworkMatrix();
+    List<PlanPair> plan =
+        List.of(
+            new PlanPair(instanceData.workflow().get("task01"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task02"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task04"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task05"), instanceData.hosts().get("HostC")),
+            new PlanPair(instanceData.workflow().get("task03"), instanceData.hosts().get("HostC")),
+            new PlanPair(instanceData.workflow().get("task06"), instanceData.hosts().get("HostB")),
+            new PlanPair(instanceData.workflow().get("task07"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task09"), instanceData.hosts().get("HostB")),
+            new PlanPair(instanceData.workflow().get("task08"), instanceData.hosts().get("HostC")),
+            new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
+
+    FitnessInfo result =
+        fitnessCalculator.calculateFitness(plan, computationMatrix, networkMatrix);
+
+    assertEquals(205D, result.fitness().get("makespan"));
+  }
+
+
+
   @Test
   void findHostSpeedSame() {
     var hosts =
