@@ -97,9 +97,7 @@ public class FitnessCalculatorTest {
 
     InstanceData instanceData = loadFitnessTest();
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
-    var computationMatrix =
-        fitnessCalculator.calculateComputationMatrix(new UnitParser().parseUnits("441Gf"));
-    var networkMatrix = fitnessCalculator.calculateNetworkMatrix();
+
     List<PlanPair> plan =
         List.of(
             new PlanPair(instanceData.workflow().get("task01"), instanceData.hosts().get("HostA")),
@@ -114,7 +112,7 @@ public class FitnessCalculatorTest {
             new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
 
     FitnessInfo result =
-        fitnessCalculator.calculateFitness(plan, computationMatrix, networkMatrix);
+        fitnessCalculator.calculateFitness(plan);
 
     assertEquals(210D, result.fitness().get("makespan"));
   }
@@ -125,9 +123,6 @@ public class FitnessCalculatorTest {
 
     InstanceData instanceData = loadFitnessTest();
     FitnessCalculator fitnessCalculator = new FitnessCalculatorHeft(instanceData);
-    var computationMatrix =
-        fitnessCalculator.calculateComputationMatrix(new UnitParser().parseUnits("441Gf"));
-    var networkMatrix = fitnessCalculator.calculateNetworkMatrix();
     List<PlanPair> plan =
         List.of(
             new PlanPair(instanceData.workflow().get("task01"), instanceData.hosts().get("HostA")),
@@ -142,7 +137,7 @@ public class FitnessCalculatorTest {
             new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
 
     FitnessInfo result =
-        fitnessCalculator.calculateFitness(plan, computationMatrix, networkMatrix);
+        fitnessCalculator.calculateFitness(plan);
 
     assertEquals(205D, result.fitness().get("makespan"));
   }
@@ -157,7 +152,7 @@ public class FitnessCalculatorTest {
             new Host("HostA", 100L, 100L, 50L),
             "HostB",
             new Host("HostB", 100L, 25L, 100L));
-    var instanceData = new InstanceData(Collections.emptyMap(), hosts);
+    var instanceData = new InstanceData(Collections.emptyMap(), hosts,0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
     var expected = 100L;
@@ -176,7 +171,7 @@ public class FitnessCalculatorTest {
             new Host("HostA", 100L, 100L, 50L),
             "HostB",
             new Host("HostB", 100L, 25L, 100L));
-    var instanceData = new InstanceData(Collections.emptyMap(), hosts);
+    var instanceData = new InstanceData(Collections.emptyMap(), hosts,0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
     var expected = 25L;
@@ -194,7 +189,7 @@ public class FitnessCalculatorTest {
             new Host("HostA", 100L, 100L, 50L),
             "HostB",
             new Host("HostB", 100L, 25L, 100L));
-    var instanceData = new InstanceData(Collections.emptyMap(), hosts);
+    var instanceData = new InstanceData(Collections.emptyMap(), hosts, 0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
     var expected = 50L;
@@ -212,7 +207,7 @@ public class FitnessCalculatorTest {
             new Host("HostA", 100L, 100L, 50L),
             "HostB",
             new Host("HostB", 100L, 10L, 25L));
-    var instanceData = new InstanceData(Collections.emptyMap(), hosts);
+    var instanceData = new InstanceData(Collections.emptyMap(), hosts, 0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
     var expected = 25L;

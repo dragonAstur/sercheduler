@@ -9,7 +9,7 @@ import org.springframework.core.io.ClassPathResource;
 
 class HostLoaderFileLoaderTest {
 
-  HostFileLoader hostFileLoader = new HostFileLoader(new UnitParser());
+  HostFileLoader hostFileLoader = new HostFileLoader();
 
   @Test
   void loadHost() throws IOException {
