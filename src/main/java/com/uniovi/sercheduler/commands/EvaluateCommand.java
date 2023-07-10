@@ -66,8 +66,6 @@ public class EvaluateCommand {
 
     var bestSchedule =
         IntStream.range(0, executions)
-            .unordered()
-            .parallel()
             .mapToObj(u -> planGenerator.generatePlan())
             .map(p -> fitnessCalculator.calculateFitness(p))
             .min(Comparator.comparing(f -> f.fitness().get("makespan")))
