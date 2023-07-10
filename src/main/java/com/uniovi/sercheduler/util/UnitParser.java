@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 /** Util class for parsing units. */
-@Service
+
 public class UnitParser {
 
   static final String UNIT_REGEX = "(\\d+[\\\\.\\d+]*)\\s*([A-z]+)";
@@ -17,7 +17,7 @@ public class UnitParser {
    * @param units Units in human-readable format.
    * @return The units in the least unit possible, normally bits.
    */
-  public Long parseUnits(String units) {
+  public static Long parseUnits(String units) {
 
     Pattern pattern = Pattern.compile(UNIT_REGEX);
     Matcher matcher = pattern.matcher(units);

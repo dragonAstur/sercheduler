@@ -13,6 +13,10 @@ import java.util.stream.Stream;
 public abstract class FitnessCalculator {
 
   InstanceData instanceData;
+  Map<String, Map<String, Double>> computationMatrix;
+  Map<String, Map<String, Long>> networkMatrix;
+
+
 
   /**
    * Full constructor.
@@ -21,6 +25,8 @@ public abstract class FitnessCalculator {
    */
   protected FitnessCalculator(InstanceData instanceData) {
     this.instanceData = instanceData;
+    this.computationMatrix = calculateComputationMatrix(instanceData.referenceFlops());
+    this.networkMatrix=calculateNetworkMatrix();
   }
 
   private static Map.Entry<String, Map<String, Long>> calculateStaging(
@@ -100,29 +106,23 @@ public abstract class FitnessCalculator {
   }
 
   public abstract FitnessInfo calculateFitness(
-      List<PlanPair> plan,
-      Map<String, Map<String, Double>> computationMatrix,
-      Map<String, Map<String, Long>> networkMatrix);
+      List<PlanPair> plan);
 
   /**
    * Calculates the eft of a given task.
    *
-   * @param task Task to execute.
-   * @param host Where does the task run.
-   * @param computationMatrix How much time it takes in each host.
-   * @param networkMatrix The bits to transfer from each task.
-   * @param schedule The schedule to update.
+   * @param task      Task to execute.
+   * @param host      Where does the task run.
+   * @param schedule  The schedule to update.
    * @param available When each machine is available.
    * @return Information about the executed task.
    */
   public TaskCosts calculateEft(
       Task task,
       Host host,
-      Map<String, Map<String, Double>> computationMatrix,
-      Map<String, Map<String, Long>> networkMatrix,
       Map<String, TaskSchedule> schedule,
       Map<String, Double> available) {
-    var parentsInfo = findTaskCommunications(task, host, schedule, networkMatrix);
+    var parentsInfo = findTaskCommunications(task, host, schedule);
     var taskCommunications = parentsInfo.taskCommunications();
     Double diskReadStaging =
         networkMatrix.get(task.getName()).get(task.getName()) / host.getDiskSpeed().doubleValue();
@@ -141,17 +141,15 @@ public abstract class FitnessCalculator {
   /**
    * Find the time it takes to transfer all information between the task and it's parents.
    *
-   * @param task Task to check.
-   * @param host The host where it's going to run.
+   * @param task     Task to check.
+   * @param host     The host where it's going to run.
    * @param schedule The schedule to check the parents' info.
-   * @param networkMatrix Bits to transfer between tasks.
    * @return Information about parents.
    */
   public ParentsInfo findTaskCommunications(
       Task task,
       Host host,
-      Map<String, TaskSchedule> schedule,
-      Map<String, Map<String, Long>> networkMatrix) {
+      Map<String, TaskSchedule> schedule) {
 
     double taskCommunications = 0D;
     double maxEst = 0D;

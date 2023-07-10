@@ -21,11 +21,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class HostFileLoader implements HostLoader {
 
-  private final UnitParser unitParser;
 
-  public HostFileLoader(UnitParser unitParser) {
-    this.unitParser = unitParser;
-  }
+
 
   /**
    * Parse a list of hosts to easier to use format.
@@ -41,9 +38,9 @@ public class HostFileLoader implements HostLoader {
             h ->
                 new Host(
                     h.name(),
-                    unitParser.parseUnits(h.cpuSpeed()) * h.cores(),
-                    unitParser.parseUnits(h.diskSpeed()),
-                    unitParser.parseUnits(h.networkSpeed())))
+                    UnitParser.parseUnits(h.cpuSpeed()) * h.cores(),
+                    UnitParser.parseUnits(h.diskSpeed()),
+                    UnitParser.parseUnits(h.networkSpeed())))
         .collect(Collectors.toMap(Host::getName, Function.identity()));
   }
 

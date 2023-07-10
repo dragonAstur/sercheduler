@@ -16,17 +16,13 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
    * Calculates the makespan of a given schedule.
    *
    * @param plan Schedule to calculate.
-   * @param computationMatrix Computation matrix.
-   * @param networkMatrix Network matrix.
    * @return The value of the makespan.
    */
   @Override
   public FitnessInfo calculateFitness(
-      List<PlanPair> plan,
-      Map<String, Map<String, Double>> computationMatrix,
-      Map<String, Map<String, Long>> networkMatrix) {
+      List<PlanPair> plan) {
 
-    Double makespan = 0D;
+    double makespan = 0D;
 
     var available = new HashMap<String, Double>(instanceData.hosts().size());
     var schedule = new HashMap<String, TaskSchedule>(instanceData.workflow().size());
@@ -39,8 +35,6 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
           calculateEft(
               schedulePair.task(),
               schedulePair.host(),
-              computationMatrix,
-              networkMatrix,
               schedule,
               available);
 

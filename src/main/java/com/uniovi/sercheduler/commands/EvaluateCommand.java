@@ -58,21 +58,18 @@ public class EvaluateCommand {
     LOG.info("Loading {} workflow file", workflowFile);
     var workflow = workflowLoader.load(workflowLoader.readFromFile(new File(workflowFile)));
     LOG.info("Loaded workflow with {} tasks", workflow.size());
-    var instanceData = new InstanceData(workflow, hosts);
+    var instanceData = new InstanceData(workflow, hosts,UnitParser.parseUnits("441Gf"));
 
     var fitnessCalculator = chooseFitness(fitness, instanceData);
     var planGenerator = new PlanGenerator(new Random(seed), instanceData);
 
-    var computationMatrix =
-        fitnessCalculator.calculateComputationMatrix(new UnitParser().parseUnits("441Gf"));
-    var networkMatrix = fitnessCalculator.calculateNetworkMatrix();
 
     var bestSchedule =
         IntStream.range(0, executions)
             .unordered()
             .parallel()
             .mapToObj(u -> planGenerator.generatePlan())
-            .map(p -> fitnessCalculator.calculateFitness(p, computationMatrix, networkMatrix))
+            .map(p -> fitnessCalculator.calculateFitness(p))
             .min(Comparator.comparing(f -> f.fitness().get("makespan")))
             .orElseThrow();
 

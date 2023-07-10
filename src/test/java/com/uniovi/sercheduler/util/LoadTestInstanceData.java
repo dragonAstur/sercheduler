@@ -21,7 +21,7 @@ public class LoadTestInstanceData {
 
   private static InstanceData loadTestJson(String hostFile, String workflowFile) {
     try {
-      HostLoader hostLoader = new HostFileLoader(new UnitParser());
+      HostLoader hostLoader = new HostFileLoader();
       WorkflowLoader workflowLoader = new WorkflowFileLoader();
 
       var hostsJson = new ClassPathResource(hostFile).getFile();
@@ -32,7 +32,7 @@ public class LoadTestInstanceData {
       var workflowDao = workflowLoader.readFromFile(workflowJson);
       var workflow = workflowLoader.load(workflowDao);
 
-      return new InstanceData(workflow, hosts);
+      return new InstanceData(workflow, hosts,UnitParser.parseUnits("441Gf"));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

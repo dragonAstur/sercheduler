@@ -19,15 +19,11 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
    * Calculates the makespan of a given schedule.
    *
    * @param plan Schedule to calculate.
-   * @param computationMatrix Computation matrix.
-   * @param networkMatrix Network matrix.
    * @return The value of the makespan.
    */
   @Override
   public FitnessInfo calculateFitness(
-      List<PlanPair> plan,
-      Map<String, Map<String, Double>> computationMatrix,
-      Map<String, Map<String, Long>> networkMatrix) {
+      List<PlanPair> plan) {
 
     double makespan = 0D;
 
@@ -38,7 +34,7 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
 
       Double minEft =
           calculateHeftTaskCost(
-              schedulePair.task(), computationMatrix, networkMatrix, schedule, available);
+              schedulePair.task(), schedule, available);
 
       makespan = Math.max(minEft, makespan);
     }
@@ -51,8 +47,6 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
 
   private Double calculateHeftTaskCost(
       Task task,
-      Map<String, Map<String, Double>> computationMatrix,
-      Map<String, Map<String, Long>> networkMatrix,
       HashMap<String, TaskSchedule> schedule,
       HashMap<String, Double> available) {
     double minEft = Double.MAX_VALUE;
@@ -61,7 +55,7 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
     for (var host : instanceData.hosts().values()) {
 
       var taskCosts =
-          calculateEft(task, host, computationMatrix, networkMatrix, schedule, available);
+          calculateEft(task, host, schedule, available);
       double tmpEft = minEft;
 
       minEft = Math.min(minEft, taskCosts.eft());
