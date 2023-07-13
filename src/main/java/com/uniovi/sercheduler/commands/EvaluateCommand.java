@@ -58,11 +58,10 @@ public class EvaluateCommand {
     LOG.info("Loading {} workflow file", workflowFile);
     var workflow = workflowLoader.load(workflowLoader.readFromFile(new File(workflowFile)));
     LOG.info("Loaded workflow with {} tasks", workflow.size());
-    var instanceData = new InstanceData(workflow, hosts,UnitParser.parseUnits("441Gf"));
+    var instanceData = new InstanceData(workflow, hosts, UnitParser.parseUnits("441Gf"));
 
     var fitnessCalculator = chooseFitness(fitness, instanceData);
     var planGenerator = new PlanGenerator(new Random(seed), instanceData);
-
 
     var bestSchedule =
         IntStream.range(0, executions)
