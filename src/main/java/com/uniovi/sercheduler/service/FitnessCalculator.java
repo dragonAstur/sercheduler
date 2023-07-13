@@ -4,6 +4,8 @@ import com.uniovi.sercheduler.dto.Host;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.dto.TaskFile;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,7 +18,7 @@ public abstract class FitnessCalculator {
   Map<String, Map<String, Double>> computationMatrix;
   Map<String, Map<String, Long>> networkMatrix;
 
-
+  Double referenceNetworkSpeed;
 
   /**
    * Full constructor.
@@ -26,7 +28,8 @@ public abstract class FitnessCalculator {
   protected FitnessCalculator(InstanceData instanceData) {
     this.instanceData = instanceData;
     this.computationMatrix = calculateComputationMatrix(instanceData.referenceFlops());
-    this.networkMatrix=calculateNetworkMatrix();
+    this.networkMatrix = calculateNetworkMatrix();
+    this.referenceNetworkSpeed = calculateReferenceSpeed();
   }
 
   private static Map.Entry<String, Map<String, Long>> calculateStaging(
@@ -105,23 +108,109 @@ public abstract class FitnessCalculator {
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  public abstract FitnessInfo calculateFitness(
-      List<PlanPair> plan);
+  /**
+   * Calculates the ranking for the HEFT algorithm, the ranking is in DECREASING ORDER, being the
+   * tasks with the highest cost the ones that should be executed first.
+   *
+   * @return The ranking in DECREASING order.
+   */
+  public List<Task> calculateHeftRanking() {
+    Map<String, Double> savedCosts = new HashMap<>();
+
+    var childrenStatus =
+        instanceData.workflow().values().stream()
+            .map(
+                t ->
+                    Map.entry(
+                        t.getName(),
+                        t.getChildren().stream().map(Task::getName).collect(Collectors.toList())))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    var tasksToExplore =
+        instanceData.workflow().values().stream()
+            .filter(t -> t.getChildren().isEmpty())
+            .collect(Collectors.toList());
+
+    for (int i = 0; i < instanceData.workflow().size(); i++) {
+      var taskToExplore = tasksToExplore.get(i);
+      savedCosts.put(taskToExplore.getName(), calculateTaskCost(taskToExplore, savedCosts));
+
+      // We need to remove the task from the children list of non-calculated parents.
+      for (var parent : taskToExplore.getParents()) {
+        childrenStatus.get(parent.getName()).remove(taskToExplore.getName());
+        if (childrenStatus.get(parent.getName()).isEmpty()) {
+          tasksToExplore.add(parent);
+        }
+      }
+    }
+    // Creates the rank
+    return savedCosts.entrySet().stream()
+        .sorted(Comparator.comparing(Map.Entry::getValue, Comparator.reverseOrder()))
+        .map(p -> instanceData.workflow().get(p.getKey()))
+        .toList();
+  }
+
+  /**
+   * Calculates the possible cost of a task, with the average of communications and computation
+   * time.
+   *
+   * @param task Task to calculate.
+   * @param savedCosts Contains the saved cost of past operations (acts as a cache).
+   * @return The cost.
+   */
+  public Double calculateTaskCost(Task task, Map<String, Double> savedCosts) {
+    if (savedCosts.get(task.getName()) != null) {
+      return savedCosts.get(task.getName());
+    }
+
+    var taskCost =
+        computationMatrix.get(task.getName()).values().stream()
+            .mapToDouble(Double::doubleValue)
+            .average()
+            .orElseThrow();
+
+    var maxChild =
+        task.getChildren().stream()
+            .map(Task::getName)
+            .map(savedCosts::get)
+            .mapToDouble(Double::doubleValue)
+            .max()
+            .orElse(0D);
+
+    taskCost += task.getInput().getSizeInBits() / referenceNetworkSpeed;
+    taskCost += task.getOutput().getSizeInBits() / referenceNetworkSpeed;
+
+    taskCost += maxChild;
+
+    return taskCost;
+  }
+
+  /**
+   * Calculates the average of the communications speed.
+   *
+   * @return the average.
+   */
+  public Double calculateReferenceSpeed() {
+    return instanceData.hosts().values().stream()
+        .map(h -> Math.min(h.getNetworkSpeed(), h.getDiskSpeed()))
+        .mapToLong(Long::longValue)
+        .average()
+        .orElseThrow();
+  }
+
+  public abstract FitnessInfo calculateFitness(List<PlanPair> plan);
 
   /**
    * Calculates the eft of a given task.
    *
-   * @param task      Task to execute.
-   * @param host      Where does the task run.
-   * @param schedule  The schedule to update.
+   * @param task Task to execute.
+   * @param host Where does the task run.
+   * @param schedule The schedule to update.
    * @param available When each machine is available.
    * @return Information about the executed task.
    */
   public TaskCosts calculateEft(
-      Task task,
-      Host host,
-      Map<String, TaskSchedule> schedule,
-      Map<String, Double> available) {
+      Task task, Host host, Map<String, TaskSchedule> schedule, Map<String, Double> available) {
     var parentsInfo = findTaskCommunications(task, host, schedule);
     var taskCommunications = parentsInfo.taskCommunications();
     Double diskReadStaging =
@@ -141,15 +230,13 @@ public abstract class FitnessCalculator {
   /**
    * Find the time it takes to transfer all information between the task and it's parents.
    *
-   * @param task     Task to check.
-   * @param host     The host where it's going to run.
+   * @param task Task to check.
+   * @param host The host where it's going to run.
    * @param schedule The schedule to check the parents' info.
    * @return Information about parents.
    */
   public ParentsInfo findTaskCommunications(
-      Task task,
-      Host host,
-      Map<String, TaskSchedule> schedule) {
+      Task task, Host host, Map<String, TaskSchedule> schedule) {
 
     double taskCommunications = 0D;
     double maxEst = 0D;
