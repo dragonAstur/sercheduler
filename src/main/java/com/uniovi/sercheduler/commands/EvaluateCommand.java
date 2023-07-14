@@ -5,8 +5,11 @@ import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowLoader;
 import com.uniovi.sercheduler.service.FitnessCalculator;
 import com.uniovi.sercheduler.service.FitnessCalculatorHeft;
+import com.uniovi.sercheduler.service.FitnessCalculatorMulti;
+import com.uniovi.sercheduler.service.FitnessCalculatorRank;
 import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 import com.uniovi.sercheduler.service.PlanGenerator;
+import com.uniovi.sercheduler.service.ScheduleExporter;
 import com.uniovi.sercheduler.util.UnitParser;
 import java.io.File;
 import java.time.Duration;
@@ -28,9 +31,20 @@ public class EvaluateCommand {
   final WorkflowLoader workflowLoader;
   final HostLoader hostLoader;
 
-  public EvaluateCommand(WorkflowLoader workflowLoader, HostLoader hostLoader) {
+  final ScheduleExporter scheduleExporter;
+
+  /**
+   * Full constructor.
+   *
+   * @param workflowLoader Loads workflows.
+   * @param hostLoader Loads hosts.
+   * @param scheduleExporter Exports the schedules.
+   */
+  public EvaluateCommand(
+      WorkflowLoader workflowLoader, HostLoader hostLoader, ScheduleExporter scheduleExporter) {
     this.workflowLoader = workflowLoader;
     this.hostLoader = hostLoader;
+    this.scheduleExporter = scheduleExporter;
   }
 
   /**
@@ -52,7 +66,8 @@ public class EvaluateCommand {
     Instant start = Instant.now();
 
     LOG.info("Loading {} host file", hostsFile);
-    var hosts = hostLoader.load(hostLoader.readFromFile(new File(hostsFile)));
+    var hostsJson = hostLoader.readFromFile(new File(hostsFile));
+    var hosts = hostLoader.load(hostsJson);
     LOG.info("Loaded hosts with {} hosts", hosts.size());
 
     LOG.info("Loading {} workflow file", workflowFile);
@@ -77,6 +92,10 @@ public class EvaluateCommand {
     Instant finish = Instant.now();
 
     var timeElapsed = Duration.between(start, finish);
+
+    LOG.info("Writing schedule to json");
+    scheduleExporter.generateJsonSchedule(bestSchedule, hostsJson, new File("schedule-0.json"));
+
     return String.format("Evaluation done, it took %d", timeElapsed.toSeconds());
   }
 
@@ -84,6 +103,8 @@ public class EvaluateCommand {
     return switch (fitness) {
       case "simple" -> new FitnessCalculatorSimple(instanceData);
       case "heft" -> new FitnessCalculatorHeft(instanceData);
+      case "rank" -> new FitnessCalculatorRank(instanceData);
+      case "multi" -> new FitnessCalculatorMulti(instanceData);
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }

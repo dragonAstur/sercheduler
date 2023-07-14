@@ -19,7 +19,7 @@ java -jar target/sercheduler-0.0.1-SNAPSHOT.jar evaluate \
   --hostsFile hostsFile \
   --seed seed \
   --executions executions \
-  --fitness [simple,heft]
+  --fitness [simple,heft,rank,multi]
 
 ```
 
