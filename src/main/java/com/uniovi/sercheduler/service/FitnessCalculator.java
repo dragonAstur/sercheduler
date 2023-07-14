@@ -18,7 +18,7 @@ public abstract class FitnessCalculator {
   Map<String, Map<String, Double>> computationMatrix;
   Map<String, Map<String, Long>> networkMatrix;
 
-  Double referenceNetworkSpeed;
+  Double referenceSpeed;
 
   /**
    * Full constructor.
@@ -29,7 +29,7 @@ public abstract class FitnessCalculator {
     this.instanceData = instanceData;
     this.computationMatrix = calculateComputationMatrix(instanceData.referenceFlops());
     this.networkMatrix = calculateNetworkMatrix();
-    this.referenceNetworkSpeed = calculateReferenceSpeed();
+    this.referenceSpeed = calculateReferenceSpeed();
   }
 
   private static Map.Entry<String, Map<String, Long>> calculateStaging(
@@ -177,8 +177,8 @@ public abstract class FitnessCalculator {
             .max()
             .orElse(0D);
 
-    taskCost += task.getInput().getSizeInBits() / referenceNetworkSpeed;
-    taskCost += task.getOutput().getSizeInBits() / referenceNetworkSpeed;
+    taskCost += task.getInput().getSizeInBits() / referenceSpeed;
+    taskCost += task.getOutput().getSizeInBits() / referenceSpeed;
 
     taskCost += maxChild;
 

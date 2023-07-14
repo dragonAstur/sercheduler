@@ -128,19 +128,19 @@ public class FitnessCalculatorTest {
         List.of(
             new PlanPair(instanceData.workflow().get("task01"), instanceData.hosts().get("HostA")),
             new PlanPair(instanceData.workflow().get("task02"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task04"), instanceData.hosts().get("HostB")),
+            new PlanPair(instanceData.workflow().get("task05"), instanceData.hosts().get("HostC")),
+            new PlanPair(instanceData.workflow().get("task06"), instanceData.hosts().get("HostA")),
             new PlanPair(instanceData.workflow().get("task03"), instanceData.hosts().get("HostB")),
-            new PlanPair(instanceData.workflow().get("task04"), instanceData.hosts().get("HostC")),
-            new PlanPair(instanceData.workflow().get("task05"), instanceData.hosts().get("HostA")),
-            new PlanPair(instanceData.workflow().get("task06"), instanceData.hosts().get("HostB")),
-            new PlanPair(instanceData.workflow().get("task07"), instanceData.hosts().get("HostC")),
+            new PlanPair(instanceData.workflow().get("task09"), instanceData.hosts().get("HostC")),
             new PlanPair(instanceData.workflow().get("task08"), instanceData.hosts().get("HostA")),
-            new PlanPair(instanceData.workflow().get("task09"), instanceData.hosts().get("HostB")),
+            new PlanPair(instanceData.workflow().get("task07"), instanceData.hosts().get("HostB")),
             new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
 
     FitnessInfo result =
         fitnessCalculator.calculateFitness(plan);
 
-    assertEquals(218D, result.fitness().get("makespan"));
+    assertEquals(181.5D, result.fitness().get("makespan"));
   }
 
 
@@ -181,6 +181,55 @@ public class FitnessCalculatorTest {
             new PlanPair(instanceData.workflow().get("task04"), instanceData.hosts().get("HostB")),
             new PlanPair(instanceData.workflow().get("task05"), instanceData.hosts().get("HostC")),
             new PlanPair(instanceData.workflow().get("task03"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task06"), instanceData.hosts().get("HostB")),
+            new PlanPair(instanceData.workflow().get("task07"), instanceData.hosts().get("HostC")),
+            new PlanPair(instanceData.workflow().get("task09"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task08"), instanceData.hosts().get("HostB")),
+            new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
+
+    FitnessInfo result =
+        fitnessCalculator.calculateFitness(plan);
+
+    assertEquals(193.5D, result.fitness().get("makespan"));
+  }
+
+  @Test
+  void CalculateFitnessHeuristic() {
+
+    InstanceData instanceData = loadFitnessTest();
+    FitnessCalculator fitnessCalculator = new FitnessCalculatorHeuristic(instanceData);
+    List<PlanPair> plan =
+        List.of(
+            new PlanPair(instanceData.workflow().get("task01"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task02"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task04"), instanceData.hosts().get("HostB")),
+            new PlanPair(instanceData.workflow().get("task05"), instanceData.hosts().get("HostC")),
+            new PlanPair(instanceData.workflow().get("task03"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task06"), instanceData.hosts().get("HostB")),
+            new PlanPair(instanceData.workflow().get("task07"), instanceData.hosts().get("HostC")),
+            new PlanPair(instanceData.workflow().get("task09"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task08"), instanceData.hosts().get("HostB")),
+            new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
+
+    FitnessInfo result =
+        fitnessCalculator.calculateFitness(plan);
+
+    assertEquals(187D, result.fitness().get("makespan"));
+  }
+
+  @Test
+  void CalculateFitnessMulti() {
+
+    InstanceData instanceData = loadFitnessTest();
+    FitnessCalculator fitnessCalculator = new FitnessCalculatorMulti(instanceData);
+
+    List<PlanPair> plan =
+        List.of(
+            new PlanPair(instanceData.workflow().get("task01"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task04"), instanceData.hosts().get("HostA")),
+            new PlanPair(instanceData.workflow().get("task03"), instanceData.hosts().get("HostB")),
+            new PlanPair(instanceData.workflow().get("task02"), instanceData.hosts().get("HostC")),
+            new PlanPair(instanceData.workflow().get("task05"), instanceData.hosts().get("HostA")),
             new PlanPair(instanceData.workflow().get("task06"), instanceData.hosts().get("HostB")),
             new PlanPair(instanceData.workflow().get("task07"), instanceData.hosts().get("HostC")),
             new PlanPair(instanceData.workflow().get("task09"), instanceData.hosts().get("HostA")),
@@ -234,7 +283,7 @@ public class FitnessCalculatorTest {
   }
 
   @Test
-  void findHostSpeedParentSlowDNetwork() {
+  void findHostSpeedParentSlowNetwork() {
     var hosts =
         Map.of(
             "HostA",
