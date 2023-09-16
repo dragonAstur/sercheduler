@@ -1,26 +1,33 @@
 package com.uniovi.sercheduler.commands;
 
-import com.uniovi.sercheduler.dto.InstanceData;
+import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
+import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
+import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
+import com.uniovi.sercheduler.jmetal.operator.ScheduleSelection;
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowLoader;
-import com.uniovi.sercheduler.service.FitnessCalculator;
-import com.uniovi.sercheduler.service.FitnessCalculatorHeft;
-import com.uniovi.sercheduler.service.FitnessCalculatorMulti;
-import com.uniovi.sercheduler.service.FitnessCalculatorRank;
-import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
-import com.uniovi.sercheduler.service.PlanGenerator;
+import com.uniovi.sercheduler.service.Operators;
 import com.uniovi.sercheduler.service.ScheduleExporter;
-import com.uniovi.sercheduler.util.UnitParser;
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.Random;
-import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
+import org.uma.jmetal.component.algorithm.EvolutionaryAlgorithm;
+import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
+import org.uma.jmetal.component.catalogue.common.evaluation.impl.MultiThreadedEvaluation;
+import org.uma.jmetal.component.catalogue.common.termination.Termination;
+import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByEvaluations;
+import org.uma.jmetal.operator.crossover.CrossoverOperator;
+import org.uma.jmetal.operator.mutation.MutationOperator;
+import org.uma.jmetal.util.fileoutput.SolutionListOutput;
+import org.uma.jmetal.util.fileoutput.impl.DefaultFileOutputContext;
+import org.uma.jmetal.util.observer.impl.FitnessObserver;
 
 /** Contains all commands related to the execution of the GA. */
 @Command
@@ -63,49 +70,50 @@ public class EvaluateCommand {
       @Option(shortNames = 'E', defaultValue = "1000") Integer executions,
       @Option(shortNames = 'S', defaultValue = "1") Long seed,
       @Option(shortNames = 'F', defaultValue = "simple") String fitness) {
-    Instant start = Instant.now();
+    final Instant start = Instant.now();
 
-    LOG.info("Loading {} host file", hostsFile);
-    var hostsJson = hostLoader.readFromFile(new File(hostsFile));
-    var hosts = hostLoader.load(hostsJson);
-    LOG.info("Loaded hosts with {} hosts", hosts.size());
+    var problem =
+        new SchedulingProblem(new File(workflowFile), new File(hostsFile), "441Gf", fitness, seed);
 
-    LOG.info("Loading {} workflow file", workflowFile);
-    var workflow = workflowLoader.load(workflowLoader.readFromFile(new File(workflowFile)));
-    LOG.info("Loaded workflow with {} tasks", workflow.size());
-    var instanceData = new InstanceData(workflow, hosts, UnitParser.parseUnits("441Gf"));
+    Operators operators = new Operators(problem.getInstanceData(), new Random(seed));
+    CrossoverOperator<SchedulePermutationSolution> crossover = new ScheduleCrossover(1, operators);
 
-    var fitnessCalculator = chooseFitness(fitness, instanceData);
-    var planGenerator = new PlanGenerator(new Random(seed), instanceData);
+    double mutationProbability = 0.1;
+    MutationOperator<SchedulePermutationSolution> mutation =
+        new ScheduleMutation(mutationProbability, operators);
 
-    var bestSchedule =
-        IntStream.range(0, executions)
-            .mapToObj(u -> planGenerator.generatePlan())
-            .map(p -> fitnessCalculator.calculateFitness(p))
-            .min(Comparator.comparing(f -> f.fitness().get("makespan")))
-            .orElseThrow();
+    int populationSize = 100;
+    int offspringPopulationSize = 100;
 
-    LOG.info(
-        "Evaluation complete, the workflow is going to take {} seconds",
-        bestSchedule.fitness().get("makespan"));
+    Termination termination = new TerminationByEvaluations(executions);
+
+    EvolutionaryAlgorithm<SchedulePermutationSolution> gaAlgo =
+        new GeneticAlgorithmBuilder<>(
+                "GGA", problem, populationSize, offspringPopulationSize, crossover, mutation)
+            .setTermination(termination)
+            .setEvaluation(new MultiThreadedEvaluation<>(8, problem))
+            .setSelection(new ScheduleSelection(new Random(seed)))
+            .setReplacement(new ScheduleReplacement(new Random(seed)))
+            .build();
+
+    gaAlgo.getObservable().register(new FitnessObserver(100));
+
+
+    gaAlgo.run();
+
+    var population = gaAlgo.getResult();
+    LOG.info("Total execution time : {} ms", gaAlgo.getTotalComputingTime());
+    LOG.info("Number of evaluations: {} ", gaAlgo.getNumberOfEvaluations());
+
+    new SolutionListOutput(population)
+        .setVarFileOutputContext(new DefaultFileOutputContext("VAR.csv", ","))
+        .setFunFileOutputContext(new DefaultFileOutputContext("FUN.csv", ","))
+        .print();
 
     Instant finish = Instant.now();
 
     var timeElapsed = Duration.between(start, finish);
 
-    LOG.info("Writing schedule to json");
-    scheduleExporter.generateJsonSchedule(bestSchedule, hostsJson, new File("schedule-0.json"));
-
     return String.format("Evaluation done, it took %d", timeElapsed.toSeconds());
-  }
-
-  private FitnessCalculator chooseFitness(String fitness, InstanceData instanceData) {
-    return switch (fitness) {
-      case "simple" -> new FitnessCalculatorSimple(instanceData);
-      case "heft" -> new FitnessCalculatorHeft(instanceData);
-      case "rank" -> new FitnessCalculatorRank(instanceData);
-      case "multi" -> new FitnessCalculatorMulti(instanceData);
-      default -> throw new IllegalStateException("Unexpected value: " + fitness);
-    };
   }
 }

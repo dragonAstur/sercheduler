@@ -1,13 +1,15 @@
 package com.uniovi.sercheduler.service;
 
 import com.uniovi.sercheduler.dto.InstanceData;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 /** Contains operations that can be done to an existing plan. */
-public class Operators {
+public class Operators implements Serializable {
 
   InstanceData instanceData;
   Random random;
@@ -40,7 +42,7 @@ public class Operators {
     for (int i = 0; i < plan2.size() && position < plan1.size(); i++) {
       int finalI = i;
       if (newPlan.stream()
-          .filter(p -> p.task().getName() == plan2.get(finalI).task().getName())
+          .filter(p -> Objects.equals(p.task().getName(), plan2.get(finalI).task().getName()))
           .findFirst()
           .isEmpty()) {
         newPlan.add(new PlanPair(plan2.get(i).task(), plan2.get(i).host()));
