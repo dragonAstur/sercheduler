@@ -274,4 +274,21 @@ public abstract class FitnessCalculator {
     // We need to do the minimum between bandwidth and parent disk
     return Math.min(bandwidth, parentHost.getDiskSpeed());
   }
+
+  /**
+   * Get the fitness calculator for a specific method.
+   *
+   * @param fitness The requested fitness.
+   * @param instanceData The data related to the problem.
+   * @return The Fitness calculator.
+   */
+  public static FitnessCalculator getFitness(String fitness, InstanceData instanceData) {
+    return switch (fitness) {
+      case "simple" -> new FitnessCalculatorSimple(instanceData);
+      case "heft" -> new FitnessCalculatorHeft(instanceData);
+      case "rank" -> new FitnessCalculatorRank(instanceData);
+      case "multi" -> new FitnessCalculatorMulti(instanceData);
+      default -> throw new IllegalStateException("Unexpected value: " + fitness);
+    };
+  }
 }
