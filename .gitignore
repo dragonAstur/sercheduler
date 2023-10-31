@@ -40,3 +40,6 @@ spring-shell.log
 FUN.csv
 VAR.csv
 jMetal.log
+
+### Office ###
+*.xlsx

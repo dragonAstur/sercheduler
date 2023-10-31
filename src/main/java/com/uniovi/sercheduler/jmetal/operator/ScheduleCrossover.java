@@ -17,7 +17,9 @@ public class ScheduleCrossover implements CrossoverOperator<SchedulePermutationS
   }
 
   /**
-   * @return
+   * Getter for the crossover probability.
+   *
+   * @return The crossoverProbability.
    */
   @Override
   public double crossoverProbability() {
@@ -25,7 +27,9 @@ public class ScheduleCrossover implements CrossoverOperator<SchedulePermutationS
   }
 
   /**
-   * @return
+   * The number of parents required for the crossover.
+   *
+   * @return The required parents.
    */
   @Override
   public int numberOfRequiredParents() {
@@ -33,7 +37,9 @@ public class ScheduleCrossover implements CrossoverOperator<SchedulePermutationS
   }
 
   /**
-   * @return
+   * The number of children generated via crossover.
+   *
+   * @return The number of generated children.
    */
   @Override
   public int numberOfGeneratedChildren() {
@@ -41,15 +47,16 @@ public class ScheduleCrossover implements CrossoverOperator<SchedulePermutationS
   }
 
   /**
-   * @param schedulePermutationSolutions
-   * @return
+   * Executes the crossover.
+   *
+   * @param schedulePermutationSolutions The list of solutions to cross.
+   * @return A list of new solutions.
    */
   @Override
   public List<SchedulePermutationSolution> execute(
       List<SchedulePermutationSolution> schedulePermutationSolutions) {
     var schedule1 = schedulePermutationSolutions.get(0);
 
-    // TODO: I need to disscuss with Jorge this
     // I need to create two children to have in the selection
     // an equal number of parents and children.
 

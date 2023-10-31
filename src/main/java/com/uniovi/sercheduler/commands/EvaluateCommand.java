@@ -11,9 +11,16 @@ import com.uniovi.sercheduler.parser.WorkflowLoader;
 import com.uniovi.sercheduler.service.Operators;
 import com.uniovi.sercheduler.service.ScheduleExporter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.Random;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
@@ -25,8 +32,6 @@ import org.uma.jmetal.component.catalogue.common.termination.Termination;
 import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByEvaluations;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
 import org.uma.jmetal.operator.mutation.MutationOperator;
-import org.uma.jmetal.util.fileoutput.SolutionListOutput;
-import org.uma.jmetal.util.fileoutput.impl.DefaultFileOutputContext;
 import org.uma.jmetal.util.observer.impl.FitnessObserver;
 
 /** Contains all commands related to the execution of the GA. */
@@ -91,13 +96,12 @@ public class EvaluateCommand {
         new GeneticAlgorithmBuilder<>(
                 "GGA", problem, populationSize, offspringPopulationSize, crossover, mutation)
             .setTermination(termination)
-            .setEvaluation(new MultiThreadedEvaluation<>(8, problem))
+            .setEvaluation(new MultiThreadedEvaluation<>(16, problem))
             .setSelection(new ScheduleSelection(new Random(seed)))
             .setReplacement(new ScheduleReplacement(new Random(seed)))
             .build();
 
     gaAlgo.getObservable().register(new FitnessObserver(100));
-
 
     gaAlgo.run();
 
@@ -105,15 +109,49 @@ public class EvaluateCommand {
     LOG.info("Total execution time : {} ms", gaAlgo.getTotalComputingTime());
     LOG.info("Number of evaluations: {} ", gaAlgo.getNumberOfEvaluations());
 
-    new SolutionListOutput(population)
-        .setVarFileOutputContext(new DefaultFileOutputContext("VAR.csv", ","))
-        .setFunFileOutputContext(new DefaultFileOutputContext("FUN.csv", ","))
-        .print();
+    var bestSolution =
+        gaAlgo.getResult().stream()
+            .min(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")));
+    var makespan = bestSolution.orElseThrow().objectives()[0];
+
+
 
     Instant finish = Instant.now();
 
     var timeElapsed = Duration.between(start, finish);
 
-    return String.format("Evaluation done, it took %d", timeElapsed.toSeconds());
+    // Writing the solution to excel
+
+    try (Workbook workbook = new XSSFWorkbook()) {
+      Sheet sheet = workbook.createSheet("Data");
+
+      // Create header row
+      Row headerRow = sheet.createRow(0);
+      headerRow.createCell(0).setCellValue("Benchmark");
+      headerRow.createCell(1).setCellValue("Hosts");
+      headerRow.createCell(2).setCellValue("Makespan");
+      headerRow.createCell(3).setCellValue("Time");
+
+      // Populate data
+      int rowNum = 1;
+
+      Row row = sheet.createRow(rowNum);
+      row.createCell(0).setCellValue(workflowFile);
+      row.createCell(1).setCellValue(hostsFile);
+      row.createCell(2).setCellValue(makespan);
+      row.createCell(3).setCellValue(timeElapsed.toSeconds());
+
+      // Write the workbook to a file
+      try (FileOutputStream outputStream = new FileOutputStream("results.xlsx")) {
+        workbook.write(outputStream);
+      }
+
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    return String.format(
+        "Evaluation done, it took %d and the best fitness is %f",
+        timeElapsed.toSeconds(), makespan);
   }
 }
