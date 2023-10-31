@@ -4,6 +4,7 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.service.Operators;
 import org.uma.jmetal.operator.mutation.MutationOperator;
 
+/** Mutation operator. */
 public class ScheduleMutation implements MutationOperator<SchedulePermutationSolution> {
   double mutationProbability;
 
@@ -15,8 +16,10 @@ public class ScheduleMutation implements MutationOperator<SchedulePermutationSol
   }
 
   /**
-   * @param schedulePermutationSolution
-   * @return
+   * Executes the mutation.
+   *
+   * @param schedulePermutationSolution Solution to mutate.
+   * @return The mutated solution.
    */
   @Override
   public SchedulePermutationSolution execute(
@@ -30,10 +33,12 @@ public class ScheduleMutation implements MutationOperator<SchedulePermutationSol
   }
 
   /**
-   * @return
+   * The probability of mutation.
+   *
+   * @return The mutation probability.
    */
   @Override
   public double mutationProbability() {
-    return mutationProbability();
+    return mutationProbability;
   }
 }

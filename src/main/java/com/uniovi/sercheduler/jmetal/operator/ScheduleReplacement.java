@@ -9,6 +9,9 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.uma.jmetal.component.catalogue.ea.replacement.Replacement;
 
+/**
+ * Defines the replacement operator.
+ */
 public class ScheduleReplacement implements Replacement<SchedulePermutationSolution> {
 
   Random random;
@@ -22,9 +25,11 @@ public class ScheduleReplacement implements Replacement<SchedulePermutationSolut
   }
 
   /**
-   * @param parents
-   * @param children
-   * @return
+   * Executes the replacement. Uses a tournament 4:2.
+   *
+   * @param parents The list of parents.
+   * @param children The list of children.
+   * @return The new pool of solution.
    */
   @Override
   public List<SchedulePermutationSolution> replace(

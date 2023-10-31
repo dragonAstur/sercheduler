@@ -1,12 +1,13 @@
 package com.uniovi.sercheduler.service;
 
 import com.uniovi.sercheduler.dto.InstanceData;
+import com.uniovi.sercheduler.dto.Task;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /** Contains operations that can be done to an existing plan. */
 public class Operators implements Serializable {
@@ -39,12 +40,12 @@ public class Operators implements Serializable {
     for (int i = 0; i < position; i++) {
       newPlan.add(plan1.get(i));
     }
+    var planSet =
+        newPlan.stream().map(PlanPair::task).map(Task::getName).collect(Collectors.toSet());
     for (int i = 0; i < plan2.size() && position < plan1.size(); i++) {
-      int finalI = i;
-      if (newPlan.stream()
-          .filter(p -> Objects.equals(p.task().getName(), plan2.get(finalI).task().getName()))
-          .findFirst()
-          .isEmpty()) {
+      // We use a set to more efficiently know if the plan already ahs that element
+
+      if (planSet.add(plan2.get(i).task().getName())) {
         newPlan.add(new PlanPair(plan2.get(i).task(), plan2.get(i).host()));
         position++;
       }

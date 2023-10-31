@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.Random;
 import org.uma.jmetal.problem.permutationproblem.PermutationProblem;
 
+/** Defines the scheduling problem. */
 public class SchedulingProblem implements PermutationProblem<SchedulePermutationSolution> {
 
   private final WorkflowLoader workflowLoader;
@@ -21,6 +22,15 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
 
   private final FitnessCalculator fitnessCalculator;
 
+  /**
+   * Full constructor.
+   *
+   * @param workflowFile The file containing the workflow.
+   * @param hostsFile The file containing the hosts.
+   * @param referenceSpeed The CPU reference speed to calculate the runtime.
+   * @param fitness The fitness function to use.
+   * @param seed The random seed to use
+   */
   public SchedulingProblem(
       File workflowFile, File hostsFile, String referenceSpeed, String fitness, Long seed) {
     this.workflowLoader = new WorkflowFileLoader();
@@ -30,26 +40,12 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
     this.planGenerator = new PlanGenerator(new Random(seed), instanceData);
   }
 
-  public SchedulingProblem(
-      File workflowFile,
-      File hostsFile,
-      String referenceSpeed,
-      FitnessCalculator fitnessCalculator,
-      PlanGenerator planGenerator,
-      HostLoader hostLoader,
-      WorkflowLoader workflowLoader) {
-
-    this.fitnessCalculator = fitnessCalculator;
-    this.planGenerator = planGenerator;
-    this.hostLoader = hostLoader;
-    this.workflowLoader = workflowLoader;
-    this.instanceData = loadData(workflowFile, hostsFile, referenceSpeed);
-  }
-
   InstanceData instanceData;
 
   /**
-   * @return
+   * Gets the size of the workflow.
+   *
+   * @return The length of the workflow
    */
   @Override
   public int length() {
@@ -57,7 +53,9 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   }
 
   /**
-   * @return
+   * Number of variables of the problem.
+   *
+   * @return The number of variables of the problem.
    */
   @Override
   public int numberOfVariables() {
@@ -65,7 +63,9 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   }
 
   /**
-   * @return
+   * The number of objectives.
+   *
+   * @return The number of objectives.
    */
   @Override
   public int numberOfObjectives() {
@@ -73,7 +73,9 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   }
 
   /**
-   * @return
+   * The number of constrains.
+   *
+   * @return The number of constrains.
    */
   @Override
   public int numberOfConstraints() {
@@ -81,7 +83,9 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   }
 
   /**
-   * @return
+   * The name of the problem.
+   *
+   * @return The name of the problem.
    */
   @Override
   public String name() {
@@ -89,8 +93,10 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   }
 
   /**
-   * @param schedulePermutationSolution
-   * @return
+   * Evaluates a solution.
+   *
+   * @param schedulePermutationSolution Solution to evaluate.
+   * @return The evaluated solution.
    */
   @Override
   public SchedulePermutationSolution evaluate(
@@ -108,7 +114,9 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   }
 
   /**
-   * @return
+   * Generates a random solution.
+   *
+   * @return A new solution.
    */
   @Override
   public SchedulePermutationSolution createSolution() {
