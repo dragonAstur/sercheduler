@@ -39,7 +39,10 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
   public Solution<PlanPair> copy() {
 
     var fitnessInfoCopy =
-        new FitnessInfo(Map.copyOf(fitnessInfo.fitness()), List.copyOf(fitnessInfo.schedule()));
+        new FitnessInfo(
+            Map.copyOf(fitnessInfo.fitness()),
+            List.copyOf(fitnessInfo.schedule()),
+            fitnessInfo.fitnessFunction());
 
     return new SchedulePermutationSolution(
         this.variables().size(), this.objectives().length, fitnessInfoCopy, List.copyOf(this.plan));

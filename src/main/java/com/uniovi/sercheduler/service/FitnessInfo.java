@@ -9,4 +9,4 @@ import java.util.Map;
  * @param fitness Map containing all possible fitness.
  * @param schedule The final schedule of the plan.
  */
-public record FitnessInfo(Map<String, Double> fitness, List<TaskSchedule> schedule) {}
+public record FitnessInfo(Map<String, Double> fitness, List<TaskSchedule> schedule, String fitnessFunction) {}

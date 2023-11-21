@@ -36,4 +36,9 @@ public class FitnessCalculatorRank extends FitnessCalculatorSimple {
     }
     return super.calculateFitness(newPlan);
   }
+
+  @Override
+  public String fitnessName(){
+    return "rank";
+  }
 }
