@@ -10,13 +10,9 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowLoader;
 import com.uniovi.sercheduler.service.Operators;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-
+import com.uniovi.sercheduler.service.ScheduleExporter;
+import com.uniovi.sercheduler.util.CsvUtils;
+import com.uniovi.sercheduler.util.ThreadSafeStringArray;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -33,36 +29,56 @@ import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByE
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
 import org.uma.jmetal.operator.mutation.MutationOperator;
 
-/** Class for running experiments. */
-@Command
-public class ExperimentCommand {
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
 
-  static final Logger LOG = LoggerFactory.getLogger(ExperimentCommand.class);
-  private static final int NUMBER_OF_REPEATS = 10;
+/** A command for analyzing the performance of multi fitness */
+@Command
+public class MultiAnalysisCommand {
+
+  static final Logger LOG = LoggerFactory.getLogger(MultiAnalysisCommand.class);
 
   final WorkflowLoader workflowLoader;
   final HostLoader hostLoader;
 
-  public ExperimentCommand(WorkflowLoader workflowLoader, HostLoader hostLoader) {
+  final ScheduleExporter scheduleExporter;
+
+  final ThreadSafeStringArray fitnessUsage = ThreadSafeStringArray.getInstance();
+  ArrayList<Map<String, Integer>> listOfOccurrences = new ArrayList<Map<String, Integer>>();
+  ArrayList<String> rows = new ArrayList<>();
+
+  /**
+   * Full constructor.
+   *
+   * @param workflowLoader Loads workflows.
+   * @param hostLoader Loads hosts.
+   * @param scheduleExporter Exports the schedules.
+   */
+  public MultiAnalysisCommand(
+      WorkflowLoader workflowLoader, HostLoader hostLoader, ScheduleExporter scheduleExporter) {
     this.workflowLoader = workflowLoader;
     this.hostLoader = hostLoader;
+    this.scheduleExporter = scheduleExporter;
   }
 
   /**
-   * Runs an experiment with all available fitness functions.
+   * Command to run the GA in multiFitness and generate information.
    *
-   * @param executions Number of evaluations before stopping.
-   * @param seed The random seed.
-   * @return An exit string.
+   * @param executions Number of schedule to generate
+   * @param seed Random seed to choose.
+   * @return The text to print at the end.
    */
-  @Command(command = "experiment")
-  public String experiment(
+  @Command(command = "analyze")
+  public String analyze(
       @Option(shortNames = 'W') String workflowsPath,
       @Option(shortNames = 'H') String hostsPath,
       @Option(shortNames = 'T') String type,
       @Option(shortNames = 'E', defaultValue = "100000") Integer executions,
       @Option(shortNames = 'S', defaultValue = "1") Long seed) {
-    var benchmarksResult = new ArrayList<BenchmarkData>();
     var benchmarks =
         List.of(
             "1000genome-chameleon-2ch-250k-001",
@@ -94,27 +110,32 @@ public class ExperimentCommand {
             "srasearch-chameleon-40a-003",
             "srasearch-chameleon-50a-003");
     Random random = new Random(seed);
+    var benchmarksResult = new ArrayList<BenchmarkData>();
+
     for (var benchmark : benchmarks) {
-
-      var fitness = List.of("simple", "heft", "rank", "multi");
+      var fitness = "multi";
       for (int i = 1; i <= 16; i = i * 2) {
-        for (var f : fitness) {
-          var benchmarkData =
-              doExperiment(
-                  executions,
-                  seed,
-                  benchmark,
-                  type,
-                  i,
-                  f,
-                  random,
-                  workflowsPath,
-                  hostsPath);
 
-          benchmarksResult.add(benchmarkData);
-          LOG.info("Done benchmark {} with {} hosts and fitness {}", benchmark, i, f);
-        }
+        var benchmarkData =
+            doExperiment(
+                executions,
+                seed,
+                benchmark,
+                type,
+                i,
+                fitness,
+                random,
+                workflowsPath,
+                hostsPath);
+
+        benchmarksResult.add(benchmarkData);
+        LOG.info("Done benchmark {} with {} hosts and fitness {}", benchmark, i, fitness);
       }
+    }
+    try {
+      CsvUtils.writeMapsToCsvTransposed("occurrences-" + type + ".csv", listOfOccurrences, rows);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     // Writing the solution to excel
     try (Workbook workbook = new XSSFWorkbook()) {
@@ -185,23 +206,24 @@ public class ExperimentCommand {
 
     var makespans = new ArrayList<Double>();
 
-    for (int i = 0; i < NUMBER_OF_REPEATS; i++) {
-      EvolutionaryAlgorithm<SchedulePermutationSolution> gaAlgo =
-          new GeneticAlgorithmBuilder<>(
-                  "GGA", problem, populationSize, offspringPopulationSize, crossover, mutation)
-              .setTermination(termination)
-              .setEvaluation(new MultiThreadedEvaluation<>(16, problem))
-              .setSelection(new ScheduleSelection(random))
-              .setReplacement(new ScheduleReplacement(random))
-              .build();
+    fitnessUsage.recreateArray(executions);
+    EvolutionaryAlgorithm<SchedulePermutationSolution> gaAlgo =
+        new GeneticAlgorithmBuilder<>(
+                "GGA", problem, populationSize, offspringPopulationSize, crossover, mutation)
+            .setTermination(termination)
+            .setEvaluation(new MultiThreadedEvaluation<>(16, problem))
+            .setSelection(new ScheduleSelection(random))
+            .setReplacement(new ScheduleReplacement(random))
+            .build();
 
-      gaAlgo.run();
-      var bestSolution =
-          gaAlgo.getResult().stream()
-              .min(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")))
-              .orElseThrow();
-      makespans.add(bestSolution.objectives()[0]);
-    }
+    gaAlgo.run();
+    var bestSolution =
+        gaAlgo.getResult().stream()
+            .min(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")))
+            .orElseThrow();
+    makespans.add(bestSolution.objectives()[0]);
+    listOfOccurrences.add(fitnessUsage.countOccurrences());
+    rows.add(benchmark + "-" + hosts);
 
     var mean = makespans.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
     Instant finish = Instant.now();

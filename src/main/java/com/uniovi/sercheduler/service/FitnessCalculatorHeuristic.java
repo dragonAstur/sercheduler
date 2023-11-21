@@ -33,4 +33,9 @@ public class FitnessCalculatorHeuristic extends FitnessCalculatorHeft {
     }
     return super.calculateFitness(newPlan);
   }
+
+  @Override
+  public String fitnessName(){
+    return "heuristic";
+  }
 }

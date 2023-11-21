@@ -33,6 +33,38 @@ java -jar target/sercheduler-0.0.1-SNAPSHOT.jar evaluate --workflowFile src/test
  --fitness heft
 ```
 
+## Execute all experiments
+We need a folder with the following structure
+
+- benchmark-data
+  - workflows (insde all workflows)
+  - hosts
+    -  mixed (inside all hosts)
+    -  fast (inside all hosts)
+  
+
+```bash
+java -jar target/sercheduler-0.0.1-SNAPSHOT.jar experiment \
+  -W workflowsPth \
+  -H hostsPath \
+  -T type \
+  --seed seed \
+  --executions executions
+```
+
+We can also do an analysis of multi fitness to get information about which method wins each round.
+
+```bash
+java -jar target/sercheduler-0.0.1-SNAPSHOT.jar analyze \
+  -W workflowsPth \
+  -H hostsPath \
+  -T type \
+  --seed seed \
+  --executions executions
+```
+
+
+
 ### Reference Documentation
 For further reference, please consider the following sections:
 

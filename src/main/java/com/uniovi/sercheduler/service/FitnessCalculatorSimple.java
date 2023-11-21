@@ -56,6 +56,11 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
     var orderedSchedule =
         schedule.values().stream().sorted(Comparator.comparing(TaskSchedule::ast)).toList();
 
-    return new FitnessInfo(Map.of("makespan", makespan), orderedSchedule);
+    return new FitnessInfo(Map.of("makespan", makespan), orderedSchedule, fitnessName());
+  }
+
+  @Override
+  public String fitnessName() {
+    return "simple";
   }
 }

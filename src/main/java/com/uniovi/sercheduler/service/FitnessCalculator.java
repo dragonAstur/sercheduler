@@ -293,4 +293,11 @@ public abstract class FitnessCalculator {
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }
+
+
+  /**
+   * Provides the name of the fitness used.
+   * @return The name of the fitness.
+   */
+  public abstract String fitnessName();
 }
