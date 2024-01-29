@@ -13,6 +13,16 @@ import com.uniovi.sercheduler.service.Operators;
 import com.uniovi.sercheduler.service.ScheduleExporter;
 import com.uniovi.sercheduler.util.CsvUtils;
 import com.uniovi.sercheduler.util.ThreadSafeStringArray;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -28,13 +38,6 @@ import org.uma.jmetal.component.catalogue.common.termination.Termination;
 import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByEvaluations;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
 import org.uma.jmetal.operator.mutation.MutationOperator;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
 
 /** A command for analyzing the performance of multi fitness */
 @Command
@@ -81,52 +84,20 @@ public class MultiAnalysisCommand {
       @Option(shortNames = 'S', defaultValue = "1") Long seed) {
     var benchmarks =
         List.of(
-            "1000genome-chameleon-2ch-250k-001",
-            "1000genome-chameleon-4ch-250k-001",
-            "1000genome-chameleon-12ch-250k-001",
-            "1000genome-chameleon-18ch-250k-001",
-            "cycles-chameleon-1l-1c-9p-001",
-            "cycles-chameleon-2l-1c-9p-001",
-            "cycles-chameleon-2l-1c-12p-001",
-            "cycles-chameleon-5l-1c-12p-001",
             "epigenomics-chameleon-hep-1seq-100k-001",
             "epigenomics-chameleon-hep-6seq-100k-001",
             "epigenomics-chameleon-ilmn-1seq-100k-001",
-            "epigenomics-chameleon-ilmn-6seq-100k-001",
-            "montage-chameleon-2mass-01d-001",
-            "montage-chameleon-2mass-005d-001",
-            "montage-chameleon-dss-10d-001",
-            "montage-chameleon-dss-125d-001",
-            "seismology-chameleon-100p-001",
-            "seismology-chameleon-500p-001",
-            "seismology-chameleon-700p-001",
-            "seismology-chameleon-1000p-001",
-            "soykb-chameleon-10fastq-10ch-001",
-            "soykb-chameleon-10fastq-20ch-001",
-            "soykb-chameleon-30fastq-10ch-001",
-            "soykb-chameleon-40fastq-20ch-001",
-            "srasearch-chameleon-10a-005",
-            "srasearch-chameleon-20a-003",
-            "srasearch-chameleon-40a-003",
-            "srasearch-chameleon-50a-003");
+            "epigenomics-chameleon-ilmn-6seq-100k-001");
     Random random = new Random(seed);
     var benchmarksResult = new ArrayList<BenchmarkData>();
 
     for (var benchmark : benchmarks) {
       var fitness = "multi";
-      for (int i = 1; i <= 16; i = i * 2) {
+      for (int i = 16; i <= 16; i = i * 2) {
 
         var benchmarkData =
             doExperiment(
-                executions,
-                seed,
-                benchmark,
-                type,
-                i,
-                fitness,
-                random,
-                workflowsPath,
-                hostsPath);
+                executions, seed, benchmark, type, i, fitness, random, workflowsPath, hostsPath);
 
         benchmarksResult.add(benchmarkData);
         LOG.info("Done benchmark {} with {} hosts and fitness {}", benchmark, i, fitness);
@@ -223,6 +194,11 @@ public class MultiAnalysisCommand {
             .orElseThrow();
     makespans.add(bestSolution.objectives()[0]);
     listOfOccurrences.add(fitnessUsage.countOccurrences());
+
+    // Export the single analysis
+    String fileName = String.format("occurences-%s-%s-%d.csv", type, benchmark, hosts);
+    CsvUtils.writeArrayToCSV(fitnessUsage.getArray(), fileName);
+
     rows.add(benchmark + "-" + hosts);
 
     var mean = makespans.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
