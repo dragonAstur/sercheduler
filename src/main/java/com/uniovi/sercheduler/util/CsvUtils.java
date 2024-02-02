@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.util;
 
+import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -41,14 +42,31 @@ public class CsvUtils {
     }
   }
 
-    public static void writeArrayToCSV(String[] array, String fileName) {
-        try (FileWriter csvWriter = new FileWriter(fileName)) {
-            for (int i = 0; i < array.length; i++) {
-                csvWriter.append(i + 1 + "," + array[i] + "\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+  public static void exportToCsv(String fileName, List<MultiResult> results) {
+    try (FileWriter writer = new FileWriter(fileName)) {
+      // Write the header
+      writer.append("Eval,Simple,Heft,Rank,Makespan\n");
 
+      // Write the data rows
+      int evalCounter = 1; // Starting eval number
+      for (MultiResult result : results) {
+        writer
+            .append(Integer.toString(evalCounter++))
+            .append(',')
+            .append(Short.toString(result.getSimple()))
+            .append(',')
+            .append(Short.toString(result.getHeft()))
+            .append(',')
+            .append(Short.toString(result.getRank()))
+            .append(',')
+            .append(Double.toString(result.getMakespan()))
+            .append('\n');
+      }
+
+      System.out.println("CSV file was created successfully.");
+    } catch (IOException e) {
+      System.out.println("An error occurred while writing the CSV file.");
+      e.printStackTrace();
+    }
+  }
 }

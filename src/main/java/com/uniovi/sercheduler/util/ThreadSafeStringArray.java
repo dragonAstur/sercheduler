@@ -1,21 +1,24 @@
 package com.uniovi.sercheduler.util;
 
+import com.uniovi.sercheduler.dto.analysis.MultiResult;
+import com.uniovi.sercheduler.service.FitnessCalculatorMulti;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ThreadSafeStringArray {
+  static final Logger LOG = LoggerFactory.getLogger(ThreadSafeStringArray.class);
   // Size of the array, can be set to a default or loaded from a configuration
   private static final int DEFAULT_SIZE = 10;
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
-  private String[] array;
+  private MultiResult[] array;
   private int currentIndex = 0; // To track the next available position
 
   // Private constructor to prevent instantiation from outside
   private ThreadSafeStringArray() {
-    this.array = new String[DEFAULT_SIZE];
+    this.array = new MultiResult[DEFAULT_SIZE];
   }
 
   // Static method to get the instance of the class
@@ -23,15 +26,32 @@ public class ThreadSafeStringArray {
     return InstanceHolder.instance;
   }
 
-  // Method to add a value to the array
-  public void setValue(String value) {
+  /**
+   * Updates the array with the new values.
+   *
+   * @param method The method tha was used.
+   * @param makespan The value of the makespan.
+   */
+  public void setValue(String method, Double makespan) {
     lock.writeLock().lock();
     try {
       if (currentIndex >= array.length) {
         // Array is full, you might want to handle this case
         // e.g., throw an exception or resize the array
       } else {
-        array[currentIndex] = value;
+
+        var currentMulti = array[currentIndex];
+        if (currentMulti == null) {
+          currentMulti = new MultiResult();
+        }
+        currentMulti.setMakespan(currentMulti.getMakespan() + makespan);
+        switch (method) {
+          case "simple" -> currentMulti.setSimple((short) (currentMulti.getSimple() + 1));
+          case "heft" -> currentMulti.setHeft((short) (currentMulti.getHeft() + 1));
+          case "rank" -> currentMulti.setRank((short) (currentMulti.getRank() + 1));
+          default -> LOG.error("Unknown fitness function: {}", method);
+        }
+        array[currentIndex] = currentMulti;
         currentIndex++; // Increment the index for the next insertion
       }
     } finally {
@@ -39,7 +59,7 @@ public class ThreadSafeStringArray {
     }
   }
 
-  public String getValue(int index) {
+  public MultiResult getValue(int index) {
     lock.readLock().lock();
     try {
       return array[index];
@@ -48,7 +68,7 @@ public class ThreadSafeStringArray {
     }
   }
 
-  public String[] getArray() {
+  public MultiResult[] getArray() {
     lock.readLock().lock();
     try {
       return Arrays.copyOf(array, array.length);
@@ -57,26 +77,19 @@ public class ThreadSafeStringArray {
     }
   }
 
-  // Method to count the occurrences of each string in the array
-  public Map<String, Integer> countOccurrences() {
-    lock.readLock().lock();
-    try {
-      Map<String, Integer> countMap = new HashMap<>();
-      for (String s : array) {
-        if (s != null) {
-          countMap.put(s, countMap.getOrDefault(s, 0) + 1);
-        }
-      }
-      return countMap;
-    } finally {
-      lock.readLock().unlock();
-    }
-  }
-
   public void recreateArray(int newSize) {
     lock.writeLock().lock();
     try {
-      array = new String[newSize];
+      array = new MultiResult[newSize];
+      currentIndex = 0;
+    } finally {
+      lock.writeLock().unlock();
+    }
+  }
+
+  public void restartIndex() {
+    lock.writeLock().lock();
+    try {
       currentIndex = 0;
     } finally {
       lock.writeLock().unlock();

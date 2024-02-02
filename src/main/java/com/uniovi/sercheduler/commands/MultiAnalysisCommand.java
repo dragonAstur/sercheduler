@@ -16,9 +16,12 @@ import com.uniovi.sercheduler.util.ThreadSafeStringArray;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +47,7 @@ import org.uma.jmetal.operator.mutation.MutationOperator;
 public class MultiAnalysisCommand {
 
   static final Logger LOG = LoggerFactory.getLogger(MultiAnalysisCommand.class);
+  private static final int NUMBER_OF_REPEATS = 10;
 
   final WorkflowLoader workflowLoader;
   final HostLoader hostLoader;
@@ -51,7 +55,6 @@ public class MultiAnalysisCommand {
   final ScheduleExporter scheduleExporter;
 
   final ThreadSafeStringArray fitnessUsage = ThreadSafeStringArray.getInstance();
-  ArrayList<Map<String, Integer>> listOfOccurrences = new ArrayList<Map<String, Integer>>();
   ArrayList<String> rows = new ArrayList<>();
 
   /**
@@ -84,16 +87,14 @@ public class MultiAnalysisCommand {
       @Option(shortNames = 'S', defaultValue = "1") Long seed) {
     var benchmarks =
         List.of(
-            "epigenomics-chameleon-hep-1seq-100k-001",
-            "epigenomics-chameleon-hep-6seq-100k-001",
-            "epigenomics-chameleon-ilmn-1seq-100k-001",
-            "epigenomics-chameleon-ilmn-6seq-100k-001");
+            "cycles-chameleon-1l-1c-9p-001"
+         );
     Random random = new Random(seed);
     var benchmarksResult = new ArrayList<BenchmarkData>();
 
     for (var benchmark : benchmarks) {
       var fitness = "multi";
-      for (int i = 16; i <= 16; i = i * 2) {
+      for (int i = 1; i <= 16; i = i * 2) {
 
         var benchmarkData =
             doExperiment(
@@ -103,11 +104,7 @@ public class MultiAnalysisCommand {
         LOG.info("Done benchmark {} with {} hosts and fitness {}", benchmark, i, fitness);
       }
     }
-    try {
-      CsvUtils.writeMapsToCsvTransposed("occurrences-" + type + ".csv", listOfOccurrences, rows);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+
     // Writing the solution to excel
     try (Workbook workbook = new XSSFWorkbook()) {
       Sheet sheet = workbook.createSheet("Data");
@@ -133,7 +130,8 @@ public class MultiAnalysisCommand {
         row.createCell(4).setCellValue(result.time());
 
         // Write the workbook to a file
-        try (FileOutputStream outputStream = new FileOutputStream("results.xlsx")) {
+        try (FileOutputStream outputStream =
+            new FileOutputStream(String.format("results-%s.xlsx", type))) {
           workbook.write(outputStream);
         }
       }
@@ -178,26 +176,35 @@ public class MultiAnalysisCommand {
     var makespans = new ArrayList<Double>();
 
     fitnessUsage.recreateArray(executions);
-    EvolutionaryAlgorithm<SchedulePermutationSolution> gaAlgo =
-        new GeneticAlgorithmBuilder<>(
-                "GGA", problem, populationSize, offspringPopulationSize, crossover, mutation)
-            .setTermination(termination)
-            .setEvaluation(new MultiThreadedEvaluation<>(16, problem))
-            .setSelection(new ScheduleSelection(random))
-            .setReplacement(new ScheduleReplacement(random))
-            .build();
 
-    gaAlgo.run();
-    var bestSolution =
-        gaAlgo.getResult().stream()
-            .min(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")))
-            .orElseThrow();
-    makespans.add(bestSolution.objectives()[0]);
-    listOfOccurrences.add(fitnessUsage.countOccurrences());
+    for (int i = 0; i < NUMBER_OF_REPEATS; i++) {
+      EvolutionaryAlgorithm<SchedulePermutationSolution> gaAlgo =
+          new GeneticAlgorithmBuilder<>(
+                  "GGA", problem, populationSize, offspringPopulationSize, crossover, mutation)
+              .setTermination(termination)
+              .setEvaluation(new MultiThreadedEvaluation<>(16, problem))
+              .setSelection(new ScheduleSelection(random))
+              .setReplacement(new ScheduleReplacement(random))
+              .build();
+
+      gaAlgo.run();
+      var bestSolution =
+          gaAlgo.getResult().stream()
+              .min(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")))
+              .orElseThrow();
+      makespans.add(bestSolution.objectives()[0]);
+      fitnessUsage.restartIndex();
+    }
+
 
     // Export the single analysis
-    String fileName = String.format("occurences-%s-%s-%d.csv", type, benchmark, hosts);
-    CsvUtils.writeArrayToCSV(fitnessUsage.getArray(), fileName);
+    try {
+      Files.createDirectories(Paths.get("analysis"));
+      String fileName = String.format("analysis/occurences-%s-%s-%d.csv", type, benchmark, hosts);
+      CsvUtils.exportToCsv(fileName, Arrays.asList(fitnessUsage.getArray()));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     rows.add(benchmark + "-" + hosts);
 
