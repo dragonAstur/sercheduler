@@ -264,9 +264,8 @@ public abstract class FitnessCalculator {
   public Long findHostSpeed(Host host, Host parentHost) {
     // If the parent and the current host are the same we should return the disk
     // speed
-    var hostName = host.getName();
-    var parentHostName = parentHost.getName();
-    if (hostName != parentHostName) {
+
+    if (host.getName().equals(parentHost.getName())) {
       return host.getDiskSpeed();
     }
 

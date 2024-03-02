@@ -1,17 +1,17 @@
 package com.uniovi.sercheduler.service;
 
 import com.uniovi.sercheduler.dto.InstanceData;
+import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import com.uniovi.sercheduler.util.ThreadSafeStringArray;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
 import java.util.Comparator;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Calculates the fitness using other fitness calculators. */
-
 public class FitnessCalculatorMulti extends FitnessCalculator {
+
+  static final Logger LOG = LoggerFactory.getLogger(FitnessCalculatorMulti.class);
 
   ThreadSafeStringArray fitnessUsage = ThreadSafeStringArray.getInstance();
 
@@ -40,15 +40,15 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
   @Override
   public FitnessInfo calculateFitness(List<PlanPair> plan) {
 
-    var fitness = fitnessCalculators.stream()
-        .map(c -> c.calculateFitness(plan))
-        .min(Comparator.comparing(f -> f.fitness().get("makespan")))
-        .orElseThrow();
+    var fitness =
+        fitnessCalculators.stream()
+            .map(c -> c.calculateFitness(plan))
+            .min(Comparator.comparing(f -> f.fitness().get("makespan")))
+            .orElseThrow();
 
-    fitnessUsage.setValue(fitness.fitnessFunction());
+    fitnessUsage.setValue(fitness.fitnessFunction(), fitness.fitness().get("makespan"));
 
     return fitness;
-
   }
 
   @Override
