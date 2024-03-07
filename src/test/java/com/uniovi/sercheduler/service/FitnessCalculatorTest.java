@@ -250,9 +250,9 @@ public class FitnessCalculatorTest {
     var hosts =
         Map.of(
             "HostA",
-            new Host("HostA", 100L, 100L, 50L),
+            new Host("HostA", 100L, 100L, 50L, 1D),
             "HostB",
-            new Host("HostB", 100L, 25L, 100L));
+            new Host("HostB", 100L, 25L, 100L, 2D));
     var instanceData = new InstanceData(Collections.emptyMap(), hosts,0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
@@ -269,9 +269,9 @@ public class FitnessCalculatorTest {
     var hosts =
         Map.of(
             "HostA",
-            new Host("HostA", 100L, 100L, 50L),
+            new Host("HostA", 100L, 100L, 50L, 1D),
             "HostB",
-            new Host("HostB", 100L, 25L, 100L));
+            new Host("HostB", 100L, 25L, 100L, 2D));
     var instanceData = new InstanceData(Collections.emptyMap(), hosts,0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
@@ -287,9 +287,9 @@ public class FitnessCalculatorTest {
     var hosts =
         Map.of(
             "HostA",
-            new Host("HostA", 100L, 100L, 50L),
+            new Host("HostA", 100L, 100L, 50L, 1D),
             "HostB",
-            new Host("HostB", 100L, 25L, 100L));
+            new Host("HostB", 100L, 25L, 100L, 2D));
     var instanceData = new InstanceData(Collections.emptyMap(), hosts, 0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
@@ -305,9 +305,9 @@ public class FitnessCalculatorTest {
     var hosts =
         Map.of(
             "HostA",
-            new Host("HostA", 100L, 100L, 50L),
+            new Host("HostA", 100L, 100L, 50L,1D),
             "HostB",
-            new Host("HostB", 100L, 10L, 25L));
+            new Host("HostB", 100L, 10L, 25L, 2D));
     var instanceData = new InstanceData(Collections.emptyMap(), hosts, 0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 

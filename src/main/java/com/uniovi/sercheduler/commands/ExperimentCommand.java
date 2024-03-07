@@ -63,36 +63,39 @@ public class ExperimentCommand {
       @Option(shortNames = 'E', defaultValue = "100000") Integer executions,
       @Option(shortNames = 'S', defaultValue = "1") Long seed) {
     var benchmarksResult = new ArrayList<BenchmarkData>();
-    var benchmarks =
-        List.of(
-            "1000genome-chameleon-2ch-250k-001",
-            "1000genome-chameleon-4ch-250k-001",
-            "1000genome-chameleon-12ch-250k-001",
-            "1000genome-chameleon-18ch-250k-001",
-            "cycles-chameleon-1l-1c-9p-001",
-            "cycles-chameleon-2l-1c-9p-001",
-            "cycles-chameleon-2l-1c-12p-001",
-            "cycles-chameleon-5l-1c-12p-001",
-            "epigenomics-chameleon-hep-1seq-100k-001",
-            "epigenomics-chameleon-hep-6seq-100k-001",
-            "epigenomics-chameleon-ilmn-1seq-100k-001",
-            "epigenomics-chameleon-ilmn-6seq-100k-001",
-            "montage-chameleon-2mass-01d-001",
-            "montage-chameleon-2mass-005d-001",
-            "montage-chameleon-dss-10d-001",
-            "montage-chameleon-dss-125d-001",
-            "seismology-chameleon-100p-001",
-            "seismology-chameleon-500p-001",
-            "seismology-chameleon-700p-001",
-            "seismology-chameleon-1000p-001",
-            "soykb-chameleon-10fastq-10ch-001",
-            "soykb-chameleon-10fastq-20ch-001",
-            "soykb-chameleon-30fastq-10ch-001",
-            "soykb-chameleon-40fastq-20ch-001",
-            "srasearch-chameleon-10a-005",
-            "srasearch-chameleon-20a-003",
-            "srasearch-chameleon-40a-003",
-            "srasearch-chameleon-50a-003");
+//    var benchmarks =
+//        List.of(
+//            "1000genome-chameleon-2ch-250k-001",
+//            "1000genome-chameleon-4ch-250k-001",
+//            "1000genome-chameleon-12ch-250k-001",
+//            "1000genome-chameleon-18ch-250k-001",
+//            "cycles-chameleon-1l-1c-9p-001",
+//            "cycles-chameleon-2l-1c-9p-001",
+//            "cycles-chameleon-2l-1c-12p-001",
+//            "cycles-chameleon-5l-1c-12p-001",
+//            "epigenomics-chameleon-hep-1seq-100k-001",
+//            "epigenomics-chameleon-hep-6seq-100k-001",
+//            "epigenomics-chameleon-ilmn-1seq-100k-001",
+//            "epigenomics-chameleon-ilmn-6seq-100k-001",
+//            "montage-chameleon-2mass-01d-001",
+//            "montage-chameleon-2mass-005d-001",
+//            "montage-chameleon-dss-10d-001",
+//            "montage-chameleon-dss-125d-001",
+//            "seismology-chameleon-100p-001",
+//            "seismology-chameleon-500p-001",
+//            "seismology-chameleon-700p-001",
+//            "seismology-chameleon-1000p-001",
+//            "soykb-chameleon-10fastq-10ch-001",
+//            "soykb-chameleon-10fastq-20ch-001",
+//            "soykb-chameleon-30fastq-10ch-001",
+//            "soykb-chameleon-40fastq-20ch-001",
+//            "srasearch-chameleon-10a-005",
+//            "srasearch-chameleon-20a-003",
+//            "srasearch-chameleon-40a-003",
+//            "srasearch-chameleon-50a-003");
+
+    var benchmarks = List.of(
+            "1000genome-chameleon-2ch-250k-001");
     Random random = new Random(seed);
     for (var benchmark : benchmarks) {
 

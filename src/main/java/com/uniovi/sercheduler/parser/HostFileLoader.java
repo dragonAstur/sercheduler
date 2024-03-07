@@ -40,7 +40,8 @@ public class HostFileLoader implements HostLoader {
                     h.name(),
                     UnitParser.parseUnits(h.cpuSpeed()) * h.cores(),
                     UnitParser.parseUnits(h.diskSpeed()),
-                    UnitParser.parseUnits(h.networkSpeed())))
+                    UnitParser.parseUnits(h.networkSpeed()),
+                        h.energyCost()))
         .collect(Collectors.toMap(Host::getName, Function.identity()));
   }
 
