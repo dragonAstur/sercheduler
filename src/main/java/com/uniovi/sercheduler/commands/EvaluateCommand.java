@@ -1,5 +1,8 @@
 package com.uniovi.sercheduler.commands;
 
+import static org.uma.jmetal.util.AbstractAlgorithmRunner.printFinalSolutionSet;
+
+import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
@@ -26,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 import org.uma.jmetal.component.algorithm.EvolutionaryAlgorithm;
+import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
 import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.MultiThreadedEvaluation;
 import org.uma.jmetal.component.catalogue.common.termination.Termination;
@@ -93,28 +97,27 @@ public class EvaluateCommand {
     Termination termination = new TerminationByEvaluations(executions);
 
     EvolutionaryAlgorithm<SchedulePermutationSolution> gaAlgo =
-        new GeneticAlgorithmBuilder<>(
-                "GGA", problem, populationSize, offspringPopulationSize, crossover, mutation)
+        new NSGAIIBuilder<>(problem, populationSize, offspringPopulationSize, crossover, mutation)
             .setTermination(termination)
-            .setEvaluation(new MultiThreadedEvaluation<>(16, problem))
-            .setSelection(new ScheduleSelection(new Random(seed)))
-            .setReplacement(new ScheduleReplacement(new Random(seed)))
+            .setEvaluation(new MultiThreadEvaluationMulti(16, problem))
+            //  .setSelection(new ScheduleSelection(new Random(seed)))
+            //  .setReplacement(new ScheduleReplacement(new Random(seed)))
             .build();
 
-    gaAlgo.getObservable().register(new FitnessObserver(100));
+    gaAlgo.observable().register(new FitnessObserver(100));
 
     gaAlgo.run();
 
-    var population = gaAlgo.getResult();
-    LOG.info("Total execution time : {} ms", gaAlgo.getTotalComputingTime());
-    LOG.info("Number of evaluations: {} ", gaAlgo.getNumberOfEvaluations());
+    var population = gaAlgo.result();
+    LOG.info("Total execution time : {} ms", gaAlgo.totalComputingTime());
+    LOG.info("Number of evaluations: {} ", gaAlgo.numberOfEvaluations());
+    printFinalSolutionSet(population);
 
     var bestSolution =
-        gaAlgo.getResult().stream()
+        gaAlgo.result().stream()
             .min(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")));
     var makespan = bestSolution.orElseThrow().objectives()[0];
-
-
+    var energy = bestSolution.orElseThrow().getFitnessInfo().fitness().get("energy");
 
     Instant finish = Instant.now();
 
@@ -151,7 +154,7 @@ public class EvaluateCommand {
     }
 
     return String.format(
-        "Evaluation done, it took %d and the best fitness is %f",
-        timeElapsed.toSeconds(), makespan);
+        "Evaluation done, it took %d and the best fitness is %f and the energy is %f",
+        timeElapsed.toSeconds(), makespan, energy);
   }
 }

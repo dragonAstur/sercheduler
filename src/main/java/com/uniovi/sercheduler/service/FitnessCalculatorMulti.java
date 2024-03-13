@@ -1,7 +1,7 @@
 package com.uniovi.sercheduler.service;
 
 import com.uniovi.sercheduler.dto.InstanceData;
-import com.uniovi.sercheduler.dto.analysis.MultiResult;
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.util.ThreadSafeStringArray;
 import java.util.Comparator;
 import java.util.List;
@@ -34,16 +34,17 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
   /**
    * Calculates the fitness using 3 calculators and returns the best schedule.
    *
-   * @param plan Plan to calculate.
-   * @return The information related to the Fitness.
+   * @param solution@return The information related to the Fitness.
    */
   @Override
-  public FitnessInfo calculateFitness(List<PlanPair> plan) {
+  public FitnessInfo calculateFitness(SchedulePermutationSolution solution) {
 
     var fitness =
         fitnessCalculators.stream()
-            .map(c -> c.calculateFitness(plan))
-            .min(Comparator.comparing(f -> f.fitness().get("makespan")))
+            .map(c -> c.calculateFitness(solution))
+            .min(
+                Comparator.comparing(
+                    f -> f.fitness().get(solution.getArbiter())))
             .orElseThrow();
 
     fitnessUsage.setValue(fitness.fitnessFunction(), fitness.fitness().get("makespan"));

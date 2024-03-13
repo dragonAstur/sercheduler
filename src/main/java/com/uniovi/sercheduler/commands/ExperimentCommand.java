@@ -200,7 +200,7 @@ public class ExperimentCommand {
 
       gaAlgo.run();
       var bestSolution =
-          gaAlgo.getResult().stream()
+          gaAlgo.result().stream()
               .min(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")))
               .orElseThrow();
       makespans.add(bestSolution.objectives()[0]);

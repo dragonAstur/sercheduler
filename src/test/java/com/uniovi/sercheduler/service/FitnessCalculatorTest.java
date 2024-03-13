@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.uniovi.sercheduler.dto.Host;
 import com.uniovi.sercheduler.dto.InstanceData;
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.util.UnitParser;
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -112,7 +113,7 @@ public class FitnessCalculatorTest {
             new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
 
     FitnessInfo result =
-        fitnessCalculator.calculateFitness(plan);
+        fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan));
 
     assertEquals(210D, result.fitness().get("makespan"));
   }
@@ -138,7 +139,7 @@ public class FitnessCalculatorTest {
             new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
 
     FitnessInfo result =
-        fitnessCalculator.calculateFitness(plan);
+        fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan));
 
     assertEquals(181.5D, result.fitness().get("makespan"));
   }
@@ -164,7 +165,7 @@ public class FitnessCalculatorTest {
             new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
 
     FitnessInfo result =
-        fitnessCalculator.calculateFitness(plan);
+        fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan));
 
     assertEquals(205D, result.fitness().get("makespan"));
   }
@@ -188,7 +189,7 @@ public class FitnessCalculatorTest {
             new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
 
     FitnessInfo result =
-        fitnessCalculator.calculateFitness(plan);
+        fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan));
 
     assertEquals(193.5D, result.fitness().get("makespan"));
   }
@@ -212,7 +213,7 @@ public class FitnessCalculatorTest {
             new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
 
     FitnessInfo result =
-        fitnessCalculator.calculateFitness(plan);
+        fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan));
 
     assertEquals(187D, result.fitness().get("makespan"));
   }
@@ -237,7 +238,7 @@ public class FitnessCalculatorTest {
             new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
 
     FitnessInfo result =
-        fitnessCalculator.calculateFitness(plan);
+        fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan));
 
     assertEquals(193.5D, result.fitness().get("makespan"));
   }
