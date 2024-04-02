@@ -1,7 +1,6 @@
 package com.uniovi.sercheduler.commands;
 
 import com.uniovi.sercheduler.dto.BenchmarkData;
-import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
@@ -11,7 +10,9 @@ import com.uniovi.sercheduler.parser.WorkflowLoader;
 import com.uniovi.sercheduler.service.Operators;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
@@ -49,7 +50,7 @@ public class ExperimentJmetalCommand {
 
   static final Logger LOG = LoggerFactory.getLogger(ExperimentJmetalCommand.class);
   private static final int NUMBER_OF_REPEATS = 10;
-  private static final int INDEPENDENT_RUNS = 2;
+  private static final int INDEPENDENT_RUNS = 30;
 
   final WorkflowLoader workflowLoader;
   final HostLoader hostLoader;
@@ -108,17 +109,19 @@ public class ExperimentJmetalCommand {
     var benchmarks =
         List.of(
             "1000genome-chameleon-2ch-250k-001"
-//            "cycles-chameleon-1l-1c-9p-001",
-//            "epigenomics-chameleon-hep-1seq-100k-001",
-//            "montage-chameleon-2mass-01d-001"
-        );
+            //            "cycles-chameleon-1l-1c-9p-001",
+            //            "epigenomics-chameleon-hep-1seq-100k-001",
+            //            "montage-chameleon-2mass-01d-001"
+            );
     Random random = new Random(seed);
 
-    var fitness = List.of("simple", "multi", "rank");
+    //    var fitness = List.of("simple", "multi", "rank");
+    var fitness = List.of("multi");
+
     var experimentBaseDirectory = "experiments";
     double mutationProbability = 0.1;
     int populationSize = 100;
-    int offspringPopulationSize = 200;
+    int offspringPopulationSize = 100;
     Termination termination = new TerminationByEvaluations(executions);
     List<ExperimentProblem<SchedulePermutationSolution>> problemList = new ArrayList<>();
     List<ExperimentAlgorithm<SchedulePermutationSolution, List<SchedulePermutationSolution>>>
@@ -126,7 +129,7 @@ public class ExperimentJmetalCommand {
 
     for (var benchmark : benchmarks) {
 
-      for (int i = 2; i <= 16; i = i * 8) {
+      for (int i = 16; i <= 16; i = i * 8) {
         var baseProblem =
             new SchedulingProblem(
                 benchmark + "-hosts-" + i,
@@ -159,11 +162,22 @@ public class ExperimentJmetalCommand {
 
           for (int run = 0; run < INDEPENDENT_RUNS; run++) {
 
+            if (f.equals("multi")) {
+              Algorithm<List<SchedulePermutationSolution>> algorithm =
+                  new NSGAIIBuilder<>(
+                          problem, populationSize, offspringPopulationSize, crossover, mutation)
+                      .setTermination(termination)
+                      .setEvaluation(new MultiThreadedEvaluation<>(16, problem))
+                      .build();
+              algorithmList.add(
+                  new ExperimentAlgorithm<>(algorithm, f + "-improved", experimentProblem, run));
+            }
+
             Algorithm<List<SchedulePermutationSolution>> algorithm =
                 new NSGAIIBuilder<>(
                         problem, populationSize, offspringPopulationSize, crossover, mutation)
                     .setTermination(termination)
-                    .setEvaluation(new MultiThreadEvaluationMulti(16, problem))
+                    .setEvaluation(new MultiThreadedEvaluation<>(0, problem))
                     .build();
             algorithmList.add(new ExperimentAlgorithm<>(algorithm, f, experimentProblem, run));
           }

@@ -32,20 +32,18 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
 
     for (var schedulePair : plan) {
 
-      var eftAndAst =
-          calculateHeftTaskCost(
-              schedulePair.task(), schedule, available);
+      var eftAndAst = calculateHeftTaskCost(schedulePair.task(), schedule, available);
 
       makespan = Math.max(eftAndAst.eft(), makespan);
 
       energy += (eftAndAst.eft() - eftAndAst.ast()) * schedulePair.host().getEnergyCost();
-
     }
 
     var orderedSchedule =
         schedule.values().stream().sorted(Comparator.comparing(TaskSchedule::ast)).toList();
 
-    return new FitnessInfo(Map.of("makespan", makespan, "energy", energy), orderedSchedule, fitnessName());
+    return new FitnessInfo(
+        Map.of("makespan", makespan, "energy", energy), orderedSchedule, fitnessName());
   }
 
   @Override
@@ -54,16 +52,13 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
   }
 
   private EftAndAst calculateHeftTaskCost(
-      Task task,
-      HashMap<String, TaskSchedule> schedule,
-      HashMap<String, Double> available) {
+      Task task, HashMap<String, TaskSchedule> schedule, HashMap<String, Double> available) {
     double minEft = Double.MAX_VALUE;
     Optional<Host> selectedHost = Optional.empty();
     Optional<TaskCosts> selectedTaskCosts = Optional.empty();
     for (var host : instanceData.hosts().values()) {
 
-      var taskCosts =
-          calculateEft(task, host, schedule, available);
+      var taskCosts = calculateEft(task, host, schedule, available);
       double tmpEft = minEft;
 
       minEft = Math.min(minEft, taskCosts.eft());
@@ -86,5 +81,5 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
     return new EftAndAst(minEft, ast);
   }
 
-  private record EftAndAst(Double eft, Double ast){}
+  private record EftAndAst(Double eft, Double ast) {}
 }

@@ -44,3 +44,6 @@ jMetal.log
 ### Office ###
 *.xlsx
 *.csv
+
+#project
+experiments
