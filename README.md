@@ -1,7 +1,6 @@
-# Sercheduler 
+# Sercheduler
 
 The project is CLI to execute a GA for the scientific workflow scheduling problem.
-
 
 # Getting Started
 
@@ -34,14 +33,14 @@ java -jar target/sercheduler-0.0.1-SNAPSHOT.jar evaluate --workflowFile src/test
 ```
 
 ## Execute all experiments
+
 We need a folder with the following structure
 
 - benchmark-data
-  - workflows (insde all workflows)
-  - hosts
-    -  mixed (inside all hosts)
-    -  fast (inside all hosts)
-  
+    - workflows (inside all workflows)
+    - hosts
+        - mixed (inside all hosts)
+        - fast (inside all hosts)
 
 ```bash
 java -jar target/sercheduler-0.0.1-SNAPSHOT.jar experiment \
@@ -50,7 +49,56 @@ java -jar target/sercheduler-0.0.1-SNAPSHOT.jar experiment \
   -T type \
   --seed seed \
   --executions executions
+  -C experimentConfigJson
 ```
+
+### Example
+
+```bash
+java -jar target/sercheduler-0.0.1-SNAPSHOT.jar experiment -W ../benchmark-data/workflows/ \
+-H ../benchmark-data/hosts/ \
+-T mixed \
+--seed 1 \
+--executions 100000 \
+-C src/test/resources/experimentConfig.json
+```
+
+## Experiment with Jmetal
+
+We can make experiments using the JMetal framework. The framework creates an `experiments` folder. If we want to redo
+the execution we need to delete it before running the program again.
+
+We need a folder with the following structure
+
+- benchmark-data
+  - workflows (inside all workflows)
+  - hosts
+    - mixed (inside all hosts)
+    - fast (inside all hosts)
+
+```bash
+java -jar target/sercheduler-0.0.1-SNAPSHOT.jar jmetal \
+  -W workflowsPth \
+  -H hostsPath \
+  -T type \
+  --seed seed \
+  --executions executions
+  -C experimentConfigJson
+```
+
+### Example
+
+```bash
+rm -rf experiments
+java -jar target/sercheduler-0.0.1-SNAPSHOT.jar jmetal -W ../benchmark-data/workflows/ \
+-H ../benchmark-data/hosts/ \
+-T mixed \
+--seed 1 \
+--executions 100000 \
+-C src/test/resources/experimentConfig.json
+```
+
+## Analysis multi fitness performance
 
 We can also do an analysis of multi fitness to get information about which method wins each round.
 
@@ -63,9 +111,8 @@ java -jar target/sercheduler-0.0.1-SNAPSHOT.jar analyze \
   --executions executions
 ```
 
-
-
 ### Reference Documentation
+
 For further reference, please consider the following sections:
 
 * [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
