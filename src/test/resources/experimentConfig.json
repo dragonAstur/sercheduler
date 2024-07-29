@@ -1,7 +1,7 @@
 {
-  "fitness": ["simple", "multi"],
+  "fitness": ["simple","xing"],
   "workflows": ["1000genome-chameleon-2ch-250k-001"],
-  "minHosts": 8,
+  "minHosts": 16,
   "maxHosts": 16,
   "hostIncrement": 2,
   "referenceSpeed": "441Gf",
