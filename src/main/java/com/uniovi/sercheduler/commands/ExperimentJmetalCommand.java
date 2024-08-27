@@ -3,6 +3,8 @@ package com.uniovi.sercheduler.commands;
 import com.uniovi.sercheduler.dto.BenchmarkData;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
+import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
+import com.uniovi.sercheduler.jmetal.operator.ScheduleSelection;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.parser.HostLoader;
@@ -20,6 +22,7 @@ import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
+import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.MultiThreadedEvaluation;
 import org.uma.jmetal.component.catalogue.common.termination.Termination;
 import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByEvaluations;
@@ -134,13 +137,33 @@ public class ExperimentJmetalCommand {
               new ScheduleMutation(mutationProbability, operators);
 
           for (int run = 0; run < experimentConfig.independentRuns(); run++) {
+            Algorithm<List<SchedulePermutationSolution>> algorithm;
 
-            Algorithm<List<SchedulePermutationSolution>> algorithm =
-                new NSGAIIBuilder<>(
-                        problem, populationSize, offspringPopulationSize, crossover, mutation)
-                    .setTermination(termination)
-                    .setEvaluation(new MultiThreadedEvaluation<>(0, problem))
-                    .build();
+            if (f.contains("mono")) {
+              algorithm =
+                  new GeneticAlgorithmBuilder<>(
+                          "GGA",
+                          problem,
+                          populationSize,
+                          offspringPopulationSize,
+                          crossover,
+                          mutation)
+                      .setTermination(termination)
+                      .setEvaluation(new MultiThreadedEvaluation<>(0, problem))
+                      .setSelection(new ScheduleSelection(random))
+                      .setReplacement(new ScheduleReplacement(random))
+                      .build();
+
+            } else {
+
+              algorithm =
+                  new NSGAIIBuilder<>(
+                          problem, populationSize, offspringPopulationSize, crossover, mutation)
+                      .setTermination(termination)
+                      .setEvaluation(new MultiThreadedEvaluation<>(0, problem))
+                      .build();
+            }
+
             algorithmList.add(new ExperimentAlgorithm<>(algorithm, f, experimentProblem, run));
           }
 
