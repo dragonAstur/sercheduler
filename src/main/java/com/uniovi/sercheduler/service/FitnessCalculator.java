@@ -82,7 +82,6 @@ public abstract class FitnessCalculator {
       case "heft", "heft-mono" -> new FitnessCalculatorHeft(instanceData);
       case "rank" -> new FitnessCalculatorRank(instanceData);
       case "multi" -> new FitnessCalculatorMulti(instanceData);
-      case "xing" -> new FitnessCalculatorXing(instanceData);
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }

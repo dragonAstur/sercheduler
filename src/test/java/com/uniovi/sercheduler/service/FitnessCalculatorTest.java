@@ -195,31 +195,6 @@ public class FitnessCalculatorTest {
   }
 
   @Test
-  void CalculateFitnessXing() {
-
-    InstanceData instanceData = loadFitnessTest();
-    FitnessCalculator fitnessCalculator = new FitnessCalculatorXing(instanceData);
-    List<PlanPair> plan =
-            List.of(
-                    new PlanPair(instanceData.workflow().get("task01"), instanceData.hosts().get("HostA")),
-                    new PlanPair(instanceData.workflow().get("task02"), instanceData.hosts().get("HostA")),
-                    new PlanPair(instanceData.workflow().get("task04"), instanceData.hosts().get("HostB")),
-                    new PlanPair(instanceData.workflow().get("task05"), instanceData.hosts().get("HostC")),
-                    new PlanPair(instanceData.workflow().get("task03"), instanceData.hosts().get("HostA")),
-                    new PlanPair(instanceData.workflow().get("task06"), instanceData.hosts().get("HostB")),
-                    new PlanPair(instanceData.workflow().get("task07"), instanceData.hosts().get("HostC")),
-                    new PlanPair(instanceData.workflow().get("task09"), instanceData.hosts().get("HostA")),
-                    new PlanPair(instanceData.workflow().get("task08"), instanceData.hosts().get("HostB")),
-                    new PlanPair(instanceData.workflow().get("task10"), instanceData.hosts().get("HostC")));
-
-    FitnessInfo result =
-            fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan));
-
-    assertEquals(193.5D, result.fitness().get("makespan"));
-    assertEquals(592.0D, result.fitness().get("energy"));
-  }
-
-  @Test
   void CalculateFitnessHeuristic() {
 
     InstanceData instanceData = loadFitnessTest();
