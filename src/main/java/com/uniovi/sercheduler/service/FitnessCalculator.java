@@ -78,8 +78,8 @@ public abstract class FitnessCalculator {
    */
   public static FitnessCalculator getFitness(String fitness, InstanceData instanceData) {
     return switch (fitness) {
-      case "simple" -> new FitnessCalculatorSimple(instanceData);
-      case "heft" -> new FitnessCalculatorHeft(instanceData);
+      case "simple", "simple-mono" -> new FitnessCalculatorSimple(instanceData);
+      case "heft", "heft-mono" -> new FitnessCalculatorHeft(instanceData);
       case "rank" -> new FitnessCalculatorRank(instanceData);
       case "multi" -> new FitnessCalculatorMulti(instanceData);
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
@@ -296,6 +296,7 @@ public abstract class FitnessCalculator {
 
   /**
    * Provides the name of the fitness used.
+   *
    * @return The name of the fitness.
    */
   public abstract String fitnessName();
