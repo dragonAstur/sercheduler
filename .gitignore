@@ -47,3 +47,6 @@ jMetal.log
 
 #project
 experiments
+
+#mac
+.DS_Store
