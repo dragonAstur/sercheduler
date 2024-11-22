@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 import org.uma.jmetal.algorithm.Algorithm;
+import org.uma.jmetal.algorithm.multiobjective.pesa2.PESA2Builder;
+import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2Builder;
 import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
 import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.MultiThreadedEvaluation;
@@ -82,7 +84,6 @@ public class ExperimentJmetalCommand {
       @Option(shortNames = 'E', defaultValue = "100000") Integer executions,
       @Option(shortNames = 'S', defaultValue = "1") Long seed,
       @Option(shortNames = 'C') String experimentConfigFile) {
-    var benchmarksResult = new ArrayList<BenchmarkData>();
 
     var experimentConfig = experimentConfigLoader.readFromFile(new File(experimentConfigFile));
 
@@ -154,6 +155,19 @@ public class ExperimentJmetalCommand {
                       .setReplacement(new ScheduleReplacement(random))
                       .build();
 
+            } else if (f.contains("spea2")) {
+              algorithm =
+                  new SPEA2Builder<>(problem, crossover, mutation)
+                      .setPopulationSize(populationSize)
+                      .setMaxIterations(executions/populationSize)
+                      .build();
+
+            } else if (f.contains("pesa2")) {
+              algorithm =
+                  new PESA2Builder<>(problem, crossover, mutation)
+                      .setPopulationSize(populationSize)
+                      .setMaxEvaluations(executions)
+                      .build();
             } else {
 
               algorithm =
@@ -174,15 +188,13 @@ public class ExperimentJmetalCommand {
 
     Experiment<SchedulePermutationSolution, List<SchedulePermutationSolution>> experiment =
         new ExperimentBuilder<SchedulePermutationSolution, List<SchedulePermutationSolution>>(
-                "NSGAIIComputingReferenceParetoFrontsStudy")
+                "Scheduling")
             .setAlgorithmList(algorithmList)
             .setProblemList(problemList)
             .setExperimentBaseDirectory(experimentBaseDirectory)
             .setOutputParetoFrontFileName("FUN")
             .setOutputParetoSetFileName("VAR")
-            .setReferenceFrontDirectory(
-                experimentBaseDirectory
-                    + "/NSGAIIComputingReferenceParetoFrontsStudy/referenceFronts")
+            .setReferenceFrontDirectory(experimentBaseDirectory + "/Scheduling/referenceFronts")
             .setIndicatorList(
                 List.of(
                     new Epsilon(),

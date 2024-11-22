@@ -85,7 +85,7 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
    */
   @Override
   public int numberOfVariables() {
-    return 1;
+    return instanceData.workflow().size();
   }
 
   /**

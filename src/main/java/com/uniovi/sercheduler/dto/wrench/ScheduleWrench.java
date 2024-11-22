@@ -11,4 +11,5 @@ import java.util.List;
  */
 public record ScheduleWrench(
     @JsonProperty("machines") List<HostWrench> hosts,
-    @JsonProperty("schedule") List<TaskWrench> tasks) {}
+    @JsonProperty("schedule") List<TaskWrench> tasks,
+    @JsonProperty("reference_speed") String referenceSpeed) {}

@@ -1,5 +1,5 @@
 {
-  "fitness": ["simple", "heft", "rank", "multi"],
+  "fitness": ["simple", "heft", "rank", "multi","heft-mono","simple-mono","heft-spea2","heft-pesa2"],
   "workflows": ["1000genome-chameleon-2ch-250k-001",
     "1000genome-chameleon-4ch-250k-001",
     "1000genome-chameleon-12ch-250k-001",

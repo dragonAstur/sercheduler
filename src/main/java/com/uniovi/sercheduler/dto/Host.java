@@ -50,4 +50,9 @@ public class Host {
   public Double getEnergyCost() {
     return energyCost;
   }
+
+  @Override
+  public String toString() {
+    return name;
+  }
 }

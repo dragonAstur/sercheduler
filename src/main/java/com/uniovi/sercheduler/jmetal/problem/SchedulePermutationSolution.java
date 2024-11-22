@@ -86,4 +86,9 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
   public void setArbiter(String arbiter) {
     this.arbiter = arbiter;
   }
+
+  @Override
+  public List<PlanPair> variables() {
+    return plan ;
+  }
 }

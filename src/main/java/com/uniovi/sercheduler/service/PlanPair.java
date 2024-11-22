@@ -9,4 +9,10 @@ import com.uniovi.sercheduler.dto.Task;
  * @param task Task to schedule.
  * @param host Host to execute the task with.
  */
-public record PlanPair(Task task, Host host) {}
+public record PlanPair(Task task, Host host) {
+
+  @Override
+  public String toString() {
+    return "[" + task + ", " + host + ']';
+  }
+}

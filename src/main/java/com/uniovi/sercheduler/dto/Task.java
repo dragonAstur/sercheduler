@@ -69,4 +69,9 @@ public class Task {
   public FileList getOutput() {
     return output;
   }
+
+  @Override
+  public String toString() {
+    return name;
+  }
 }
