@@ -111,7 +111,8 @@ public class ExperimentCommand {
       headerRow.createCell(1).setCellValue("Hosts");
       headerRow.createCell(2).setCellValue("Fitness");
       headerRow.createCell(3).setCellValue("Makespan");
-      headerRow.createCell(4).setCellValue("Time");
+      headerRow.createCell(4).setCellValue("Energy");
+      headerRow.createCell(5).setCellValue("Time");
 
       // Populate data
       int rowNum = 1;
@@ -123,7 +124,8 @@ public class ExperimentCommand {
         row.createCell(1).setCellValue(result.hosts());
         row.createCell(2).setCellValue(result.fitness());
         row.createCell(3).setCellValue(result.makespan());
-        row.createCell(4).setCellValue(result.time());
+        row.createCell(4).setCellValue(result.energy());
+        row.createCell(5).setCellValue(result.time());
 
         // Write the workbook to a file
         try (FileOutputStream outputStream = new FileOutputStream("results.xlsx")) {
@@ -170,6 +172,7 @@ public class ExperimentCommand {
     Termination termination = new TerminationByEvaluations(executions);
 
     var makespans = new ArrayList<Double>();
+    var energies = new ArrayList<Double>();
 
     for (int i = 0; i < experimentConfig.independentRuns(); i++) {
       EvolutionaryAlgorithm<SchedulePermutationSolution> gaAlgo =
@@ -187,12 +190,14 @@ public class ExperimentCommand {
               .min(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")))
               .orElseThrow();
       makespans.add(bestSolution.objectives()[0]);
+      energies.add(bestSolution.objectives()[1]);
     }
 
     var mean = makespans.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+    var energyMean = energies.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
     Instant finish = Instant.now();
 
     var timeElapsed = Duration.between(start, finish);
-    return new BenchmarkData(benchmark, hosts, fitness, mean, timeElapsed.toSeconds());
+    return new BenchmarkData(benchmark, hosts, fitness, mean, energyMean, timeElapsed.toSeconds());
   }
 }
