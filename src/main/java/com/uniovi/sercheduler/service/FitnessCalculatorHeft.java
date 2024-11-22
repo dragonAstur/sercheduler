@@ -3,9 +3,9 @@ package com.uniovi.sercheduler.service;
 import com.uniovi.sercheduler.dto.Host;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,31 +18,32 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
   /**
    * Calculates the makespan of a given schedule.
    *
-   * @param plan Schedule to calculate.
-   * @return The value of the makespan.
+   * @param solution@return The value of the makespan.
    */
   @Override
-  public FitnessInfo calculateFitness(
-      List<PlanPair> plan) {
+  public FitnessInfo calculateFitness(SchedulePermutationSolution solution) {
+    var plan = solution.getPlan();
 
     double makespan = 0D;
+    double energy = 0D;
 
     var available = new HashMap<String, Double>(instanceData.hosts().size());
     var schedule = new HashMap<String, TaskSchedule>(instanceData.workflow().size());
 
     for (var schedulePair : plan) {
 
-      Double minEft =
-          calculateHeftTaskCost(
-              schedulePair.task(), schedule, available);
+      var eftAndAst = calculateHeftTaskCost(schedulePair.task(), schedule, available);
 
-      makespan = Math.max(minEft, makespan);
+      makespan = Math.max(eftAndAst.eft(), makespan);
+
+      energy += (eftAndAst.eft() - eftAndAst.ast()) * schedulePair.host().getEnergyCost();
     }
 
     var orderedSchedule =
         schedule.values().stream().sorted(Comparator.comparing(TaskSchedule::ast)).toList();
 
-    return new FitnessInfo(Map.of("makespan", makespan), orderedSchedule, fitnessName());
+    return new FitnessInfo(
+        Map.of("makespan", makespan, "energy", energy), orderedSchedule, fitnessName());
   }
 
   @Override
@@ -50,17 +51,14 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
     return "heft";
   }
 
-  private Double calculateHeftTaskCost(
-      Task task,
-      HashMap<String, TaskSchedule> schedule,
-      HashMap<String, Double> available) {
+  private EftAndAst calculateHeftTaskCost(
+      Task task, HashMap<String, TaskSchedule> schedule, HashMap<String, Double> available) {
     double minEft = Double.MAX_VALUE;
     Optional<Host> selectedHost = Optional.empty();
     Optional<TaskCosts> selectedTaskCosts = Optional.empty();
     for (var host : instanceData.hosts().values()) {
 
-      var taskCosts =
-          calculateEft(task, host, schedule, available);
+      var taskCosts = calculateEft(task, host, schedule, available);
       double tmpEft = minEft;
 
       minEft = Math.min(minEft, taskCosts.eft());
@@ -80,6 +78,8 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
             - taskCosts.diskReadStaging();
 
     schedule.put(task.getName(), new TaskSchedule(task, ast, taskCosts.eft(), host));
-    return minEft;
+    return new EftAndAst(minEft, ast);
   }
+
+  private record EftAndAst(Double eft, Double ast) {}
 }

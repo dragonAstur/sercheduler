@@ -13,6 +13,8 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
     implements PermutationSolution<PlanPair> {
 
   FitnessInfo fitnessInfo;
+
+  String arbiter = "makespan";
   List<PlanPair> plan;
 
   /**
@@ -37,31 +39,34 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
    */
   @Override
   public Solution<PlanPair> copy() {
+    FitnessInfo fitnessInfoCopy = null;
 
-    var fitnessInfoCopy =
-        new FitnessInfo(
-            Map.copyOf(fitnessInfo.fitness()),
-            List.copyOf(fitnessInfo.schedule()),
-            fitnessInfo.fitnessFunction());
+    if (fitnessInfo != null) {
+      fitnessInfoCopy =
+          new FitnessInfo(
+              Map.copyOf(fitnessInfo.fitness()),
+              List.copyOf(fitnessInfo.schedule()),
+              fitnessInfo.fitnessFunction());
+    }
 
     return new SchedulePermutationSolution(
         this.variables().size(), this.objectives().length, fitnessInfoCopy, List.copyOf(this.plan));
-  }
-
-  public void setFitnessInfo(FitnessInfo fitnessInfo) {
-    this.fitnessInfo = fitnessInfo;
-  }
-
-  public void setPlan(List<PlanPair> plan) {
-    this.plan = plan;
   }
 
   public List<PlanPair> getPlan() {
     return plan;
   }
 
+  public void setPlan(List<PlanPair> plan) {
+    this.plan = plan;
+  }
+
   public FitnessInfo getFitnessInfo() {
     return fitnessInfo;
+  }
+
+  public void setFitnessInfo(FitnessInfo fitnessInfo) {
+    this.fitnessInfo = fitnessInfo;
   }
 
   /**
@@ -72,5 +77,18 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
   @Override
   public int getLength() {
     return plan.size();
+  }
+
+  public String getArbiter() {
+    return arbiter;
+  }
+
+  public void setArbiter(String arbiter) {
+    this.arbiter = arbiter;
+  }
+
+  @Override
+  public List<PlanPair> variables() {
+    return plan ;
   }
 }

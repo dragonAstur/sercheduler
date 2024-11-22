@@ -21,6 +21,8 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   private final PlanGenerator planGenerator;
 
   private final FitnessCalculator fitnessCalculator;
+  InstanceData instanceData;
+  private String name;
 
   /**
    * Full constructor.
@@ -38,9 +40,33 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
     this.instanceData = loadData(workflowFile, hostsFile, referenceSpeed);
     this.fitnessCalculator = FitnessCalculator.getFitness(fitness, instanceData);
     this.planGenerator = new PlanGenerator(new Random(seed), instanceData);
+    this.name = "Scheduling problem";
   }
 
-  InstanceData instanceData;
+  /**
+   * Full constructor.
+   *
+   * @param name The name of the problem.
+   * @param workflowFile The file containing the workflow.
+   * @param hostsFile The file containing the hosts.
+   * @param referenceSpeed The CPU reference speed to calculate the runtime.
+   * @param fitness The fitness function to use.
+   * @param seed The random seed to use
+   */
+  public SchedulingProblem(
+      String name,
+      File workflowFile,
+      File hostsFile,
+      String referenceSpeed,
+      String fitness,
+      Long seed) {
+    this.name = name;
+    this.workflowLoader = new WorkflowFileLoader();
+    this.hostLoader = new HostFileLoader();
+    this.instanceData = loadData(workflowFile, hostsFile, referenceSpeed);
+    this.fitnessCalculator = FitnessCalculator.getFitness(fitness, instanceData);
+    this.planGenerator = new PlanGenerator(new Random(seed), instanceData);
+  }
 
   /**
    * Gets the size of the workflow.
@@ -59,7 +85,7 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
    */
   @Override
   public int numberOfVariables() {
-    return 1;
+    return instanceData.workflow().size();
   }
 
   /**
@@ -69,7 +95,7 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
    */
   @Override
   public int numberOfObjectives() {
-    return 1;
+    return 2;
   }
 
   /**
@@ -89,7 +115,7 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
    */
   @Override
   public String name() {
-    return "Scheduling problem";
+    return this.name;
   }
 
   /**
@@ -102,13 +128,14 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   public SchedulePermutationSolution evaluate(
       SchedulePermutationSolution schedulePermutationSolution) {
 
-    var fitnessInfo = fitnessCalculator.calculateFitness(schedulePermutationSolution.plan);
+    var fitnessInfo = fitnessCalculator.calculateFitness(schedulePermutationSolution);
     var plan = fitnessInfo.schedule().stream().map(s -> new PlanPair(s.task(), s.host())).toList();
 
     schedulePermutationSolution.setPlan(plan);
     schedulePermutationSolution.setFitnessInfo(fitnessInfo);
 
     schedulePermutationSolution.objectives()[0] = fitnessInfo.fitness().get("makespan");
+    schedulePermutationSolution.objectives()[1] = fitnessInfo.fitness().get("energy");
 
     return schedulePermutationSolution;
   }

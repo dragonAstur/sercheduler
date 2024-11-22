@@ -9,6 +9,6 @@ import com.uniovi.sercheduler.dto.Task;
  * @param task Task to schedule.
  * @param ast When does the task start in the timeline.
  * @param eft When does the task ends in the timeline.
- * @param host Where does the task run.
+ * @param host Where the task runs.
  */
 public record TaskSchedule(Task task, Double ast, Double eft, Host host) {}

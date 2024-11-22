@@ -21,5 +21,7 @@ class HostLoaderFileLoaderTest {
     assertEquals(32000000L, hosts.get("HostA").getDiskSpeed());
     assertEquals(8000000L, hosts.get("HostA").getNetworkSpeed());
     assertEquals(8000000L, hosts.get("HostC").getNetworkSpeed());
+    assertEquals(2D, hosts.get("HostA").getEnergyCost());
+    assertEquals(1D, hosts.get("HostC").getEnergyCost());
   }
 }

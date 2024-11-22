@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.commands;
 
+import com.uniovi.sercheduler.dao.experiment.ExperimentConfig;
 import com.uniovi.sercheduler.dto.BenchmarkData;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
@@ -9,7 +10,9 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowLoader;
+import com.uniovi.sercheduler.parser.experiment.ExperimentConfigLoader;
 import com.uniovi.sercheduler.service.Operators;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,14 +41,18 @@ import org.uma.jmetal.operator.mutation.MutationOperator;
 public class ExperimentCommand {
 
   static final Logger LOG = LoggerFactory.getLogger(ExperimentCommand.class);
-  private static final int NUMBER_OF_REPEATS = 10;
 
   final WorkflowLoader workflowLoader;
   final HostLoader hostLoader;
+  final ExperimentConfigLoader experimentConfigLoader;
 
-  public ExperimentCommand(WorkflowLoader workflowLoader, HostLoader hostLoader) {
+  public ExperimentCommand(
+      WorkflowLoader workflowLoader,
+      HostLoader hostLoader,
+      ExperimentConfigLoader experimentConfigLoader) {
     this.workflowLoader = workflowLoader;
     this.hostLoader = hostLoader;
+    this.experimentConfigLoader = experimentConfigLoader;
   }
 
   /**
@@ -61,43 +68,20 @@ public class ExperimentCommand {
       @Option(shortNames = 'H') String hostsPath,
       @Option(shortNames = 'T') String type,
       @Option(shortNames = 'E', defaultValue = "100000") Integer executions,
-      @Option(shortNames = 'S', defaultValue = "1") Long seed) {
+      @Option(shortNames = 'S', defaultValue = "1") Long seed,
+      @Option(shortNames = 'C') String experimentConfigFile) {
     var benchmarksResult = new ArrayList<BenchmarkData>();
-    var benchmarks =
-        List.of(
-            "1000genome-chameleon-2ch-250k-001",
-            "1000genome-chameleon-4ch-250k-001",
-            "1000genome-chameleon-12ch-250k-001",
-            "1000genome-chameleon-18ch-250k-001",
-            "cycles-chameleon-1l-1c-9p-001",
-            "cycles-chameleon-2l-1c-9p-001",
-            "cycles-chameleon-2l-1c-12p-001",
-            "cycles-chameleon-5l-1c-12p-001",
-            "epigenomics-chameleon-hep-1seq-100k-001",
-            "epigenomics-chameleon-hep-6seq-100k-001",
-            "epigenomics-chameleon-ilmn-1seq-100k-001",
-            "epigenomics-chameleon-ilmn-6seq-100k-001",
-            "montage-chameleon-2mass-01d-001",
-            "montage-chameleon-2mass-005d-001",
-            "montage-chameleon-dss-10d-001",
-            "montage-chameleon-dss-125d-001",
-            "seismology-chameleon-100p-001",
-            "seismology-chameleon-500p-001",
-            "seismology-chameleon-700p-001",
-            "seismology-chameleon-1000p-001",
-            "soykb-chameleon-10fastq-10ch-001",
-            "soykb-chameleon-10fastq-20ch-001",
-            "soykb-chameleon-30fastq-10ch-001",
-            "soykb-chameleon-40fastq-20ch-001",
-            "srasearch-chameleon-10a-005",
-            "srasearch-chameleon-20a-003",
-            "srasearch-chameleon-40a-003",
-            "srasearch-chameleon-50a-003");
+
+    var experimentConfig = experimentConfigLoader.readFromFile(new File(experimentConfigFile));
+
+    var benchmarks = experimentConfig.workflows();
     Random random = new Random(seed);
     for (var benchmark : benchmarks) {
 
-      var fitness = List.of("simple", "heft", "rank", "multi");
-      for (int i = 1; i <= 16; i = i * 2) {
+      var fitness = experimentConfig.fitness();
+      for (int i = experimentConfig.minHosts();
+          i <= experimentConfig.maxHosts();
+          i = i * experimentConfig.hostIncrement()) {
         for (var f : fitness) {
           var benchmarkData =
               doExperiment(
@@ -109,7 +93,8 @@ public class ExperimentCommand {
                   f,
                   random,
                   workflowsPath,
-                  hostsPath);
+                  hostsPath,
+                  experimentConfig);
 
           benchmarksResult.add(benchmarkData);
           LOG.info("Done benchmark {} with {} hosts and fitness {}", benchmark, i, f);
@@ -126,7 +111,8 @@ public class ExperimentCommand {
       headerRow.createCell(1).setCellValue("Hosts");
       headerRow.createCell(2).setCellValue("Fitness");
       headerRow.createCell(3).setCellValue("Makespan");
-      headerRow.createCell(4).setCellValue("Time");
+      headerRow.createCell(4).setCellValue("Energy");
+      headerRow.createCell(5).setCellValue("Time");
 
       // Populate data
       int rowNum = 1;
@@ -138,7 +124,8 @@ public class ExperimentCommand {
         row.createCell(1).setCellValue(result.hosts());
         row.createCell(2).setCellValue(result.fitness());
         row.createCell(3).setCellValue(result.makespan());
-        row.createCell(4).setCellValue(result.time());
+        row.createCell(4).setCellValue(result.energy());
+        row.createCell(5).setCellValue(result.time());
 
         // Write the workbook to a file
         try (FileOutputStream outputStream = new FileOutputStream("results.xlsx")) {
@@ -161,14 +148,15 @@ public class ExperimentCommand {
       String fitness,
       Random random,
       String workflowsPath,
-      String hostsPath) {
+      String hostsPath,
+      ExperimentConfig experimentConfig) {
     final Instant start = Instant.now();
 
     var problem =
         new SchedulingProblem(
             new File(workflowsPath + benchmark + ".json"),
             new File(hostsPath + type + "/hosts-" + hosts + ".json"),
-            "441Gf",
+            experimentConfig.referenceSpeed(),
             fitness,
             seed);
 
@@ -184,29 +172,32 @@ public class ExperimentCommand {
     Termination termination = new TerminationByEvaluations(executions);
 
     var makespans = new ArrayList<Double>();
+    var energies = new ArrayList<Double>();
 
-    for (int i = 0; i < NUMBER_OF_REPEATS; i++) {
+    for (int i = 0; i < experimentConfig.independentRuns(); i++) {
       EvolutionaryAlgorithm<SchedulePermutationSolution> gaAlgo =
           new GeneticAlgorithmBuilder<>(
                   "GGA", problem, populationSize, offspringPopulationSize, crossover, mutation)
               .setTermination(termination)
-              .setEvaluation(new MultiThreadedEvaluation<>(16, problem))
+              .setEvaluation(new MultiThreadedEvaluation<>(0, problem))
               .setSelection(new ScheduleSelection(random))
               .setReplacement(new ScheduleReplacement(random))
               .build();
 
       gaAlgo.run();
       var bestSolution =
-          gaAlgo.getResult().stream()
+          gaAlgo.result().stream()
               .min(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")))
               .orElseThrow();
       makespans.add(bestSolution.objectives()[0]);
+      energies.add(bestSolution.objectives()[1]);
     }
 
     var mean = makespans.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+    var energyMean = energies.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
     Instant finish = Instant.now();
 
     var timeElapsed = Duration.between(start, finish);
-    return new BenchmarkData(benchmark, hosts, fitness, mean, timeElapsed.toSeconds());
+    return new BenchmarkData(benchmark, hosts, fitness, mean, energyMean, timeElapsed.toSeconds());
   }
 }

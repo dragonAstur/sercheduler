@@ -4,6 +4,7 @@ import com.uniovi.sercheduler.dto.Host;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.dto.TaskFile;
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +67,23 @@ public abstract class FitnessCalculator {
                   return Map.entry(parent.getName(), bitsTransferred);
                 })
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+  }
+
+  /**
+   * Get the fitness calculator for a specific method.
+   *
+   * @param fitness The requested fitness.
+   * @param instanceData The data related to the problem.
+   * @return The Fitness calculator.
+   */
+  public static FitnessCalculator getFitness(String fitness, InstanceData instanceData) {
+    return switch (fitness) {
+      case "simple", "simple-mono" -> new FitnessCalculatorSimple(instanceData);
+      case "heft", "heft-mono","heft-spea2", "heft-pesa2" -> new FitnessCalculatorHeft(instanceData);
+      case "rank" -> new FitnessCalculatorRank(instanceData);
+      case "multi" -> new FitnessCalculatorMulti(instanceData);
+      default -> throw new IllegalStateException("Unexpected value: " + fitness);
+    };
   }
 
   /**
@@ -198,7 +216,7 @@ public abstract class FitnessCalculator {
         .orElseThrow();
   }
 
-  public abstract FitnessInfo calculateFitness(List<PlanPair> plan);
+  public abstract FitnessInfo calculateFitness(SchedulePermutationSolution solution);
 
   /**
    * Calculates the eft of a given task.
@@ -277,25 +295,8 @@ public abstract class FitnessCalculator {
   }
 
   /**
-   * Get the fitness calculator for a specific method.
-   *
-   * @param fitness The requested fitness.
-   * @param instanceData The data related to the problem.
-   * @return The Fitness calculator.
-   */
-  public static FitnessCalculator getFitness(String fitness, InstanceData instanceData) {
-    return switch (fitness) {
-      case "simple" -> new FitnessCalculatorSimple(instanceData);
-      case "heft" -> new FitnessCalculatorHeft(instanceData);
-      case "rank" -> new FitnessCalculatorRank(instanceData);
-      case "multi" -> new FitnessCalculatorMulti(instanceData);
-      default -> throw new IllegalStateException("Unexpected value: " + fitness);
-    };
-  }
-
-
-  /**
    * Provides the name of the fitness used.
+   *
    * @return The name of the fitness.
    */
   public abstract String fitnessName();

@@ -1,9 +1,9 @@
 package com.uniovi.sercheduler.service;
 
 import com.uniovi.sercheduler.dto.InstanceData;
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /** Implementation for calculating the makespan using DNC model. */
@@ -15,14 +15,14 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
   /**
    * Calculates the makespan of a given schedule.
    *
-   * @param plan Schedule to calculate.
-   * @return The value of the makespan.
+   * @param solution@return The value of the makespan.
    */
   @Override
-  public FitnessInfo calculateFitness(
-      List<PlanPair> plan) {
+  public FitnessInfo calculateFitness(SchedulePermutationSolution solution) {
+    var plan = solution.getPlan();
 
     double makespan = 0D;
+    double energy = 0D;
 
     var available = new HashMap<String, Double>(instanceData.hosts().size());
     var schedule = new HashMap<String, TaskSchedule>(instanceData.workflow().size());
@@ -31,12 +31,7 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
       var taskName = schedulePair.task().getName();
       var hostName = schedulePair.host().getName();
 
-      var taskCosts =
-          calculateEft(
-              schedulePair.task(),
-              schedulePair.host(),
-              schedule,
-              available);
+      var taskCosts = calculateEft(schedulePair.task(), schedulePair.host(), schedule, available);
 
       available.put(hostName, taskCosts.eft());
       var ast =
@@ -51,12 +46,15 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
           new TaskSchedule(schedulePair.task(), ast, taskCosts.eft(), schedulePair.host()));
 
       makespan = Math.max(taskCosts.eft(), makespan);
+
+      energy += (taskCosts.eft() - ast) * schedulePair.host().getEnergyCost();
     }
 
     var orderedSchedule =
         schedule.values().stream().sorted(Comparator.comparing(TaskSchedule::ast)).toList();
 
-    return new FitnessInfo(Map.of("makespan", makespan), orderedSchedule, fitnessName());
+    return new FitnessInfo(
+        Map.of("makespan", makespan, "energy", energy), orderedSchedule, fitnessName());
   }
 
   @Override

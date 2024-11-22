@@ -10,4 +10,4 @@ package com.uniovi.sercheduler.dto;
  * @param time The time it took to execute.
  */
 public record BenchmarkData(
-    String workflow, Integer hosts, String fitness, Double makespan, Long time) {}
+    String workflow, Integer hosts, String fitness, Double makespan, Double energy, Long time) {}

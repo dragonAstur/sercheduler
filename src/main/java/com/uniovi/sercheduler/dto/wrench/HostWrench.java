@@ -16,4 +16,5 @@ public record HostWrench(
     String cores,
     @JsonProperty("cpu_speed") String cpuSpeed,
     @JsonProperty("disk_speed") String diskSpeed,
-    @JsonProperty("network_speed") String networkSpeed) {}
+    @JsonProperty("network_speed") String networkSpeed,
+    @JsonProperty("energy_cost") String energyCost) {}

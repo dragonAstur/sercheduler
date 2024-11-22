@@ -1,0 +1,10 @@
+{
+  "fitness": [ "heft", "simple"],
+  "workflows": ["epigenomics-chameleon-hep-1seq-100k-001"
+  ],
+  "minHosts": 16,
+  "maxHosts": 16,
+  "hostIncrement": 2,
+  "referenceSpeed": "441Gf",
+  "independentRuns": 10
+}

@@ -22,7 +22,7 @@ public class ScheduleExporter {
    * @param scheduleJson The file to use.
    */
   public void generateJsonSchedule(
-      FitnessInfo fitnessInfo, List<HostDao> hosts, File scheduleJson) {
+      FitnessInfo fitnessInfo, List<HostDao> hosts, File scheduleJson, String referenceSpeed) {
 
     var hostsWrench =
         hosts.stream()
@@ -33,7 +33,8 @@ public class ScheduleExporter {
                         h.cores().toString(),
                         h.cpuSpeed(),
                         h.diskSpeed(),
-                        h.networkSpeed()))
+                        h.networkSpeed(),
+                        h.energyCost().toString()))
             .toList();
 
     var tasks =
@@ -41,7 +42,7 @@ public class ScheduleExporter {
             .map(s -> new TaskWrench(s.task().getName(), s.host().getName()))
             .toList();
 
-    var scheduleWrench = new ScheduleWrench(hostsWrench, tasks);
+    var scheduleWrench = new ScheduleWrench(hostsWrench, tasks, referenceSpeed);
 
     var objectMapper = new ObjectMapper();
     try {
