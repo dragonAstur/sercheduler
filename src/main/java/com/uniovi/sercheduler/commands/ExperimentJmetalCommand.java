@@ -1,6 +1,6 @@
 package com.uniovi.sercheduler.commands;
 
-import com.uniovi.sercheduler.dto.BenchmarkData;
+import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
@@ -150,7 +150,7 @@ public class ExperimentJmetalCommand {
                           crossover,
                           mutation)
                       .setTermination(termination)
-                      .setEvaluation(new MultiThreadedEvaluation<>(0, problem))
+                      .setEvaluation(new MultiThreadEvaluationMulti(0, problem))
                       .setSelection(new ScheduleSelection(random))
                       .setReplacement(new ScheduleReplacement(random))
                       .build();
@@ -174,7 +174,7 @@ public class ExperimentJmetalCommand {
                   new NSGAIIBuilder<>(
                           problem, populationSize, offspringPopulationSize, crossover, mutation)
                       .setTermination(termination)
-                      .setEvaluation(new MultiThreadedEvaluation<>(0, problem))
+                      .setEvaluation(new MultiThreadEvaluationMulti(0, problem))
                       .build();
             }
 

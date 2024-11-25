@@ -15,7 +15,9 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
 
   ThreadSafeStringArray fitnessUsage = ThreadSafeStringArray.getInstance();
 
-  List<FitnessCalculator> fitnessCalculators;
+  List<FitnessCalculator> fitnessCalculatorsMakespan;
+  List<FitnessCalculator> fitnessCalculatorsEnergy;
+
 
   /**
    * Full constructor.
@@ -24,11 +26,15 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
    */
   public FitnessCalculatorMulti(InstanceData instanceData) {
     super(instanceData);
-    fitnessCalculators =
+    fitnessCalculatorsMakespan =
         List.of(
             new FitnessCalculatorSimple(instanceData),
             new FitnessCalculatorHeft(instanceData),
             new FitnessCalculatorRank(instanceData));
+
+    fitnessCalculatorsEnergy =
+        List.of(new FitnessCalculatorSimple(instanceData),
+            new FitnessCalculatorHeftEnergy(instanceData));
   }
 
   /**
@@ -38,6 +44,16 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
    */
   @Override
   public FitnessInfo calculateFitness(SchedulePermutationSolution solution) {
+    List<FitnessCalculator> fitnessCalculators;
+
+    if(solution.getArbiter().equals("energy")){
+      fitnessCalculators = fitnessCalculatorsEnergy;
+    }else {
+      fitnessCalculators = fitnessCalculatorsMakespan;
+    }
+
+
+
 
     var fitness =
         fitnessCalculators.stream()

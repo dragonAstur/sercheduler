@@ -15,7 +15,8 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
   /**
    * Calculates the makespan of a given schedule.
    *
-   * @param solution@return The value of the makespan.
+   * @param solution
+   * @return The value of the makespan.
    */
   @Override
   public FitnessInfo calculateFitness(SchedulePermutationSolution solution) {

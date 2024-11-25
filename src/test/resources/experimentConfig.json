@@ -1,5 +1,5 @@
 {
-  "fitness": [ "heft", "simple"],
+  "fitness": [ "heft", "simple", "multi"],
   "workflows": ["epigenomics-chameleon-hep-1seq-100k-001"
   ],
   "minHosts": 16,
