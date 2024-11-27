@@ -2,11 +2,10 @@ package com.uniovi.sercheduler.commands;
 
 import static org.uma.jmetal.util.AbstractAlgorithmRunner.printFinalSolutionSet;
 
+import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
-import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
-import com.uniovi.sercheduler.jmetal.operator.ScheduleSelection;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.parser.HostLoader;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -30,8 +30,6 @@ import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 import org.uma.jmetal.component.algorithm.EvolutionaryAlgorithm;
 import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
-import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
-import org.uma.jmetal.component.catalogue.common.evaluation.impl.MultiThreadedEvaluation;
 import org.uma.jmetal.component.catalogue.common.termination.Termination;
 import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByEvaluations;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
@@ -80,9 +78,11 @@ public class EvaluateCommand {
       @Option(shortNames = 'S', defaultValue = "1") Long seed,
       @Option(shortNames = 'F', defaultValue = "simple") String fitness) {
     final Instant start = Instant.now();
+    List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
 
     var problem =
-        new SchedulingProblem(new File(workflowFile), new File(hostsFile), "441Gf", fitness, seed);
+        new SchedulingProblem(
+            new File(workflowFile), new File(hostsFile), "441Gf", fitness, seed, objectives);
 
     Operators operators = new Operators(problem.getInstanceData(), new Random(seed));
     CrossoverOperator<SchedulePermutationSolution> crossover = new ScheduleCrossover(1, operators);
@@ -115,9 +115,13 @@ public class EvaluateCommand {
 
     var bestSolution =
         gaAlgo.result().stream()
-            .min(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")));
-    var makespan = bestSolution.orElseThrow().objectives()[0];
-    var energy = bestSolution.orElseThrow().getFitnessInfo().fitness().get("energy");
+            .min(
+                Comparator.comparing(
+                    s -> s.getFitnessInfo().fitness().get(Objective.MAKESPAN.objectiveName)));
+    var makespan =
+        bestSolution.orElseThrow().getFitnessInfo().fitness().get(Objective.MAKESPAN.objectiveName);
+    var energy =
+        bestSolution.orElseThrow().getFitnessInfo().fitness().get(Objective.ENERGY.objectiveName);
 
     Instant finish = Instant.now();
 

@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.jmetal.problem;
 
+import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.parser.HostFileLoader;
 import com.uniovi.sercheduler.parser.HostLoader;
@@ -10,6 +11,7 @@ import com.uniovi.sercheduler.service.PlanGenerator;
 import com.uniovi.sercheduler.service.PlanPair;
 import com.uniovi.sercheduler.util.UnitParser;
 import java.io.File;
+import java.util.List;
 import java.util.Random;
 import org.uma.jmetal.problem.permutationproblem.PermutationProblem;
 
@@ -23,6 +25,7 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   private final FitnessCalculator fitnessCalculator;
   InstanceData instanceData;
   private String name;
+  private List<Objective> objectives;
 
   /**
    * Full constructor.
@@ -34,13 +37,19 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
    * @param seed The random seed to use
    */
   public SchedulingProblem(
-      File workflowFile, File hostsFile, String referenceSpeed, String fitness, Long seed) {
+      File workflowFile,
+      File hostsFile,
+      String referenceSpeed,
+      String fitness,
+      Long seed,
+      List<Objective> objectives) {
     this.workflowLoader = new WorkflowFileLoader();
     this.hostLoader = new HostFileLoader();
     this.instanceData = loadData(workflowFile, hostsFile, referenceSpeed);
     this.fitnessCalculator = FitnessCalculator.getFitness(fitness, instanceData);
     this.planGenerator = new PlanGenerator(new Random(seed), instanceData);
     this.name = "Scheduling problem";
+    this.objectives = objectives;
   }
 
   /**
@@ -59,13 +68,15 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
       File hostsFile,
       String referenceSpeed,
       String fitness,
-      Long seed) {
+      Long seed,
+      List<Objective> objectives) {
     this.name = name;
     this.workflowLoader = new WorkflowFileLoader();
     this.hostLoader = new HostFileLoader();
     this.instanceData = loadData(workflowFile, hostsFile, referenceSpeed);
     this.fitnessCalculator = FitnessCalculator.getFitness(fitness, instanceData);
     this.planGenerator = new PlanGenerator(new Random(seed), instanceData);
+    this.objectives = objectives;
   }
 
   /**
@@ -134,8 +145,10 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
     schedulePermutationSolution.setPlan(plan);
     schedulePermutationSolution.setFitnessInfo(fitnessInfo);
 
-    schedulePermutationSolution.objectives()[0] = fitnessInfo.fitness().get("makespan");
-    schedulePermutationSolution.objectives()[1] = fitnessInfo.fitness().get("energy");
+    for (int i = 0; i < objectives.size(); i++) {
+      schedulePermutationSolution.objectives()[i] =
+          fitnessInfo.fitness().get(objectives.get(i).objectiveName);
+    }
 
     return schedulePermutationSolution;
   }

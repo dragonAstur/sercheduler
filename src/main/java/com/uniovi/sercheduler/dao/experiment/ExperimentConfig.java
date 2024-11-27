@@ -9,4 +9,5 @@ public record ExperimentConfig(
     int maxHosts,
     int hostIncrement,
     String referenceSpeed,
-    int independentRuns) {}
+    int independentRuns,
+    List<String> objectives) {}

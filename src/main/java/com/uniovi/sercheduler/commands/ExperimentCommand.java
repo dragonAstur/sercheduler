@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.commands;
 
+import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.dao.experiment.ExperimentConfig;
 import com.uniovi.sercheduler.dto.BenchmarkData;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
@@ -12,14 +13,12 @@ import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowLoader;
 import com.uniovi.sercheduler.parser.experiment.ExperimentConfigLoader;
 import com.uniovi.sercheduler.service.Operators;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -152,13 +151,14 @@ public class ExperimentCommand {
       ExperimentConfig experimentConfig) {
     final Instant start = Instant.now();
 
+    List<Objective> objectives = List.of(Objective.MAKESPAN,Objective.ENERGY);
     var problem =
         new SchedulingProblem(
             new File(workflowsPath + benchmark + ".json"),
             new File(hostsPath + type + "/hosts-" + hosts + ".json"),
             experimentConfig.referenceSpeed(),
             fitness,
-            seed);
+            seed,objectives);
 
     Operators operators = new Operators(problem.getInstanceData(), random);
     CrossoverOperator<SchedulePermutationSolution> crossover = new ScheduleCrossover(1, operators);
@@ -181,7 +181,7 @@ public class ExperimentCommand {
               .setTermination(termination)
               .setEvaluation(new MultiThreadedEvaluation<>(0, problem))
               .setSelection(new ScheduleSelection(random))
-              .setReplacement(new ScheduleReplacement(random))
+              .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
               .build();
 
       gaAlgo.run();

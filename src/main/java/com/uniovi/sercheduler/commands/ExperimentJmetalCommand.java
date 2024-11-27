@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.commands;
 
+import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
@@ -25,7 +26,6 @@ import org.uma.jmetal.algorithm.multiobjective.pesa2.PESA2Builder;
 import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2Builder;
 import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
 import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
-import org.uma.jmetal.component.catalogue.common.evaluation.impl.MultiThreadedEvaluation;
 import org.uma.jmetal.component.catalogue.common.termination.Termination;
 import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByEvaluations;
 import org.uma.jmetal.lab.experiment.Experiment;
@@ -102,6 +102,8 @@ public class ExperimentJmetalCommand {
     List<ExperimentAlgorithm<SchedulePermutationSolution, List<SchedulePermutationSolution>>>
         algorithmList = new ArrayList<>();
 
+    var objectives = experimentConfig.objectives().stream().map(Objective::of).toList();
+
     for (var benchmark : benchmarks) {
 
       for (int i = experimentConfig.minHosts();
@@ -114,7 +116,8 @@ public class ExperimentJmetalCommand {
                 new File(hostsPath + type + "/hosts-" + i + ".json"),
                 "441Gf",
                 "simple",
-                seed);
+                seed,
+                objectives);
 
         var experimentProblem = new ExperimentProblem<>(baseProblem);
         problemList.add(experimentProblem);
@@ -128,7 +131,8 @@ public class ExperimentJmetalCommand {
                   new File(hostsPath + type + "/hosts-" + i + ".json"),
                   experimentConfig.referenceSpeed(),
                   f,
-                  seed);
+                  seed,
+                  objectives);
 
           Operators operators = new Operators(problem.getInstanceData(), random);
           CrossoverOperator<SchedulePermutationSolution> crossover =
@@ -152,14 +156,14 @@ public class ExperimentJmetalCommand {
                       .setTermination(termination)
                       .setEvaluation(new MultiThreadEvaluationMulti(0, problem))
                       .setSelection(new ScheduleSelection(random))
-                      .setReplacement(new ScheduleReplacement(random))
+                      .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
                       .build();
 
             } else if (f.contains("spea2")) {
               algorithm =
                   new SPEA2Builder<>(problem, crossover, mutation)
                       .setPopulationSize(populationSize)
-                      .setMaxIterations(executions/populationSize)
+                      .setMaxIterations(executions / populationSize)
                       .build();
 
             } else if (f.contains("pesa2")) {
