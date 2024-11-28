@@ -18,23 +18,17 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
   List<FitnessCalculator> fitnessCalculatorsMakespan;
   List<FitnessCalculator> fitnessCalculatorsEnergy;
 
-
   /**
    * Full constructor.
    *
    * @param instanceData Infrastructure to use.
    */
-  public FitnessCalculatorMulti(InstanceData instanceData) {
+  public FitnessCalculatorMulti(
+      InstanceData instanceData, List<FitnessCalculator> fitnessCalculatorsMakespan, List<FitnessCalculator> fitnessCalculatorsEnergy) {
     super(instanceData);
-    fitnessCalculatorsMakespan =
-        List.of(
-            new FitnessCalculatorSimple(instanceData),
-            new FitnessCalculatorHeft(instanceData),
-            new FitnessCalculatorRank(instanceData));
+    this.fitnessCalculatorsMakespan = fitnessCalculatorsMakespan;
+    this.fitnessCalculatorsEnergy = fitnessCalculatorsEnergy;
 
-    fitnessCalculatorsEnergy =
-        List.of(new FitnessCalculatorSimple(instanceData),
-            new FitnessCalculatorHeftEnergy(instanceData));
   }
 
   /**
@@ -46,21 +40,16 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
   public FitnessInfo calculateFitness(SchedulePermutationSolution solution) {
     List<FitnessCalculator> fitnessCalculators;
 
-    if(solution.getArbiter().equals("energy")){
+    if (solution.getArbiter().equals("energy")) {
       fitnessCalculators = fitnessCalculatorsEnergy;
-    }else {
+    } else {
       fitnessCalculators = fitnessCalculatorsMakespan;
     }
-
-
-
 
     var fitness =
         fitnessCalculators.stream()
             .map(c -> c.calculateFitness(solution))
-            .min(
-                Comparator.comparing(
-                    f -> f.fitness().get(solution.getArbiter())))
+            .min(Comparator.comparing(f -> f.fitness().get(solution.getArbiter())))
             .orElseThrow();
 
     fitnessUsage.setValue(fitness.fitnessFunction(), fitness.fitness().get("makespan"));

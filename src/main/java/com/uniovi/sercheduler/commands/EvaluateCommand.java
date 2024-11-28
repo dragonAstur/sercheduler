@@ -82,7 +82,13 @@ public class EvaluateCommand {
 
     var problem =
         new SchedulingProblem(
-            new File(workflowFile), new File(hostsFile), "441Gf", fitness, seed, objectives);
+            new File(workflowFile),
+            new File(hostsFile),
+            "441Gf",
+            fitness,
+            seed,
+            objectives,
+            Objective.MAKESPAN.objectiveName);
 
     Operators operators = new Operators(problem.getInstanceData(), new Random(seed));
     CrossoverOperator<SchedulePermutationSolution> crossover = new ScheduleCrossover(1, operators);
@@ -99,7 +105,8 @@ public class EvaluateCommand {
     EvolutionaryAlgorithm<SchedulePermutationSolution> gaAlgo =
         new NSGAIIBuilder<>(problem, populationSize, offspringPopulationSize, crossover, mutation)
             .setTermination(termination)
-            .setEvaluation(new MultiThreadEvaluationMulti(16, problem))
+            .setEvaluation(
+                new MultiThreadEvaluationMulti(16, problem, objectives.get(1).objectiveName))
             //  .setSelection(new ScheduleSelection(new Random(seed)))
             //  .setReplacement(new ScheduleReplacement(new Random(seed)))
             .build();

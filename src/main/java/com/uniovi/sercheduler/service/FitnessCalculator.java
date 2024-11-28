@@ -5,6 +5,7 @@ import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.dto.TaskFile;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -79,11 +80,35 @@ public abstract class FitnessCalculator {
   public static FitnessCalculator getFitness(String fitness, InstanceData instanceData) {
     return switch (fitness) {
       case "simple", "simple-mono" -> new FitnessCalculatorSimple(instanceData);
-      case "heft", "heft-mono", "heft-spea2", "heft-pesa2" ->
+      case "heft", "heft-makespan-mono", "heft-spea2", "heft-pesa2" ->
           new FitnessCalculatorHeft(instanceData);
       case "heft-energy", "heft-energy-mono" -> new FitnessCalculatorHeftEnergy(instanceData);
       case "rank" -> new FitnessCalculatorRank(instanceData);
-      case "multi" -> new FitnessCalculatorMulti(instanceData);
+      case "multi" ->
+          new FitnessCalculatorMulti(
+              instanceData,
+              List.of(
+                  new FitnessCalculatorSimple(instanceData),
+                  new FitnessCalculatorHeft(instanceData),
+                  new FitnessCalculatorRank(instanceData)),
+              List.of(
+                  new FitnessCalculatorSimple(instanceData),
+                  new FitnessCalculatorHeftEnergy(instanceData)));
+      case "multi-makespan", "multi-makespan-mono" ->
+          new FitnessCalculatorMulti(
+              instanceData,
+              List.of(
+                  new FitnessCalculatorSimple(instanceData),
+                  new FitnessCalculatorHeft(instanceData),
+                  new FitnessCalculatorRank(instanceData)),
+              Collections.emptyList());
+      case "multi-energy", "multi-energy-mono" ->
+          new FitnessCalculatorMulti(
+              instanceData,
+              Collections.emptyList(),
+              List.of(
+                  new FitnessCalculatorSimple(instanceData),
+                  new FitnessCalculatorHeftEnergy(instanceData)));
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }

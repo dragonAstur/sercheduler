@@ -151,14 +151,16 @@ public class ExperimentCommand {
       ExperimentConfig experimentConfig) {
     final Instant start = Instant.now();
 
-    List<Objective> objectives = List.of(Objective.MAKESPAN,Objective.ENERGY);
+    List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
     var problem =
         new SchedulingProblem(
             new File(workflowsPath + benchmark + ".json"),
             new File(hostsPath + type + "/hosts-" + hosts + ".json"),
             experimentConfig.referenceSpeed(),
             fitness,
-            seed,objectives);
+            seed,
+            objectives,
+            Objective.MAKESPAN.objectiveName);
 
     Operators operators = new Operators(problem.getInstanceData(), random);
     CrossoverOperator<SchedulePermutationSolution> crossover = new ScheduleCrossover(1, operators);

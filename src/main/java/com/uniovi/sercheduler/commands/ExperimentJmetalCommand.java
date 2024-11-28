@@ -26,6 +26,8 @@ import org.uma.jmetal.algorithm.multiobjective.pesa2.PESA2Builder;
 import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2Builder;
 import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
 import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
+import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
+import org.uma.jmetal.component.catalogue.common.evaluation.impl.MultiThreadedEvaluation;
 import org.uma.jmetal.component.catalogue.common.termination.Termination;
 import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByEvaluations;
 import org.uma.jmetal.lab.experiment.Experiment;
@@ -42,6 +44,7 @@ import org.uma.jmetal.lab.experiment.util.ExperimentAlgorithm;
 import org.uma.jmetal.lab.experiment.util.ExperimentProblem;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
 import org.uma.jmetal.operator.mutation.MutationOperator;
+import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.qualityindicator.impl.Epsilon;
 import org.uma.jmetal.qualityindicator.impl.GenerationalDistance;
 import org.uma.jmetal.qualityindicator.impl.InvertedGenerationalDistance;
@@ -117,7 +120,8 @@ public class ExperimentJmetalCommand {
                 "441Gf",
                 "simple",
                 seed,
-                objectives);
+                objectives,
+                objectives.get(0).objectiveName);
 
         var experimentProblem = new ExperimentProblem<>(baseProblem);
         problemList.add(experimentProblem);
@@ -132,7 +136,8 @@ public class ExperimentJmetalCommand {
                   experimentConfig.referenceSpeed(),
                   f,
                   seed,
-                  objectives);
+                  objectives,
+                  objectives.get(0).objectiveName);
 
           Operators operators = new Operators(problem.getInstanceData(), random);
           CrossoverOperator<SchedulePermutationSolution> crossover =
@@ -154,7 +159,8 @@ public class ExperimentJmetalCommand {
                           crossover,
                           mutation)
                       .setTermination(termination)
-                      .setEvaluation(new MultiThreadEvaluationMulti(0, problem))
+                      .setEvaluation(
+                          getEvaluator("simple", problem, objectives))
                       .setSelection(new ScheduleSelection(random))
                       .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
                       .build();
@@ -178,7 +184,8 @@ public class ExperimentJmetalCommand {
                   new NSGAIIBuilder<>(
                           problem, populationSize, offspringPopulationSize, crossover, mutation)
                       .setTermination(termination)
-                      .setEvaluation(new MultiThreadEvaluationMulti(0, problem))
+                      .setEvaluation(
+                          getEvaluator("simple", problem, objectives))
                       .build();
             }
 
@@ -227,5 +234,14 @@ public class ExperimentJmetalCommand {
     }
 
     return "All experiments done";
+  }
+
+  private Evaluation<SchedulePermutationSolution> getEvaluator(
+      String evaluator, Problem<SchedulePermutationSolution> problem, List<Objective> objectives) {
+    return switch (evaluator) {
+      case "simple" -> new MultiThreadedEvaluation<>(0, problem);
+      case "multi" -> new MultiThreadEvaluationMulti(0, problem, objectives.get(1).objectiveName);
+      default -> new MultiThreadedEvaluation<>(0, problem);
+    };
   }
 }

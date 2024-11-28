@@ -26,6 +26,7 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   InstanceData instanceData;
   private String name;
   private List<Objective> objectives;
+  private String defaultArbiter;
 
   /**
    * Full constructor.
@@ -42,7 +43,8 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
       String referenceSpeed,
       String fitness,
       Long seed,
-      List<Objective> objectives) {
+      List<Objective> objectives,
+      String defaultArbiter) {
     this.workflowLoader = new WorkflowFileLoader();
     this.hostLoader = new HostFileLoader();
     this.instanceData = loadData(workflowFile, hostsFile, referenceSpeed);
@@ -50,6 +52,7 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
     this.planGenerator = new PlanGenerator(new Random(seed), instanceData);
     this.name = "Scheduling problem";
     this.objectives = objectives;
+    this.defaultArbiter = defaultArbiter;
   }
 
   /**
@@ -69,7 +72,8 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
       String referenceSpeed,
       String fitness,
       Long seed,
-      List<Objective> objectives) {
+      List<Objective> objectives,
+      String defaultArbiter) {
     this.name = name;
     this.workflowLoader = new WorkflowFileLoader();
     this.hostLoader = new HostFileLoader();
@@ -77,6 +81,7 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
     this.fitnessCalculator = FitnessCalculator.getFitness(fitness, instanceData);
     this.planGenerator = new PlanGenerator(new Random(seed), instanceData);
     this.objectives = objectives;
+    this.defaultArbiter = defaultArbiter;
   }
 
   /**
@@ -161,7 +166,7 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   @Override
   public SchedulePermutationSolution createSolution() {
     var plan = planGenerator.generatePlan();
-    return new SchedulePermutationSolution(numberOfVariables(), numberOfObjectives(), null, plan);
+    return new SchedulePermutationSolution(numberOfVariables(), numberOfObjectives(), null, plan, defaultArbiter);
   }
 
   private InstanceData loadData(File workflowFile, File hostsFile, String referenceSpeed) {

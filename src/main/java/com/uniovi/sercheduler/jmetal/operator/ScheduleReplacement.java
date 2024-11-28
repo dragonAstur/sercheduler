@@ -10,9 +10,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.uma.jmetal.component.catalogue.ea.replacement.Replacement;
 
-/**
- * Defines the replacement operator.
- */
+/** Defines the replacement operator. */
 public class ScheduleReplacement implements Replacement<SchedulePermutationSolution> {
 
   Random random;
@@ -21,7 +19,6 @@ public class ScheduleReplacement implements Replacement<SchedulePermutationSolut
   public ScheduleReplacement(Objective objective) {
     this(new Random(), objective);
   }
-
 
   public ScheduleReplacement(Random random, Objective objective) {
     this.random = random;
@@ -47,14 +44,19 @@ public class ScheduleReplacement implements Replacement<SchedulePermutationSolut
       var tournament = List.of(parent1, parent2, child1, child2);
       var result =
           tournament.stream()
-              .sorted(Comparator.comparing(s -> s.getFitnessInfo().fitness().get(objective.objectiveName)))
+              .sorted(
+                  Comparator.comparing(
+                      s -> s.getFitnessInfo().fitness().get(objective.objectiveName)))
               .collect(
                   Collectors.collectingAndThen(
                       Collectors.toCollection(
                           () ->
                               new TreeSet<>(
                                   Comparator.comparing(
-                                      s -> s.getFitnessInfo().fitness().get(objective.objectiveName)))),
+                                      s ->
+                                          s.getFitnessInfo()
+                                              .fitness()
+                                              .get(objective.objectiveName)))),
                       ArrayList::new));
 
       if (result.size() == 1) {

@@ -1,11 +1,11 @@
 {
-  "fitness": [ "heft-energy-mono", "simple-mono"],
-  "workflows": ["epigenomics-chameleon-hep-1seq-100k-001"
+  "fitness": [ "heft-energy-mono", "simple-mono", "multi-energy-mono"],
+  "workflows": ["1000genome-chameleon-2ch-250k-001"
   ],
   "minHosts": 16,
   "maxHosts": 16,
   "hostIncrement": 2,
   "referenceSpeed": "441Gf",
-  "independentRuns": 2,
+  "independentRuns": 10,
   "objectives" : ["energy","makespan"]
 }

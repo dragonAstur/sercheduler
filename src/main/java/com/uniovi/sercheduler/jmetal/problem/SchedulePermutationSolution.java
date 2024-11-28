@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.jmetal.problem;
 
+import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.service.FitnessInfo;
 import com.uniovi.sercheduler.service.PlanPair;
 import java.util.List;
@@ -14,7 +15,7 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
 
   FitnessInfo fitnessInfo;
 
-  String arbiter = "makespan";
+  String arbiter;
   List<PlanPair> plan;
 
   /**
@@ -26,10 +27,15 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
    * @param plan List of the possible schedule.
    */
   public SchedulePermutationSolution(
-      int numberOfVariables, int numberOfObjectives, FitnessInfo fitnessInfo, List<PlanPair> plan) {
+      int numberOfVariables,
+      int numberOfObjectives,
+      FitnessInfo fitnessInfo,
+      List<PlanPair> plan,
+      String arbiter) {
     super(numberOfVariables, numberOfObjectives);
     this.fitnessInfo = fitnessInfo;
     this.plan = plan;
+    this.arbiter = arbiter;
   }
 
   /**
@@ -50,7 +56,11 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
     }
 
     return new SchedulePermutationSolution(
-        this.variables().size(), this.objectives().length, fitnessInfoCopy, List.copyOf(this.plan));
+        this.variables().size(),
+        this.objectives().length,
+        fitnessInfoCopy,
+        List.copyOf(this.plan),
+        this.arbiter);
   }
 
   public List<PlanPair> getPlan() {
@@ -89,6 +99,6 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
 
   @Override
   public List<PlanPair> variables() {
-    return plan ;
+    return plan;
   }
 }

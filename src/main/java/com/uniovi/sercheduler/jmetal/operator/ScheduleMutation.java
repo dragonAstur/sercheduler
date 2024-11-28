@@ -6,9 +6,8 @@ import org.uma.jmetal.operator.mutation.MutationOperator;
 
 /** Mutation operator. */
 public class ScheduleMutation implements MutationOperator<SchedulePermutationSolution> {
-  double mutationProbability;
-
   final Operators operators;
+  double mutationProbability;
 
   public ScheduleMutation(double mutationProbability, Operators operators) {
     this.mutationProbability = mutationProbability;
@@ -29,7 +28,8 @@ public class ScheduleMutation implements MutationOperator<SchedulePermutationSol
         schedulePermutationSolution.variables().size(),
         schedulePermutationSolution.objectives().length,
         null,
-        operators.mutate(schedulePermutationSolution.getPlan()));
+        operators.mutate(schedulePermutationSolution.getPlan()),
+        schedulePermutationSolution.getArbiter());
   }
 
   /**

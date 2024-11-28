@@ -71,8 +71,16 @@ public class ScheduleCrossover implements CrossoverOperator<SchedulePermutationS
             schedulePermutationSolutions.get(0).getPlan());
     return List.of(
         new SchedulePermutationSolution(
-            schedule1.variables().size(), schedule1.objectives().length, null, newPlan),
+            schedule1.variables().size(),
+            schedule1.objectives().length,
+            null,
+            newPlan,
+            schedule1.getArbiter()),
         new SchedulePermutationSolution(
-            schedule1.variables().size(), schedule1.objectives().length, null, newPlan2));
+            schedule1.variables().size(),
+            schedule1.objectives().length,
+            null,
+            newPlan2,
+            schedule1.getArbiter()));
   }
 }
