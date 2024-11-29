@@ -83,6 +83,7 @@ public abstract class FitnessCalculator {
       case "heft", "heft-makespan-mono", "heft-spea2", "heft-pesa2" ->
           new FitnessCalculatorHeft(instanceData);
       case "heft-energy", "heft-energy-mono" -> new FitnessCalculatorHeftEnergy(instanceData);
+      case "min-energy-UM", "min-energy-UM-mono" -> new FitnessCalculatorMinEnergyUM(instanceData);
       case "rank" -> new FitnessCalculatorRank(instanceData);
       case "multi" ->
           new FitnessCalculatorMulti(
@@ -93,7 +94,8 @@ public abstract class FitnessCalculator {
                   new FitnessCalculatorRank(instanceData)),
               List.of(
                   new FitnessCalculatorSimple(instanceData),
-                  new FitnessCalculatorHeftEnergy(instanceData)));
+                  new FitnessCalculatorHeftEnergy(instanceData),
+                  new FitnessCalculatorMinEnergyUM(instanceData)));
       case "multi-makespan", "multi-makespan-mono" ->
           new FitnessCalculatorMulti(
               instanceData,
@@ -108,7 +110,8 @@ public abstract class FitnessCalculator {
               Collections.emptyList(),
               List.of(
                   new FitnessCalculatorSimple(instanceData),
-                  new FitnessCalculatorHeftEnergy(instanceData)));
+                  new FitnessCalculatorHeftEnergy(instanceData),
+                  new FitnessCalculatorMinEnergyUM(instanceData)));
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }
