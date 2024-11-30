@@ -13,10 +13,11 @@ import com.uniovi.sercheduler.parser.WorkflowLoader;
 import com.uniovi.sercheduler.parser.experiment.ExperimentConfigLoader;
 import com.uniovi.sercheduler.service.Operators;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
@@ -159,8 +160,7 @@ public class ExperimentJmetalCommand {
                           crossover,
                           mutation)
                       .setTermination(termination)
-                      .setEvaluation(
-                          getEvaluator("simple", problem, objectives))
+                      .setEvaluation(getEvaluator("simple", problem, objectives))
                       .setSelection(new ScheduleSelection(random))
                       .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
                       .build();
@@ -184,8 +184,7 @@ public class ExperimentJmetalCommand {
                   new NSGAIIBuilder<>(
                           problem, populationSize, offspringPopulationSize, crossover, mutation)
                       .setTermination(termination)
-                      .setEvaluation(
-                          getEvaluator("simple", problem, objectives))
+                      .setEvaluation(getEvaluator("simple", problem, objectives))
                       .build();
             }
 
@@ -216,18 +215,22 @@ public class ExperimentJmetalCommand {
                     new InvertedGenerationalDistance(),
                     new InvertedGenerationalDistancePlus()))
             .setIndependentRuns(experimentConfig.independentRuns())
-            .setNumberOfCores(8)
+            .setNumberOfCores(Runtime.getRuntime().availableProcessors())
             .build();
     new ExecuteAlgorithms<>(experiment).run();
 
     try {
-      new GenerateReferenceParetoFront(experiment).run();
-      new ComputeQualityIndicators<>(experiment).run();
-      new GenerateLatexTablesWithStatistics(experiment).run();
-      new GenerateFriedmanHolmTestTables<>(experiment).run();
-      new GenerateWilcoxonTestTablesWithR<>(experiment).run();
-      new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
-      new GenerateHtmlPages<>(experiment).run();
+      if (objectives.size() > 1) {
+        new GenerateReferenceParetoFront(experiment).run();
+        new ComputeQualityIndicators<>(experiment).run();
+        new GenerateLatexTablesWithStatistics(experiment).run();
+        new GenerateFriedmanHolmTestTables<>(experiment).run();
+        new GenerateWilcoxonTestTablesWithR<>(experiment).run();
+        new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
+        new GenerateHtmlPages<>(experiment).run();
+      } else {
+        computeStatistics(experiment);
+      }
 
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -244,4 +247,91 @@ public class ExperimentJmetalCommand {
       default -> new MultiThreadedEvaluation<>(0, problem);
     };
   }
+
+  // Method to compute and save statistics
+  private static void computeStatistics(
+      Experiment<SchedulePermutationSolution, List<SchedulePermutationSolution>> experiment)
+      throws IOException {
+    System.out.println("Computing statistics...");
+    String outputDirectory = experiment.getExperimentBaseDirectory() + "/statistics/";
+    new File(outputDirectory).mkdirs();
+
+    // Iterate through all algorithms
+    var algorithms =
+        experiment.getAlgorithmList().stream()
+            .map(ExperimentAlgorithm::getAlgorithmTag)
+            .collect(Collectors.toSet());
+    var workflows = experiment.getProblemList().stream().map(ExperimentProblem::getTag).toList();
+    List<ExecutionStat> executionStatistics = new ArrayList<>();
+    for (String algorithm : algorithms) {
+
+      for (var workflow : workflows) {
+
+        List<Double> fitnessValues = new ArrayList<>();
+
+        // Collect fitness values from independent runs
+        for (int run = 0; run < experiment.getIndependentRuns(); run++) {
+          List<Double> fitnessValuesRun = new ArrayList<>();
+          String resultFile =
+              experiment.getExperimentBaseDirectory()
+                  + "/data/"
+                  + algorithm
+                  + "/"
+                  + workflow
+                  + "/FUN"
+                  + run
+                  + ".csv";
+
+          // Read the best fitness from the result file
+          try (Scanner scanner = new Scanner(new File(resultFile))) {
+            while (scanner.hasNextLine()) {
+              fitnessValuesRun.add(Double.parseDouble(scanner.nextLine().trim().split(",")[0]));
+            }
+          }
+          Double bestOfTheRun =
+              fitnessValuesRun.stream().mapToDouble(Double::doubleValue).min().orElseThrow();
+          fitnessValues.add(bestOfTheRun);
+        }
+
+        // Compute statistics
+        DoubleSummaryStatistics stats =
+            fitnessValues.stream().mapToDouble(Double::doubleValue).summaryStatistics();
+        var executionName = workflow + "-" + algorithm;
+        executionStatistics.add(new ExecutionStat(executionName, workflow, algorithm, stats));
+
+        System.out.printf(
+            "Statistics for %s: Mean = %.4f, Std. Dev. = %.4f, Min = %.4f, Max = %.4f%n",
+            executionName,
+            stats.getAverage(),
+            Math.sqrt(
+                fitnessValues.stream()
+                        .mapToDouble(val -> Math.pow(val - stats.getAverage(), 2))
+                        .sum()
+                    / stats.getCount()),
+            stats.getMin(),
+            stats.getMax());
+      }
+    }
+
+    // Write statistics to a CSV file for each algorithm
+    try (FileWriter writer = new FileWriter(outputDirectory + "stats.csv")) {
+      writer.write("Execution,Algorithm,Workflow,Best,Mean,Min,Max\n");
+      for (var executionStat : executionStatistics) {
+
+        writer.write(
+            String.format(
+                "%s,%s,%s,%f,%f,%f,%f\n",
+                executionStat.excutionName(),
+                executionStat.algorithm(),
+                executionStat.workflow(),
+                executionStat.statistics().getMin(),
+                executionStat.statistics().getAverage(),
+                executionStat.statistics().getMin(),
+                executionStat.statistics().getMax()));
+      }
+    }
+  }
+
+  private record ExecutionStat(
+      String excutionName, String workflow, String algorithm, DoubleSummaryStatistics statistics) {}
 }
