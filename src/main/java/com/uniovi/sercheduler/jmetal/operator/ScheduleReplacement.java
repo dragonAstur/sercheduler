@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.jmetal.operator;
 
+import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -9,19 +10,19 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.uma.jmetal.component.catalogue.ea.replacement.Replacement;
 
-/**
- * Defines the replacement operator.
- */
+/** Defines the replacement operator. */
 public class ScheduleReplacement implements Replacement<SchedulePermutationSolution> {
 
   Random random;
+  Objective objective;
 
-  public ScheduleReplacement() {
-    this(new Random());
+  public ScheduleReplacement(Objective objective) {
+    this(new Random(), objective);
   }
 
-  public ScheduleReplacement(Random random) {
+  public ScheduleReplacement(Random random, Objective objective) {
     this.random = random;
+    this.objective = objective;
   }
 
   /**
@@ -43,14 +44,19 @@ public class ScheduleReplacement implements Replacement<SchedulePermutationSolut
       var tournament = List.of(parent1, parent2, child1, child2);
       var result =
           tournament.stream()
-              .sorted(Comparator.comparing(s -> s.getFitnessInfo().fitness().get("makespan")))
+              .sorted(
+                  Comparator.comparing(
+                      s -> s.getFitnessInfo().fitness().get(objective.objectiveName)))
               .collect(
                   Collectors.collectingAndThen(
                       Collectors.toCollection(
                           () ->
                               new TreeSet<>(
                                   Comparator.comparing(
-                                      s -> s.getFitnessInfo().fitness().get("makespan")))),
+                                      s ->
+                                          s.getFitnessInfo()
+                                              .fitness()
+                                              .get(objective.objectiveName)))),
                       ArrayList::new));
 
       if (result.size() == 1) {

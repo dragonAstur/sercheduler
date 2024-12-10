@@ -1,6 +1,7 @@
 package com.uniovi.sercheduler.jmetal.operator;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -26,7 +27,8 @@ public class ScheduleSelection implements Selection<SchedulePermutationSolution>
    */
   @Override
   public List<SchedulePermutationSolution> select(List<SchedulePermutationSolution> list) {
-    Collections.shuffle(list, random);
-    return list;
+    var listToShuffle = new ArrayList<>(list);
+    Collections.shuffle(listToShuffle, random);
+    return listToShuffle;
   }
 }

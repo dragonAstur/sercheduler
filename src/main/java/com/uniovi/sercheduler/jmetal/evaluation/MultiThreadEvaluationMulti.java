@@ -13,9 +13,10 @@ public class MultiThreadEvaluationMulti implements Evaluation<SchedulePermutatio
   private final Problem<SchedulePermutationSolution> problem;
   private final int numberOfThreads;
   private int computedEvaluations;
+  private String alternativeArbiter;
 
   public MultiThreadEvaluationMulti(
-      int numberOfThreads, Problem<SchedulePermutationSolution> problem) {
+      int numberOfThreads, Problem<SchedulePermutationSolution> problem, String alternativeArbiter) {
     Check.that(
         numberOfThreads >= 0, "The number of threads is a negative value: " + numberOfThreads);
     Check.notNull(problem);
@@ -28,6 +29,7 @@ public class MultiThreadEvaluationMulti implements Evaluation<SchedulePermutatio
 
     this.numberOfThreads = numberOfThreads;
     this.problem = problem;
+    this.alternativeArbiter = alternativeArbiter;
     computedEvaluations = 0;
   }
 
@@ -41,7 +43,7 @@ public class MultiThreadEvaluationMulti implements Evaluation<SchedulePermutatio
             .flatMap(
                 s -> {
                   var copy = (SchedulePermutationSolution) s.copy();
-                  copy.setArbiter("energy");
+                  copy.setArbiter(alternativeArbiter);
 
                   return Stream.of(s, copy);
                 })

@@ -3,8 +3,10 @@ package com.uniovi.sercheduler.util;
 import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class CsvUtils {
 

@@ -9,4 +9,4 @@ package com.uniovi.sercheduler.service;
  * @param taskCommunications Time to transfer all the info.
  */
 public record TaskCosts(
-    Double diskReadStaging, Double diskWrite, Double eft, Double taskCommunications) {}
+    Double diskReadStaging, Double diskWrite, Double eft, Double taskCommunications, Double ast) {}
