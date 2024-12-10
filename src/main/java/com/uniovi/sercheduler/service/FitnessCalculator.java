@@ -5,6 +5,8 @@ import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.dto.TaskFile;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.service.support.ScheduleGap;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -82,8 +84,16 @@ public abstract class FitnessCalculator {
       case "simple", "simple-mono" -> new FitnessCalculatorSimple(instanceData);
       case "heft", "heft-makespan-mono", "heft-spea2", "heft-pesa2" ->
           new FitnessCalculatorHeft(instanceData);
-      case "heft-energy", "heft-energy-mono" -> new FitnessCalculatorHeftEnergy(instanceData);
-      case "min-energy-UM", "min-energy-UM-mono" -> new FitnessCalculatorMinEnergyUM(instanceData);
+      case "heft-energy-active", "heft-energy-mono-active" ->
+          new FitnessCalculatorHeftEnergy(instanceData, "active");
+      case "heft-energy-semi-active", "heft-energy-mono-semi-active" ->
+          new FitnessCalculatorHeftEnergy(instanceData, "semi-active");
+
+      case "min-energy-UM-active", "min-energy-UM-mono-active" ->
+          new FitnessCalculatorMinEnergyUM(instanceData, "active");
+      case "min-energy-UM-semi-active", "min-energy-UM-mono-semi-active" ->
+          new FitnessCalculatorMinEnergyUM(instanceData, "semi-active");
+
       case "rank" -> new FitnessCalculatorRank(instanceData);
       case "multi" ->
           new FitnessCalculatorMulti(
@@ -94,8 +104,10 @@ public abstract class FitnessCalculator {
                   new FitnessCalculatorRank(instanceData)),
               List.of(
                   new FitnessCalculatorSimple(instanceData),
-                  new FitnessCalculatorHeftEnergy(instanceData),
-                  new FitnessCalculatorMinEnergyUM(instanceData)));
+                  new FitnessCalculatorHeftEnergy(instanceData, "active"),
+                  new FitnessCalculatorHeftEnergy(instanceData, "semi-active"),
+                  new FitnessCalculatorMinEnergyUM(instanceData, "active"),
+                  new FitnessCalculatorMinEnergyUM(instanceData, "semi-active")));
       case "multi-makespan", "multi-makespan-mono" ->
           new FitnessCalculatorMulti(
               instanceData,
@@ -110,8 +122,10 @@ public abstract class FitnessCalculator {
               Collections.emptyList(),
               List.of(
                   new FitnessCalculatorSimple(instanceData),
-                  new FitnessCalculatorHeftEnergy(instanceData),
-                  new FitnessCalculatorMinEnergyUM(instanceData)));
+                  new FitnessCalculatorHeftEnergy(instanceData, "active"),
+                  new FitnessCalculatorHeftEnergy(instanceData, "semi-active"),
+                  new FitnessCalculatorMinEnergyUM(instanceData, "active"),
+                  new FitnessCalculatorMinEnergyUM(instanceData, "semi-active")));
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }
@@ -249,7 +263,7 @@ public abstract class FitnessCalculator {
   public abstract FitnessInfo calculateFitness(SchedulePermutationSolution solution);
 
   /**
-   * Calculates the eft of a given task.
+   * Calculates the eft of a given task. Without insertion
    *
    * @param task Task to execute.
    * @param host Where does the task run.
@@ -257,22 +271,68 @@ public abstract class FitnessCalculator {
    * @param available When each machine is available.
    * @return Information about the executed task.
    */
-  public TaskCosts calculateEft(
+  public TaskCosts calculateEftSemiActive(
       Task task, Host host, Map<String, TaskSchedule> schedule, Map<String, Double> available) {
     var parentsInfo = findTaskCommunications(task, host, schedule);
     var taskCommunications = parentsInfo.taskCommunications();
     Double diskReadStaging =
         networkMatrix.get(task.getName()).get(task.getName()) / host.getDiskSpeed().doubleValue();
     Double diskWrite = task.getOutput().getSizeInBits() / host.getDiskSpeed().doubleValue();
-
+    Double ast = Math.max(available.getOrDefault(host.getName(), 0D), parentsInfo.maxEst());
     Double eft =
         diskReadStaging
             + diskWrite
             + computationMatrix.get(task.getName()).get(host.getName())
-            + Math.max(available.getOrDefault(host.getName(), 0D), parentsInfo.maxEst())
+            + taskCommunications
+            + ast;
+
+    return new TaskCosts(diskReadStaging, diskWrite, eft, taskCommunications, ast);
+  }
+
+  /**
+   * Calculates the eft of a given task. With insertion, which means that it take into account the
+   * gaps.
+   *
+   * @param task Task to execute.
+   * @param host Where does the task run.
+   * @param schedule The schedule to update.
+   * @param available When each machine is available.
+   * @return Information about the executed task.
+   */
+  public TaskCosts calculateEftActive(
+      Task task,
+      Host host,
+      Map<String, TaskSchedule> schedule,
+      Map<String, List<ScheduleGap>> available) {
+    var parentsInfo = findTaskCommunications(task, host, schedule);
+    var taskCommunications = parentsInfo.taskCommunications();
+    Double diskReadStaging =
+        networkMatrix.get(task.getName()).get(task.getName()) / host.getDiskSpeed().doubleValue();
+    Double diskWrite = task.getOutput().getSizeInBits() / host.getDiskSpeed().doubleValue();
+
+    // We need to find the first available schedule where we can execute the full task and the ast
+    // will be after the eft of the parents.
+
+    double taskTime =
+        diskReadStaging
+            + diskWrite
+            + computationMatrix.get(task.getName()).get(host.getName())
             + taskCommunications;
 
-    return new TaskCosts(diskReadStaging, diskWrite, eft, taskCommunications);
+    var availableHostGaps =
+        available.getOrDefault(host.getName(), List.of(new ScheduleGap(0D, Double.MAX_VALUE)));
+
+    Double ast =
+        availableHostGaps.stream()
+            .filter(
+                gap -> gap.start() >= parentsInfo.maxEst() && taskTime <= (gap.end() - gap.start()))
+            .min(Comparator.comparing(ScheduleGap::start))
+            .orElse(new ScheduleGap(parentsInfo.maxEst(), 0D))
+            .start();
+
+    Double eft = ast + taskTime;
+
+    return new TaskCosts(diskReadStaging, diskWrite, eft, taskCommunications, ast);
   }
 
   /**

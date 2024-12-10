@@ -32,23 +32,18 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
       var taskName = schedulePair.task().getName();
       var hostName = schedulePair.host().getName();
 
-      var taskCosts = calculateEft(schedulePair.task(), schedulePair.host(), schedule, available);
+      var taskCosts = calculateEftSemiActive(schedulePair.task(), schedulePair.host(), schedule, available);
 
       available.put(hostName, taskCosts.eft());
-      var ast =
-          available.get(hostName)
-              - computationMatrix.get(taskName).get(hostName)
-              - taskCosts.diskWrite()
-              - taskCosts.taskCommunications()
-              - taskCosts.diskReadStaging();
+
 
       schedule.put(
           taskName,
-          new TaskSchedule(schedulePair.task(), ast, taskCosts.eft(), schedulePair.host()));
+          new TaskSchedule(schedulePair.task(), taskCosts.ast(), taskCosts.eft(), schedulePair.host()));
 
       makespan = Math.max(taskCosts.eft(), makespan);
 
-      energy += (taskCosts.eft() - ast) * schedulePair.host().getEnergyCost();
+      energy += (taskCosts.eft() - taskCosts.ast()) * schedulePair.host().getEnergyCost();
     }
 
     var orderedSchedule =

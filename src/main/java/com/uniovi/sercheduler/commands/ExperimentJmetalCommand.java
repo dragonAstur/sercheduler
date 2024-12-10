@@ -220,7 +220,7 @@ public class ExperimentJmetalCommand {
     new ExecuteAlgorithms<>(experiment).run();
 
     try {
-      if (objectives.size() > 1) {
+
         new GenerateReferenceParetoFront(experiment).run();
         new ComputeQualityIndicators<>(experiment).run();
         new GenerateLatexTablesWithStatistics(experiment).run();
@@ -228,9 +228,9 @@ public class ExperimentJmetalCommand {
         new GenerateWilcoxonTestTablesWithR<>(experiment).run();
         new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
         new GenerateHtmlPages<>(experiment).run();
-      } else {
-        computeStatistics(experiment);
-      }
+
+        computeStatistics(experiment, objectives);
+
 
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -250,7 +250,8 @@ public class ExperimentJmetalCommand {
 
   // Method to compute and save statistics
   private static void computeStatistics(
-      Experiment<SchedulePermutationSolution, List<SchedulePermutationSolution>> experiment)
+      Experiment<SchedulePermutationSolution, List<SchedulePermutationSolution>> experiment,
+      List<Objective> objectives)
       throws IOException {
     System.out.println("Computing statistics...");
     String outputDirectory = experiment.getExperimentBaseDirectory() + "/statistics/";
@@ -262,16 +263,25 @@ public class ExperimentJmetalCommand {
             .map(ExperimentAlgorithm::getAlgorithmTag)
             .collect(Collectors.toSet());
     var workflows = experiment.getProblemList().stream().map(ExperimentProblem::getTag).toList();
-    List<ExecutionStat> executionStatistics = new ArrayList<>();
+    Map<String, List<ExecutionStat>> executionStatistics = new HashMap<>();
+    for (var objective : objectives) {
+      executionStatistics.put(objective.name(), new ArrayList<>());
+    }
+
     for (String algorithm : algorithms) {
 
       for (var workflow : workflows) {
 
-        List<Double> fitnessValues = new ArrayList<>();
-
+        Map<String, List<Double>> fitnessValues = new HashMap<>();
+        for (var objective : objectives) {
+          fitnessValues.put(objective.name(), new ArrayList<>());
+        }
         // Collect fitness values from independent runs
         for (int run = 0; run < experiment.getIndependentRuns(); run++) {
-          List<Double> fitnessValuesRun = new ArrayList<>();
+          Map<String, List<Double>> fitnessValuesRun = new HashMap<>();
+          for (var objective : objectives) {
+            fitnessValuesRun.put(objective.name(), new ArrayList<>());
+          }
           String resultFile =
               experiment.getExperimentBaseDirectory()
                   + "/data/"
@@ -285,49 +295,88 @@ public class ExperimentJmetalCommand {
           // Read the best fitness from the result file
           try (Scanner scanner = new Scanner(new File(resultFile))) {
             while (scanner.hasNextLine()) {
-              fitnessValuesRun.add(Double.parseDouble(scanner.nextLine().trim().split(",")[0]));
+
+              var values = scanner.nextLine().trim().split(",");
+
+              int i = 0;
+              for (var objective : objectives) {
+                fitnessValuesRun.get(objective.name()).add(Double.parseDouble(values[i]));
+                i++;
+              }
             }
           }
-          Double bestOfTheRun =
-              fitnessValuesRun.stream().mapToDouble(Double::doubleValue).min().orElseThrow();
-          fitnessValues.add(bestOfTheRun);
+
+          for (var objective : objectives) {
+            Double bestOfTheRun =
+                fitnessValuesRun.get(objective.name()).stream()
+                    .mapToDouble(Double::doubleValue)
+                    .min()
+                    .orElseThrow();
+            fitnessValues.get(objective.name()).add(bestOfTheRun);
+          }
         }
 
-        // Compute statistics
-        DoubleSummaryStatistics stats =
-            fitnessValues.stream().mapToDouble(Double::doubleValue).summaryStatistics();
-        var executionName = workflow + "-" + algorithm;
-        executionStatistics.add(new ExecutionStat(executionName, workflow, algorithm, stats));
+        // Compute statistics for each metric
+        for (var objective : objectives) {
+          DoubleSummaryStatistics stats =
+              fitnessValues.get(objective.name()).stream()
+                  .mapToDouble(Double::doubleValue)
+                  .summaryStatistics();
+          var executionName = workflow + "-" + algorithm;
+          executionStatistics
+              .get(objective.name())
+              .add(new ExecutionStat(executionName, workflow, algorithm, stats));
 
-        System.out.printf(
-            "Statistics for %s: Mean = %.4f, Std. Dev. = %.4f, Min = %.4f, Max = %.4f%n",
-            executionName,
-            stats.getAverage(),
-            Math.sqrt(
-                fitnessValues.stream()
-                        .mapToDouble(val -> Math.pow(val - stats.getAverage(), 2))
-                        .sum()
-                    / stats.getCount()),
-            stats.getMin(),
-            stats.getMax());
+          System.out.printf(
+              "Statistics for %s and objective %s: Mean = %.4f, Std. Dev. = %.4f, Min = %.4f, Max = %.4f%n",
+              executionName,
+              objective.name(),
+              stats.getAverage(),
+              Math.sqrt(
+                  fitnessValues.get(objective.name()).stream()
+                          .mapToDouble(val -> Math.pow(val - stats.getAverage(), 2))
+                          .sum()
+                      / stats.getCount()),
+              stats.getMin(),
+              stats.getMax());
+        }
       }
     }
 
     // Write statistics to a CSV file for each algorithm
     try (FileWriter writer = new FileWriter(outputDirectory + "stats.csv")) {
-      writer.write("Execution,Algorithm,Workflow,Best,Mean,Min,Max\n");
-      for (var executionStat : executionStatistics) {
+
+      // TODO: Change to be compatible with more than two objectives
+      String objective1 = objectives.get(0).name();
+      String objective2 = objectives.get(1).name();
+
+      writer.write(
+          String.format(
+              "Execution,Algorithm,Workflow,Best %s,Mean %s,Min %s,Max %s,Best %s,Mean %s,Min %s,Max %s\n",
+              objective1,
+              objective1,
+              objective1,
+              objective1,
+              objective2,
+              objective2,
+              objective2,
+              objective2));
+      for (int i = 0; i < executionStatistics.get(objectives.get(0).name()).size(); i++) {
 
         writer.write(
             String.format(
-                "%s,%s,%s,%f,%f,%f,%f\n",
-                executionStat.excutionName(),
-                executionStat.algorithm(),
-                executionStat.workflow(),
-                executionStat.statistics().getMin(),
-                executionStat.statistics().getAverage(),
-                executionStat.statistics().getMin(),
-                executionStat.statistics().getMax()));
+                "%s,%s,%s,%f,%f,%f,%f,%f,%f,%f,%f\n",
+                executionStatistics.get(objective1).get(i).excutionName(),
+                    executionStatistics.get(objective1).get(i).algorithm(),
+                    executionStatistics.get(objective1).get(i).workflow(),
+                    executionStatistics.get(objective1).get(i).statistics().getMin(),
+                    executionStatistics.get(objective1).get(i).statistics().getAverage(),
+                    executionStatistics.get(objective1).get(i).statistics().getMin(),
+                    executionStatistics.get(objective1).get(i).statistics().getMax(),
+                    executionStatistics.get(objective2).get(i).statistics().getMin(),
+                    executionStatistics.get(objective2).get(i).statistics().getAverage(),
+                    executionStatistics.get(objective2).get(i).statistics().getMin(),
+                    executionStatistics.get(objective2).get(i).statistics().getMax()));
       }
     }
   }

@@ -1,11 +1,21 @@
 {
-  "fitness": [ "heft-energy-mono", "simple-mono", "multi-energy-mono"],
-  "workflows": ["1000genome-chameleon-2ch-250k-001"
+  "fitness": [
+    "heft-energy-mono-active",
+    "heft-energy-mono-semi-active",
+    "simple-mono",
+    "min-energy-UM-mono-active",
+    "min-energy-UM-mono-semi-active"
+  ],
+  "workflows": [
+    "1000genome-chameleon-2ch-250k-001",
+    "cycles-chameleon-1l-1c-9p-001"
   ],
   "minHosts": 16,
   "maxHosts": 16,
   "hostIncrement": 2,
   "referenceSpeed": "441Gf",
-  "independentRuns": 10,
-  "objectives" : ["energy","makespan"]
+  "independentRuns": 2,
+  "objectives": [
+    "energy", "makespan"
+  ]
 }

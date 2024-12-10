@@ -4,17 +4,24 @@ import com.uniovi.sercheduler.dto.Host;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.service.support.EftAndAst;
+import com.uniovi.sercheduler.service.support.EftAndEnergy;
+import com.uniovi.sercheduler.service.support.ScheduleGap;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Implementation for calculating the makespan using DNC model and heft second phase, focused on
  * Energy.
  */
 public class FitnessCalculatorMinEnergyUM extends FitnessCalculator {
-  public FitnessCalculatorMinEnergyUM(InstanceData instanceData) {
+  private String planificationType;
+
+  public FitnessCalculatorMinEnergyUM(InstanceData instanceData, String planificationType) {
     super(instanceData);
+    this.planificationType = planificationType;
   }
 
   /**
@@ -28,14 +35,22 @@ public class FitnessCalculatorMinEnergyUM extends FitnessCalculator {
 
     double makespan = 0D;
     double energy = 0D;
+    var availableSemiActive = new HashMap<String, Double>(instanceData.hosts().size());
+    var availableActive = new HashMap<String, List<ScheduleGap>>(instanceData.hosts().size());
 
-    var available = new HashMap<String, Double>(instanceData.hosts().size());
     var schedule = new HashMap<String, TaskSchedule>(instanceData.workflow().size());
 
     for (var schedulePair : plan) {
 
-      var eftAndAst = calculateHeftTaskCost(schedulePair.task(), schedule, available, makespan);
+      EftAndAst eftAndAst;
 
+      if (planificationType.equals("active")) {
+        eftAndAst = calculateHeftTaskCostActive(schedulePair.task(), schedule, availableActive, makespan);
+
+      } else {
+        eftAndAst =
+            calculateHeftTaskCostSemiActive(schedulePair.task(), schedule, availableSemiActive, makespan);
+      }
       makespan = Math.max(eftAndAst.eft(), makespan);
 
       energy += (eftAndAst.eft() - eftAndAst.ast()) * schedulePair.host().getEnergyCost();
@@ -53,7 +68,7 @@ public class FitnessCalculatorMinEnergyUM extends FitnessCalculator {
     return "min-energy-UM";
   }
 
-  private EftAndAst calculateHeftTaskCost(
+  private EftAndAst calculateHeftTaskCostSemiActive(
       Task task,
       HashMap<String, TaskSchedule> schedule,
       HashMap<String, Double> available,
@@ -63,7 +78,7 @@ public class FitnessCalculatorMinEnergyUM extends FitnessCalculator {
 
     for (var host : instanceData.hosts().values()) {
 
-      var taskCosts = calculateEft(task, host, schedule, available);
+      var taskCosts = calculateEftSemiActive(task, host, schedule, available);
 
       var ast =
           taskCosts.eft()
@@ -89,11 +104,12 @@ public class FitnessCalculatorMinEnergyUM extends FitnessCalculator {
                 Collectors.toMap(
                     Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
-    String selectedHostName = sortedEftAndEnergy.entrySet().stream()
-        .filter(e -> e.getValue().eft < currentMakespan)
-        .findFirst()
-        .orElse(sortedEftAndEnergy.entrySet().iterator().next()).getKey();
-
+    String selectedHostName =
+        sortedEftAndEnergy.entrySet().stream()
+            .filter(e -> e.getValue().eft() < currentMakespan)
+            .findFirst()
+            .orElse(sortedEftAndEnergy.entrySet().iterator().next())
+            .getKey();
 
     var taskCosts = possibleTaskCosts.get(selectedHostName);
     var host = instanceData.hosts().get(selectedHostName);
@@ -109,7 +125,82 @@ public class FitnessCalculatorMinEnergyUM extends FitnessCalculator {
     return new EftAndAst(taskCosts.eft(), ast);
   }
 
-  private record EftAndAst(Double eft, Double ast) {}
 
-  private record EftAndEnergy(Double eft, Double energy) {}
+
+  private EftAndAst calculateHeftTaskCostActive(
+          Task task,
+          HashMap<String, TaskSchedule> schedule,
+          Map<String, List<ScheduleGap>> available,
+          Double currentMakespan) {
+    HashMap<String, EftAndEnergy> tempEftAndEnergy = new HashMap<>();
+    HashMap<String, TaskCosts> possibleTaskCosts = new HashMap<>();
+
+    for (var host : instanceData.hosts().values()) {
+
+      var taskCosts = calculateEftActive(task, host, schedule, available);
+
+      var ast =
+              taskCosts.eft()
+                      - computationMatrix.get(task.getName()).get(host.getName())
+                      - taskCosts.diskWrite()
+                      - taskCosts.taskCommunications()
+                      - taskCosts.diskReadStaging();
+      var energy = (taskCosts.eft() - ast) * host.getEnergyCost();
+      tempEftAndEnergy.put(host.getName(), new EftAndEnergy(taskCosts.eft(), energy));
+      possibleTaskCosts.put(host.getName(), taskCosts);
+    }
+
+    // We need to sort the possible solutions and find the one that doesn't modify the makespan and
+    // has the less energy consumption. If we have to modify the makespan we will choose the first
+    // item in the list which is the one that consumes less and take less.
+
+    var sortedEftAndEnergy =
+            tempEftAndEnergy.entrySet().stream()
+                    .sorted(
+                            Comparator.comparing((Map.Entry<String, EftAndEnergy> e) -> e.getValue().energy())
+                                    .thenComparing(e -> e.getValue().eft()))
+                    .collect(
+                            Collectors.toMap(
+                                    Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+    String selectedHostName =
+            sortedEftAndEnergy.entrySet().stream()
+                    .filter(e -> e.getValue().eft() < currentMakespan)
+                    .findFirst()
+                    .orElse(sortedEftAndEnergy.entrySet().iterator().next())
+                    .getKey();
+
+    var taskCosts = possibleTaskCosts.get(selectedHostName);
+    var host = instanceData.hosts().get(selectedHostName);
+    // we need to find the closest gap
+
+    var availableHostGaps =
+            available.getOrDefault(host.getName(), List.of(new ScheduleGap(0D, Double.MAX_VALUE)));
+    var gapToReplace =
+            availableHostGaps.stream()
+                    .filter(gap -> taskCosts.eft() <= gap.end() && taskCosts.ast() >= gap.start())
+                    .findFirst()
+                    .orElseThrow();
+    // Now we need to split the gap in two, using the eft as the slice, depending of the cut we can
+    // have one or two gaps. We always generate two gaps so we need to remove the gaps where the
+    // start and the end are the same.
+
+    var newGaps =
+            Stream.of(
+                            new ScheduleGap(gapToReplace.start(), taskCosts.ast()),
+                            new ScheduleGap(taskCosts.eft(), gapToReplace.end()))
+                    .filter(gap -> !gap.start().equals(gap.end()))
+                    .toList();
+
+    // Now we generate a new list with the old gaps and the new ones, removing the used gap.
+    var newHostGaps = Stream.concat(availableHostGaps.stream()
+            .filter(gap -> ! gap.equals(gapToReplace)),newGaps.stream()
+    ).toList();
+
+    // We need to put the available gaps
+    available.put(host.getName(), newHostGaps);
+
+    schedule.put(task.getName(), new TaskSchedule(task, taskCosts.ast(), taskCosts.eft(), host));
+    return new EftAndAst(taskCosts.eft(), taskCosts.ast());
+  }
 }
