@@ -33,7 +33,7 @@ public class FitnessCalculatorHeftEnergy extends FitnessCalculator {
     var plan = solution.getPlan();
 
     double makespan = 0D;
-    double energy = 0D;
+    double energyActive = 0D;
 
     var availableSemiActive = new HashMap<String, Double>(instanceData.hosts().size());
     var availableActive = new HashMap<String,  List<ScheduleGap>>(instanceData.hosts().size());
@@ -53,12 +53,19 @@ public class FitnessCalculatorHeftEnergy extends FitnessCalculator {
 
       makespan = Math.max(eftAndAst.eft(), makespan);
 
-      energy += (eftAndAst.eft() - eftAndAst.ast()) * schedulePair.host().getEnergyCost();
+      energyActive += (eftAndAst.eft() - eftAndAst.ast()) * schedulePair.host().getEnergyCost();
     }
 
     var orderedSchedule =
         schedule.values().stream().sorted(Comparator.comparing(TaskSchedule::ast)).toList();
 
+    // We need to calculate the standby energy of each host
+    double energyStandBy = 0;
+    for (var host : instanceData.hosts().values()) {
+      energyStandBy += host.getEnergyCostStandBy() * makespan;
+    }
+
+    double energy = energyActive + energyStandBy;
     return new FitnessInfo(
         Map.of("makespan", makespan, "energy", energy), orderedSchedule, fitnessName());
   }
@@ -82,7 +89,16 @@ public class FitnessCalculatorHeftEnergy extends FitnessCalculator {
               - taskCosts.diskWrite()
               - taskCosts.taskCommunications()
               - taskCosts.diskReadStaging();
-      var energy = (taskCosts.eft() - ast) * host.getEnergyCost();
+      double energyActive = (taskCosts.eft() - ast) * host.getEnergyCost();
+
+      // The standby energy is calculated starting from the first instant the host is available
+      // until the task is completed
+      var hostReady = available.getOrDefault(host.getName(), 0D);
+
+      double energyStandBy = (taskCosts.eft() - hostReady) * host.getEnergyCostStandBy();
+
+      double energy = energyActive + energyStandBy;
+
       tempEftAndEnergy.put(host.getName(), new EftAndEnergy(taskCosts.eft(), energy));
       possibleTaskCosts.put(host.getName(), taskCosts);
     }
@@ -124,7 +140,22 @@ public class FitnessCalculatorHeftEnergy extends FitnessCalculator {
                       - taskCosts.diskWrite()
                       - taskCosts.taskCommunications()
                       - taskCosts.diskReadStaging();
-      var energy = (taskCosts.eft() - ast) * host.getEnergyCost();
+      double energyActive = (taskCosts.eft() - ast) * host.getEnergyCost();
+
+      // The standby energy is calculated starting from the first instant the host is available
+      // until the task is completed
+      var hostReady =
+              available
+                      .getOrDefault(host.getName(), List.of(new ScheduleGap(0D, Double.MAX_VALUE)))
+                      .stream()
+                      .max(Comparator.comparing(ScheduleGap::start))
+                      .orElseThrow()
+                      .start();
+
+      double energyStandBy = (taskCosts.eft() - hostReady) * host.getEnergyCostStandBy();
+
+      double energy = energyActive + Math.max(0,energyStandBy);
+
       tempEftAndEnergy.put(host.getName(), new EftAndEnergy(taskCosts.eft(), energy));
       possibleTaskCosts.put(host.getName(), taskCosts);
     }

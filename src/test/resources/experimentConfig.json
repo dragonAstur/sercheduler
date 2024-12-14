@@ -13,7 +13,7 @@
   "minHosts": 16,
   "maxHosts": 16,
   "hostIncrement": 2,
-  "referenceSpeed": "441Gf",
+  "referenceSpeed": "86.4Gf",
   "independentRuns": 2,
   "objectives": [
     "energy", "makespan"

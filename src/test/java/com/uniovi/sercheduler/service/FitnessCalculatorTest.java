@@ -116,6 +116,7 @@ public class FitnessCalculatorTest {
         fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan,"makespan"));
 
     assertEquals(210D, result.fitness().get("makespan"));
+    assertEquals (679.65D, result.fitness().get("energy"), 1e-10);
   }
 
 
@@ -258,9 +259,9 @@ public class FitnessCalculatorTest {
     var hosts =
         Map.of(
             "HostA",
-            new Host("HostA", 100L, 100L, 50L, 1D),
+            new Host("HostA", 100L, 100L, 50L, 0.9D, 0.1D),
             "HostB",
-            new Host("HostB", 100L, 25L, 100L, 2D));
+            new Host("HostB", 100L, 25L, 100L, 1.8D, 0.2D));
     var instanceData = new InstanceData(Collections.emptyMap(), hosts,0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
@@ -277,9 +278,9 @@ public class FitnessCalculatorTest {
     var hosts =
         Map.of(
             "HostA",
-            new Host("HostA", 100L, 100L, 50L, 1D),
+            new Host("HostA", 100L, 100L, 50L, 0.9D, 0.1D),
             "HostB",
-            new Host("HostB", 100L, 25L, 100L, 2D));
+            new Host("HostB", 100L, 25L, 100L, 1.8D, 0.2D));
     var instanceData = new InstanceData(Collections.emptyMap(), hosts,0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
@@ -295,9 +296,9 @@ public class FitnessCalculatorTest {
     var hosts =
         Map.of(
             "HostA",
-            new Host("HostA", 100L, 100L, 50L, 1D),
+            new Host("HostA", 100L, 100L, 50L, 0.9D,0.1D),
             "HostB",
-            new Host("HostB", 100L, 25L, 100L, 2D));
+            new Host("HostB", 100L, 25L, 100L, 1.8D, 0.2D));
     var instanceData = new InstanceData(Collections.emptyMap(), hosts, 0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
@@ -313,9 +314,9 @@ public class FitnessCalculatorTest {
     var hosts =
         Map.of(
             "HostA",
-            new Host("HostA", 100L, 100L, 50L,1D),
+            new Host("HostA", 100L, 100L, 50L,0.9D, 0.1D),
             "HostB",
-            new Host("HostB", 100L, 10L, 25L, 2D));
+            new Host("HostB", 100L, 10L, 25L, 1.8D,0.2D));
     var instanceData = new InstanceData(Collections.emptyMap(), hosts, 0L);
     FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 

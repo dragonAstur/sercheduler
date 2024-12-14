@@ -17,4 +17,5 @@ public record HostDao(
     Integer cores,
     @JsonProperty("disk_speed") String diskSpeed,
     @JsonProperty("network_speed") String networkSpeed,
-    @JsonProperty("energy_cost") Double energyCost) {}
+    @JsonProperty("energy_cost") Double energyCost,
+    @JsonProperty("energy_cost_stand_by") Double energyCostStandBy) {}

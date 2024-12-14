@@ -26,7 +26,7 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
     var plan = solution.getPlan();
 
     double makespan = 0D;
-    double energy = 0D;
+    double energyActive = 0D;
 
     var available = new HashMap<String,  List<ScheduleGap>>(instanceData.hosts().size());
     var schedule = new HashMap<String, TaskSchedule>(instanceData.workflow().size());
@@ -37,12 +37,19 @@ public class FitnessCalculatorHeft extends FitnessCalculator {
 
       makespan = Math.max(eftAndAst.eft(), makespan);
 
-      energy += (eftAndAst.eft() - eftAndAst.ast()) * schedulePair.host().getEnergyCost();
+      energyActive += (eftAndAst.eft() - eftAndAst.ast()) * schedulePair.host().getEnergyCost();
     }
 
     var orderedSchedule =
         schedule.values().stream().sorted(Comparator.comparing(TaskSchedule::ast)).toList();
 
+    // We need to calculate the standby energy of each host
+    double energyStandBy = 0;
+    for (var host : instanceData.hosts().values()) {
+      energyStandBy += host.getEnergyCostStandBy() * makespan;
+    }
+
+    double energy = energyActive + energyStandBy;
     return new FitnessInfo(
         Map.of("makespan", makespan, "energy", energy), orderedSchedule, fitnessName());
   }

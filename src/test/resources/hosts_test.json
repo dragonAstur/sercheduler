@@ -6,7 +6,8 @@
       "cpu_speed": "441Gf",
       "disk_speed": "32Mbps",
       "network_speed": "8Mbps",
-      "energy_cost": 2
+      "energy_cost": 1.8,
+      "energy_cost_stand_by": 0.2
     },
     {
       "name": "HostB",
@@ -14,7 +15,8 @@
       "cpu_speed": "441Gf",
       "disk_speed": "32Mbps",
       "network_speed": "8Mbps",
-      "energy_cost": 2
+      "energy_cost": 1.8,
+      "energy_cost_stand_by": 0.2
     },
     {
       "name": "HostC",
@@ -22,7 +24,8 @@
       "cpu_speed": "441Gf",
       "disk_speed": "32Mbps",
       "network_speed": "1MBps",
-      "energy_cost": 1
+      "energy_cost": 0.9,
+      "energy_cost_stand_by": 0.1
     }
   ]
 }

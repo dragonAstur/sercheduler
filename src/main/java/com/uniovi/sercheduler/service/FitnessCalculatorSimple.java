@@ -23,7 +23,7 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
     var plan = solution.getPlan();
 
     double makespan = 0D;
-    double energy = 0D;
+    double energyActive = 0D;
 
     var available = new HashMap<String, Double>(instanceData.hosts().size());
     var schedule = new HashMap<String, TaskSchedule>(instanceData.workflow().size());
@@ -32,23 +32,31 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
       var taskName = schedulePair.task().getName();
       var hostName = schedulePair.host().getName();
 
-      var taskCosts = calculateEftSemiActive(schedulePair.task(), schedulePair.host(), schedule, available);
+      var taskCosts =
+          calculateEftSemiActive(schedulePair.task(), schedulePair.host(), schedule, available);
 
       available.put(hostName, taskCosts.eft());
 
-
       schedule.put(
           taskName,
-          new TaskSchedule(schedulePair.task(), taskCosts.ast(), taskCosts.eft(), schedulePair.host()));
+          new TaskSchedule(
+              schedulePair.task(), taskCosts.ast(), taskCosts.eft(), schedulePair.host()));
 
       makespan = Math.max(taskCosts.eft(), makespan);
 
-      energy += (taskCosts.eft() - taskCosts.ast()) * schedulePair.host().getEnergyCost();
+      energyActive += (taskCosts.eft() - taskCosts.ast()) * schedulePair.host().getEnergyCost();
     }
 
     var orderedSchedule =
         schedule.values().stream().sorted(Comparator.comparing(TaskSchedule::ast)).toList();
 
+    // We need to calculate the standby energy of each host
+    double energyStandBy = 0;
+    for (var host : instanceData.hosts().values()) {
+      energyStandBy += host.getEnergyCostStandBy() * makespan;
+    }
+
+    double energy = energyActive + energyStandBy;
     return new FitnessInfo(
         Map.of("makespan", makespan, "energy", energy), orderedSchedule, fitnessName());
   }

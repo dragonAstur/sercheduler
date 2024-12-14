@@ -12,23 +12,26 @@ public class Host {
    * @param networkSpeed network speed in bits.
    * @param energyCost The cost per second of the host.
    */
-  public Host(String name, Long flops, Long diskSpeed, Long networkSpeed, Double energyCost) {
+  public Host(String name, Long flops, Long diskSpeed, Long networkSpeed, Double energyCost, Double energyCostStandBy) {
     this.name = name;
     this.flops = flops;
     this.diskSpeed = diskSpeed;
     this.networkSpeed = networkSpeed;
     this.energyCost = energyCost;
+    this.energyCostStandBy = energyCostStandBy;
   }
 
-  private String name;
+  private final String name;
 
-  private Long flops;
+  private final Long flops;
 
-  private Long diskSpeed;
+  private final Long diskSpeed;
 
-  private Long networkSpeed;
+  private final Long networkSpeed;
 
-  private Double energyCost;
+  private final Double energyCost;
+
+  private final Double energyCostStandBy;
 
 
   public String getName() {
@@ -49,6 +52,10 @@ public class Host {
 
   public Double getEnergyCost() {
     return energyCost;
+  }
+
+  public Double getEnergyCostStandBy() {
+    return energyCostStandBy;
   }
 
   @Override
