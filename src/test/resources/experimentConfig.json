@@ -37,7 +37,7 @@
     "srasearch-chameleon-40a-003",
     "srasearch-chameleon-50a-003"
   ],
-  "minHosts": 4,
+  "minHosts": 2,
   "maxHosts": 16,
   "hostIncrement": 2,
   "referenceSpeed": "86.4Gf",
