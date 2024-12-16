@@ -221,13 +221,13 @@ public class ExperimentJmetalCommand {
 
     try {
 
-        new GenerateReferenceParetoFront(experiment).run();
-        new ComputeQualityIndicators<>(experiment).run();
-        new GenerateLatexTablesWithStatistics(experiment).run();
-        new GenerateFriedmanHolmTestTables<>(experiment).run();
-        new GenerateWilcoxonTestTablesWithR<>(experiment).run();
-        new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
-        new GenerateHtmlPages<>(experiment).run();
+//        new GenerateReferenceParetoFront(experiment).run();
+//        new ComputeQualityIndicators<>(experiment).run();
+//        new GenerateLatexTablesWithStatistics(experiment).run();
+//        new GenerateFriedmanHolmTestTables<>(experiment).run();
+//        new GenerateWilcoxonTestTablesWithR<>(experiment).run();
+//        new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
+//        new GenerateHtmlPages<>(experiment).run();
 
         computeStatistics(experiment, objectives);
 

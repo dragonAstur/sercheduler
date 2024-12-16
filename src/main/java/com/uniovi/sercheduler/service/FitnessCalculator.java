@@ -123,9 +123,7 @@ public abstract class FitnessCalculator {
               List.of(
                   new FitnessCalculatorSimple(instanceData),
                   new FitnessCalculatorHeftEnergy(instanceData, "active"),
-                  new FitnessCalculatorHeftEnergy(instanceData, "semi-active"),
-                  new FitnessCalculatorMinEnergyUM(instanceData, "active"),
-                  new FitnessCalculatorMinEnergyUM(instanceData, "semi-active")));
+                  new FitnessCalculatorMinEnergyUM(instanceData, "active")));
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }
