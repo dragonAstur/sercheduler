@@ -2,6 +2,7 @@ package com.uniovi.sercheduler.commands;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
+import com.uniovi.sercheduler.jmetal.experiment.ExecuteAlgorithmsSequential;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
@@ -217,7 +218,7 @@ public class ExperimentJmetalCommand {
             .setIndependentRuns(experimentConfig.independentRuns())
             .setNumberOfCores(Runtime.getRuntime().availableProcessors())
             .build();
-    new ExecuteAlgorithms<>(experiment).run();
+    new ExecuteAlgorithmsSequential(experiment).run();
 
     try {
 
