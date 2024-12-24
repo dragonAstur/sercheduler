@@ -9,13 +9,15 @@ import org.uma.jmetal.util.errorchecking.JMetalException;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 
-public class ExecuteAlgorithmsSequential
+public class ExecuteAlgorithmsCustom
     extends ExecuteAlgorithms<SchedulePermutationSolution, List<SchedulePermutationSolution>> {
 
   private Experiment<SchedulePermutationSolution, List<SchedulePermutationSolution>> experiment;
 
-  public ExecuteAlgorithmsSequential(
+  public ExecuteAlgorithmsCustom(
       Experiment<SchedulePermutationSolution, List<SchedulePermutationSolution>> configuration) {
     super(configuration);
     this.experiment = configuration;
@@ -25,9 +27,9 @@ public class ExecuteAlgorithmsSequential
   public void run() {
     JMetalLogger.logger.info("ExecuteAlgorithms: Preparing output directory");
     this.prepareOutputDirectory();
-    System.setProperty(
-        "java.util.concurrent.ForkJoinPool.common.parallelism",
-        "" + this.experiment.getNumberOfCores());
+    // Create a custom ForkJoinPool with the desired parallelism level
+    ForkJoinPool customThreadPool = new ForkJoinPool(this.experiment.getNumberOfCores());
+
     int retryCounter = 0;
     int maxRetries = 5;
     boolean computationNotFinished = true;
@@ -39,8 +41,16 @@ public class ExecuteAlgorithmsSequential
       } else {
         JMetalLogger.logger.info(
             "ExecuteAlgorithms: there are " + unfinishedAlgorithmList.size() + " runs pending");
-        unfinishedAlgorithmList.forEach((algorithm) -> algorithm.runAlgorithm(this.experiment));
-        ++retryCounter;
+          try {
+              customThreadPool.submit(() -> {
+                unfinishedAlgorithmList.parallelStream().forEach((algorithm) -> algorithm.runAlgorithm(this.experiment));
+              }).get();
+          } catch (InterruptedException | ExecutionException e) {
+              throw new RuntimeException(e);
+          } finally {
+            customThreadPool.shutdown(); // Shut down the custom thread pool
+          }
+          ++retryCounter;
       }
     }
 
@@ -50,6 +60,9 @@ public class ExecuteAlgorithmsSequential
       JMetalLogger.logger.info("Algorithm runs finished. Number of tries: " + retryCounter);
     }
   }
+
+
+
 
   private void prepareOutputDirectory() {
     if (this.experimentDirectoryDoesNotExist()) {
