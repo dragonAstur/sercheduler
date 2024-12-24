@@ -2,6 +2,7 @@ package com.uniovi.sercheduler.commands;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
+import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadedEvaluation;
 import com.uniovi.sercheduler.jmetal.experiment.ExecuteAlgorithmsCustom;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
@@ -31,7 +32,6 @@ import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2Builder;
 import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
 import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
-import org.uma.jmetal.component.catalogue.common.evaluation.impl.MultiThreadedEvaluation;
 import org.uma.jmetal.component.catalogue.common.termination.Termination;
 import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByEvaluations;
 import org.uma.jmetal.lab.experiment.Experiment;
@@ -237,9 +237,9 @@ public class ExperimentJmetalCommand {
   private Evaluation<SchedulePermutationSolution> getEvaluator(
       String evaluator, Problem<SchedulePermutationSolution> problem, List<Objective> objectives) {
     return switch (evaluator) {
-      case "simple" -> new MultiThreadedEvaluation<>(0, problem);
+      case "simple" -> new MultiThreadedEvaluation(0, problem);
       case "multi" -> new MultiThreadEvaluationMulti(0, problem, objectives.get(1).objectiveName);
-      default -> new MultiThreadedEvaluation<>(0, problem);
+      default -> new MultiThreadedEvaluation(0, problem);
     };
   }
 

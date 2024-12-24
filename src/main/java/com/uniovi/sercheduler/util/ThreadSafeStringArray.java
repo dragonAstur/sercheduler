@@ -49,7 +49,7 @@ public class ThreadSafeStringArray {
           case "simple" -> currentMulti.setSimple((short) (currentMulti.getSimple() + 1));
           case "heft" -> currentMulti.setHeft((short) (currentMulti.getHeft() + 1));
           case "rank" -> currentMulti.setRank((short) (currentMulti.getRank() + 1));
-          default -> LOG.error("Unknown fitness function: {}", method);
+          default -> LOG.debug("Unknown fitness function: {}", method);
         }
         array[currentIndex] = currentMulti;
         currentIndex++; // Increment the index for the next insertion
