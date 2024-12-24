@@ -83,7 +83,7 @@ public class ExperimentJmetalCommand {
       @Option(shortNames = 'E', defaultValue = "100000") Integer executions,
       @Option(shortNames = 'S', defaultValue = "1") Long seed,
       @Option(shortNames = 'C') String experimentConfigFile,
-      @Option(shortNames = 'P', defaultValue = "2") int maxParallel) {
+      @Option(shortNames = 'P', defaultValue = "1") int maxParallel) {
 
     var experimentConfig = experimentConfigLoader.readFromFile(new File(experimentConfigFile));
 
