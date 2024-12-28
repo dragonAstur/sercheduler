@@ -10,6 +10,7 @@ import com.uniovi.sercheduler.service.support.ScheduleGap;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,7 +23,8 @@ public abstract class FitnessCalculator {
   Map<String, Map<String, Double>> computationMatrix;
   Map<String, Map<String, Long>> networkMatrix;
 
-  Double referenceSpeed;
+  Double referenceSpeedRead;
+  Double referenceSpeedWrite;
 
   /**
    * Full constructor.
@@ -33,7 +35,8 @@ public abstract class FitnessCalculator {
     this.instanceData = instanceData;
     this.computationMatrix = calculateComputationMatrix(instanceData.referenceFlops());
     this.networkMatrix = calculateNetworkMatrix();
-    this.referenceSpeed = calculateReferenceSpeed();
+    this.referenceSpeedWrite = calculateReferenceSpeedWrite();
+    this.referenceSpeedRead = calculateReferenceSpeedRead();
   }
 
   private static Map.Entry<String, Map<String, Long>> calculateStaging(
@@ -93,6 +96,11 @@ public abstract class FitnessCalculator {
           new FitnessCalculatorMinEnergyUM(instanceData, "active");
       case "min-energy-UM-semi-active", "min-energy-UM-mono-semi-active" ->
           new FitnessCalculatorMinEnergyUM(instanceData, "semi-active");
+
+      case "fvlt-me-active", "fvlt-me-mono-active" ->
+          new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active");
+      case "fvlt-me-semi-active", "fvlt-me-mono-semi-active" ->
+          new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "semi-active");
 
       case "rank" -> new FitnessCalculatorRank(instanceData);
       case "multi" ->
@@ -174,7 +182,7 @@ public abstract class FitnessCalculator {
    *
    * @return The ranking in DECREASING order.
    */
-  public List<Task> calculateHeftRanking() {
+  public LinkedHashMap<Task, Double> calculateHeftRanking() {
     Map<String, Double> savedCosts = new HashMap<>();
 
     var childrenStatus =
@@ -203,11 +211,14 @@ public abstract class FitnessCalculator {
         }
       }
     }
-    // Creates the rank
     return savedCosts.entrySet().stream()
-        .sorted(Comparator.comparing(Map.Entry::getValue, Comparator.reverseOrder()))
-        .map(p -> instanceData.workflow().get(p.getKey()))
-        .toList();
+        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+        .collect(
+            Collectors.toMap(
+                t -> instanceData.workflow().get(t.getKey()),
+                Map.Entry::getValue,
+                (o, n) -> o,
+                LinkedHashMap::new));
   }
 
   /**
@@ -237,8 +248,8 @@ public abstract class FitnessCalculator {
             .max()
             .orElse(0D);
 
-    taskCost += task.getInput().getSizeInBits() / referenceSpeed;
-    taskCost += task.getOutput().getSizeInBits() / referenceSpeed;
+    taskCost += task.getInput().getSizeInBits() / referenceSpeedRead;
+    taskCost += task.getOutput().getSizeInBits() / referenceSpeedWrite;
 
     taskCost += maxChild;
 
@@ -246,13 +257,26 @@ public abstract class FitnessCalculator {
   }
 
   /**
-   * Calculates the average of the communications speed.
+   * Calculates the average of the communications speed for the input.
    *
    * @return the average.
    */
-  public Double calculateReferenceSpeed() {
+  public Double calculateReferenceSpeedRead() {
     return instanceData.hosts().values().stream()
         .map(h -> Math.min(h.getNetworkSpeed(), h.getDiskSpeed()))
+        .mapToLong(Long::longValue)
+        .average()
+        .orElseThrow();
+  }
+
+  /**
+   * Calculates the average of the communications speed for the output.
+   *
+   * @return the average.
+   */
+  public Double calculateReferenceSpeedWrite() {
+    return instanceData.hosts().values().stream()
+        .map(Host::getDiskSpeed)
         .mapToLong(Long::longValue)
         .average()
         .orElseThrow();

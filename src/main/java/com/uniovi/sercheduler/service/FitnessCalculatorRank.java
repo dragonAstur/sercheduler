@@ -19,7 +19,7 @@ public class FitnessCalculatorRank extends FitnessCalculatorSimple {
   public FitnessCalculatorRank(InstanceData instanceData) {
     super(instanceData);
 
-    heftRanking = calculateHeftRanking();
+    heftRanking = calculateHeftRanking().keySet().stream().toList();
   }
 
   /**

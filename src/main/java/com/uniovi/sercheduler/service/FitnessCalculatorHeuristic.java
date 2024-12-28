@@ -13,7 +13,7 @@ public class FitnessCalculatorHeuristic extends FitnessCalculatorHeft {
 
   public FitnessCalculatorHeuristic(InstanceData instanceData) {
     super(instanceData);
-    heftRanking = calculateHeftRanking();
+    heftRanking = calculateHeftRanking().keySet().stream().toList();
   }
 
   /**

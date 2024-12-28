@@ -192,7 +192,7 @@ public class FitnessCalculatorTest {
     FitnessInfo result =
         fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan, "makespan"));
 
-    assertEquals(193.5D, result.fitness().get("makespan"));
+    assertEquals(209D, result.fitness().get("makespan"));
   }
 
   @Test
@@ -216,7 +216,7 @@ public class FitnessCalculatorTest {
     FitnessInfo result =
         fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan, "makespan"));
 
-    assertEquals(187D, result.fitness().get("makespan"));
+    assertEquals(180.5D, result.fitness().get("makespan"));
   }
 
   @Test
@@ -248,7 +248,7 @@ public class FitnessCalculatorTest {
     FitnessInfo result =
         fitnessCalculator.calculateFitness(new SchedulePermutationSolution(1,2,null, plan, "makespan"));
 
-    assertEquals(193.5D, result.fitness().get("makespan"));
+    assertEquals(209D, result.fitness().get("makespan"));
   }
 
 
