@@ -5,7 +5,9 @@
     "simple-mono",
     "min-energy-UM-mono-active",
     "min-energy-UM-mono-semi-active",
-    "multi-energy-mono"
+    "multi-energy-mono",
+    "fvlt-me-mono-active",
+    "fvlt-me-mono-semi-active"
   ],
   "workflows": [
     "1000genome-chameleon-2ch-250k-001",
