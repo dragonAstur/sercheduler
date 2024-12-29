@@ -6,6 +6,7 @@
     "min-energy-UM-mono-active",
     "min-energy-UM-mono-semi-active",
     "multi-energy-mono",
+    "multi-energy-mono-no-fvlt",
     "fvlt-me-mono-active",
     "fvlt-me-mono-semi-active"
   ],

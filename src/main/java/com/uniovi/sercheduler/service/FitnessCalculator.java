@@ -124,7 +124,7 @@ public abstract class FitnessCalculator {
                   new FitnessCalculatorHeft(instanceData),
                   new FitnessCalculatorRank(instanceData)),
               Collections.emptyList());
-      case "multi-energy", "multi-energy-mono" ->
+      case "multi-energy-no-fvlt", "multi-energy-mono-no-fvlt" ->
           new FitnessCalculatorMulti(
               instanceData,
               Collections.emptyList(),
@@ -132,6 +132,15 @@ public abstract class FitnessCalculator {
                   new FitnessCalculatorSimple(instanceData),
                   new FitnessCalculatorHeftEnergy(instanceData, "active"),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active")));
+      case "multi-energy", "multi-energy-mono" ->
+          new FitnessCalculatorMulti(
+              instanceData,
+              Collections.emptyList(),
+              List.of(
+                  new FitnessCalculatorSimple(instanceData),
+                  new FitnessCalculatorHeftEnergy(instanceData, "active"),
+                  new FitnessCalculatorMinEnergyUM(instanceData, "active"),
+                  new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData,"active")));
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }
