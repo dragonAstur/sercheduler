@@ -138,7 +138,6 @@ public abstract class FitnessCalculator {
               Collections.emptyList(),
               List.of(
                   new FitnessCalculatorSimple(instanceData),
-                  new FitnessCalculatorHeftEnergy(instanceData, "active"),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active"),
                   new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData,"active")));
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
