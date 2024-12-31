@@ -102,7 +102,7 @@ public abstract class FitnessCalculator {
       case "fvlt-me-semi-active", "fvlt-me-mono-semi-active" ->
           new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "semi-active");
 
-      case "rank" -> new FitnessCalculatorRank(instanceData);
+      case "rank", "rank-makespan", "rank-makespan-mono" -> new FitnessCalculatorRank(instanceData);
       case "multi" ->
           new FitnessCalculatorMulti(
               instanceData,
@@ -139,7 +139,7 @@ public abstract class FitnessCalculator {
               List.of(
                   new FitnessCalculatorSimple(instanceData),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active"),
-                  new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData,"active")));
+                  new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active")));
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }
