@@ -84,7 +84,13 @@ public abstract class FitnessCalculator {
    */
   public static FitnessCalculator getFitness(String fitness, InstanceData instanceData) {
     return switch (fitness) {
-      case "simple", "simple-mono" -> new FitnessCalculatorSimple(instanceData);
+      case "simple",
+          "simple-mono",
+          "simple-makespan",
+          "simple-makespan-mono",
+          "simple-energy",
+          "simple-energy-mono" ->
+          new FitnessCalculatorSimple(instanceData);
       case "heft", "heft-makespan-mono", "heft-spea2", "heft-pesa2" ->
           new FitnessCalculatorHeft(instanceData);
       case "heft-energy-active", "heft-energy-mono-active" ->
