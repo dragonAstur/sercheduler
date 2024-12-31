@@ -32,10 +32,12 @@ import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2Builder;
 import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
 import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
+import org.uma.jmetal.component.catalogue.common.evaluation.impl.SequentialEvaluation;
 import org.uma.jmetal.component.catalogue.common.termination.Termination;
 import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByEvaluations;
 import org.uma.jmetal.lab.experiment.Experiment;
 import org.uma.jmetal.lab.experiment.ExperimentBuilder;
+import org.uma.jmetal.lab.experiment.component.impl.ExecuteAlgorithms;
 import org.uma.jmetal.lab.experiment.util.ExperimentAlgorithm;
 import org.uma.jmetal.lab.experiment.util.ExperimentProblem;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
@@ -213,7 +215,7 @@ public class ExperimentJmetalCommand {
             .setIndependentRuns(experimentConfig.independentRuns())
             .setNumberOfCores(maxParallel)
             .build();
-    new ExecuteAlgorithmsCustom(experiment).run();
+    new ExecuteAlgorithms<>(experiment).run();
 
     try {
 
@@ -237,7 +239,7 @@ public class ExperimentJmetalCommand {
   private Evaluation<SchedulePermutationSolution> getEvaluator(
       String evaluator, Problem<SchedulePermutationSolution> problem, List<Objective> objectives) {
     return switch (evaluator) {
-      case "simple" -> new MultiThreadedEvaluation(0, problem);
+      case "simple" -> new SequentialEvaluation<>(problem);
       case "multi" -> new MultiThreadEvaluationMulti(0, problem, objectives.get(1).objectiveName);
       default -> new MultiThreadedEvaluation(0, problem);
     };
@@ -363,7 +365,7 @@ public class ExperimentJmetalCommand {
         Matcher matcher = pattern.matcher(workflowName);
         int hostsNumber = 0;
         if (matcher.find()) {
-         hostsNumber = Integer.parseInt(matcher.group(1));
+          hostsNumber = Integer.parseInt(matcher.group(1));
         }
 
         writer.write(
