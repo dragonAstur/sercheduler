@@ -1,14 +1,10 @@
 {
   "fitness": [
     "heft-energy-mono-active",
-    "heft-energy-mono-semi-active",
-    "simple-mono",
+    "simple-energy-mono",
     "min-energy-UM-mono-active",
-    "min-energy-UM-mono-semi-active",
     "multi-energy-mono",
-    "multi-energy-mono-no-fvlt",
-    "fvlt-me-mono-active",
-    "fvlt-me-mono-semi-active"
+    "fvlt-me-mono-active"
   ],
   "workflows": [
     "1000genome-chameleon-2ch-250k-001",
@@ -22,28 +18,12 @@
     "epigenomics-chameleon-hep-1seq-100k-001",
     "epigenomics-chameleon-hep-6seq-100k-001",
     "epigenomics-chameleon-ilmn-1seq-100k-001",
-    "epigenomics-chameleon-ilmn-6seq-100k-001",
-    "montage-chameleon-2mass-01d-001",
-    "montage-chameleon-2mass-005d-001",
-    "montage-chameleon-dss-10d-001",
-    "montage-chameleon-dss-125d-001",
-    "seismology-chameleon-100p-001",
-    "seismology-chameleon-500p-001",
-    "seismology-chameleon-700p-001",
-    "seismology-chameleon-1000p-001",
-    "soykb-chameleon-10fastq-10ch-001",
-    "soykb-chameleon-10fastq-20ch-001",
-    "soykb-chameleon-30fastq-10ch-001",
-    "soykb-chameleon-40fastq-20ch-001",
-    "srasearch-chameleon-10a-005",
-    "srasearch-chameleon-20a-003",
-    "srasearch-chameleon-40a-003",
-    "srasearch-chameleon-50a-003"
+    "epigenomics-chameleon-ilmn-6seq-100k-001"
   ],
   "minHosts": 2,
   "maxHosts": 16,
   "hostIncrement": 2,
-  "referenceSpeed": "86.4Gf",
+  "referenceSpeed": "121.6Gf",
   "independentRuns": 10,
   "objectives": [
     "energy", "makespan"
