@@ -358,13 +358,21 @@ public abstract class FitnessCalculator {
     var availableHostGaps =
         available.getOrDefault(host.getName(), List.of(new ScheduleGap(0D, Double.MAX_VALUE)));
 
-    Double ast =
-        availableHostGaps.stream()
-            .filter(
-                gap -> gap.start() >= parentsInfo.maxEst() && taskTime <= (gap.end() - gap.start()))
-            .min(Comparator.comparing(ScheduleGap::start))
-            .orElse(new ScheduleGap(parentsInfo.maxEst(), 0D))
-            .start();
+    Double ast = null;
+    double maxEst = parentsInfo.maxEst();
+
+    for (ScheduleGap gap : availableHostGaps) {
+      if (gap.start() >= maxEst && taskTime <= (gap.end() - gap.start())) {
+        if (ast == null || gap.start() < ast) {
+          ast = gap.start();
+        }
+      }
+    }
+
+// Use default value if no matching gap is found
+    if (ast == null) {
+      ast = parentsInfo.maxEst();
+    }
 
     Double eft = ast + taskTime;
 

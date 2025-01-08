@@ -6,10 +6,8 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.service.support.EftAndAst;
 import com.uniovi.sercheduler.service.support.EftAndEnergy;
 import com.uniovi.sercheduler.service.support.ScheduleGap;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -171,14 +169,21 @@ public class FitnessCalculatorFastVirtualMachineForLargeTasks extends FitnessCal
 
       // The standby energy is calculated starting from the first instant the host is available
       // until the task is completed
-      var hostReady =
-          available
-              .getOrDefault(host.getName(), List.of(new ScheduleGap(0D, Double.MAX_VALUE)))
-              .stream()
-              .max(Comparator.comparing(ScheduleGap::start))
-              .orElseThrow()
-              .start();
+      List<ScheduleGap> scheduleGaps =
+          available.getOrDefault(host.getName(), List.of(new ScheduleGap(0D, Double.MAX_VALUE)));
 
+      ScheduleGap maxGap = null;
+      for (ScheduleGap gap : scheduleGaps) {
+        if (maxGap == null || gap.start() > maxGap.start()) {
+          maxGap = gap;
+        }
+      }
+      if (maxGap == null) {
+        throw new RuntimeException("No ScheduleGap found");
+      }
+
+      var hostReady = maxGap.start();
+      // If we are using a gap the energy can be negative
       double energyStandBy = (taskCosts.eft() - hostReady) * host.getEnergyCostStandBy();
 
       double energy = energyActive + Math.max(0, energyStandBy);
@@ -190,47 +195,67 @@ public class FitnessCalculatorFastVirtualMachineForLargeTasks extends FitnessCal
     // There are two possible orders, if the task is not high priority we use an
     // energy-efficient VM, if is high priority we will choose the fastest machine.
     var byEnergyAndEft =
-            Comparator.comparing((Map.Entry<String, EftAndEnergy> e) -> e.getValue().energy())
-                    .thenComparing(e -> e.getValue().eft());
+        Comparator.comparing((Map.Entry<String, EftAndEnergy> e) -> e.getValue().energy())
+            .thenComparing(e -> e.getValue().eft());
     var byEftAndEnergy =
-            Comparator.comparing((Map.Entry<String, EftAndEnergy> e) -> e.getValue().eft())
-                    .thenComparing(e -> e.getValue().energy());
+        Comparator.comparing((Map.Entry<String, EftAndEnergy> e) -> e.getValue().eft())
+            .thenComparing(e -> e.getValue().energy());
 
     var comparator = priorityTasks.get(task.getName()) ? byEftAndEnergy : byEnergyAndEft;
 
-    String selectedHostName =
-            tempEftAndEnergy.entrySet().stream().min(comparator).orElseThrow().getKey();
+    // we need to find the minimum value using the comparator.
+    String selectedHostName = null;
+    Map.Entry<String, EftAndEnergy> minEntry = null;
 
+    for (Map.Entry<String, EftAndEnergy> entry : tempEftAndEnergy.entrySet()) {
+      if (minEntry == null || comparator.compare(entry, minEntry) < 0) {
+        minEntry = entry;
+      }
+    }
+
+    if (minEntry == null) {
+      throw new RuntimeException("No minimum entry found");
+    }
+
+    selectedHostName = minEntry.getKey();
 
     var taskCosts = possibleTaskCosts.get(selectedHostName);
     var host = instanceData.hosts().get(selectedHostName);
 
-    // we need to find the closest gap
-
+    // Retrieve the list of gaps or use a default value
     var availableHostGaps =
         available.getOrDefault(host.getName(), List.of(new ScheduleGap(0D, Double.MAX_VALUE)));
-    var gapToReplace =
-        availableHostGaps.stream()
-            .filter(gap -> taskCosts.eft() <= gap.end() && taskCosts.ast() >= gap.start())
-            .findFirst()
-            .orElseThrow();
-    // Now we need to split the gap in two, using the eft as the slice, depending of the cut we can
-    // have one or two gaps. We always generate two gaps so we need to remove the gaps where the
-    // start and the end are the same.
 
-    var newGaps =
-        Stream.of(
-                new ScheduleGap(gapToReplace.start(), taskCosts.ast()),
-                new ScheduleGap(taskCosts.eft(), gapToReplace.end()))
-            .filter(gap -> !gap.start().equals(gap.end()))
-            .toList();
+    // Find the closest gap to replace
+    ScheduleGap gapToReplace = null;
+    for (ScheduleGap gap : availableHostGaps) {
+      if (taskCosts.eft() <= gap.end() && taskCosts.ast() >= gap.start()) {
+        gapToReplace = gap;
+        break;
+      }
+    }
 
-    // Now we generate a new list with the old gaps and the new ones, removing the used gap.
-    var newHostGaps =
-        Stream.concat(
-                availableHostGaps.stream().filter(gap -> !gap.equals(gapToReplace)),
-                newGaps.stream())
-            .toList();
+    if (gapToReplace == null) {
+      throw new RuntimeException("No suitable gap found");
+    }
+
+    // Split the gap into two, avoiding gaps with equal start and end
+    List<ScheduleGap> newGaps = new ArrayList<>();
+    if (!taskCosts.ast().equals(gapToReplace.start())) {
+      newGaps.add(new ScheduleGap(gapToReplace.start(), taskCosts.ast()));
+    }
+    if (!taskCosts.eft().equals(gapToReplace.end())) {
+      newGaps.add(new ScheduleGap(taskCosts.eft(), gapToReplace.end()));
+    }
+
+    // Create a new list of gaps by replacing the old gap with the new ones
+    List<ScheduleGap> newHostGaps = new ArrayList<>();
+    for (ScheduleGap gap : availableHostGaps) {
+      if (!gap.equals(gapToReplace)) {
+        newHostGaps.add(gap);
+      }
+    }
+    newHostGaps.addAll(newGaps);
 
     // We need to put the available gaps
     available.put(host.getName(), newHostGaps);
