@@ -18,17 +18,32 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
   List<FitnessCalculator> fitnessCalculatorsMakespan;
   List<FitnessCalculator> fitnessCalculatorsEnergy;
 
+  String overrideObjective;
+
   /**
-   * Full constructor.
+   * Basic constructor
    *
    * @param instanceData Infrastructure to use.
    */
   public FitnessCalculatorMulti(
-      InstanceData instanceData, List<FitnessCalculator> fitnessCalculatorsMakespan, List<FitnessCalculator> fitnessCalculatorsEnergy) {
+      InstanceData instanceData,
+      List<FitnessCalculator> fitnessCalculatorsMakespan,
+      List<FitnessCalculator> fitnessCalculatorsEnergy) {
     super(instanceData);
     this.fitnessCalculatorsMakespan = fitnessCalculatorsMakespan;
     this.fitnessCalculatorsEnergy = fitnessCalculatorsEnergy;
+    this.overrideObjective = "none";
+  }
 
+  public FitnessCalculatorMulti(
+      InstanceData instanceData,
+      List<FitnessCalculator> fitnessCalculatorsMakespan,
+      List<FitnessCalculator> fitnessCalculatorsEnergy,
+      String overrideObjective) {
+    super(instanceData);
+    this.fitnessCalculatorsMakespan = fitnessCalculatorsMakespan;
+    this.fitnessCalculatorsEnergy = fitnessCalculatorsEnergy;
+    this.overrideObjective = overrideObjective;
   }
 
   /**
@@ -40,16 +55,20 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
   public FitnessInfo calculateFitness(SchedulePermutationSolution solution) {
     List<FitnessCalculator> fitnessCalculators;
 
-    if (solution.getArbiter().equals("energy")) {
+    if ((solution.getArbiter().equals("energy") || overrideObjective.equals("energy"))  && !overrideObjective.equals("makespan")) {
       fitnessCalculators = fitnessCalculatorsEnergy;
-    } else {
+    } else if (solution.getArbiter().equals("makespan") || overrideObjective.equals("makespan")) {
       fitnessCalculators = fitnessCalculatorsMakespan;
+    } else {
+      throw new RuntimeException("No fitness calculator found");
     }
+
+    var objective = overrideObjective.equals("none") ? solution.getArbiter() : overrideObjective;
 
     var fitness =
         fitnessCalculators.stream()
             .map(c -> c.calculateFitness(solution))
-            .min(Comparator.comparing(f -> f.fitness().get(solution.getArbiter())))
+            .min(Comparator.comparing(f -> f.fitness().get(objective)))
             .orElseThrow();
 
     fitnessUsage.setValue(fitness.fitnessFunction(), fitness.fitness().get("makespan"));

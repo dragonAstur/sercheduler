@@ -129,7 +129,7 @@ public abstract class FitnessCalculator {
                   new FitnessCalculatorSimple(instanceData),
                   new FitnessCalculatorHeft(instanceData),
                   new FitnessCalculatorRank(instanceData)),
-              Collections.emptyList());
+              Collections.emptyList(),"makespan");
       case "multi-energy-no-fvlt", "multi-energy-mono-no-fvlt" ->
           new FitnessCalculatorMulti(
               instanceData,
@@ -145,7 +145,7 @@ public abstract class FitnessCalculator {
               List.of(
                   new FitnessCalculatorSimple(instanceData),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active"),
-                  new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active")));
+                  new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active")), "energy");
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }
