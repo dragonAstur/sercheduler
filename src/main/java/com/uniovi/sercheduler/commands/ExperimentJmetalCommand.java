@@ -3,7 +3,6 @@ package com.uniovi.sercheduler.commands;
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadedEvaluation;
-import com.uniovi.sercheduler.jmetal.experiment.ExecuteAlgorithmsCustom;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
@@ -17,7 +16,13 @@ import com.uniovi.sercheduler.service.Operators;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -37,7 +42,14 @@ import org.uma.jmetal.component.catalogue.common.termination.Termination;
 import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByEvaluations;
 import org.uma.jmetal.lab.experiment.Experiment;
 import org.uma.jmetal.lab.experiment.ExperimentBuilder;
+import org.uma.jmetal.lab.experiment.component.impl.ComputeQualityIndicators;
 import org.uma.jmetal.lab.experiment.component.impl.ExecuteAlgorithms;
+import org.uma.jmetal.lab.experiment.component.impl.GenerateBoxplotsWithR;
+import org.uma.jmetal.lab.experiment.component.impl.GenerateFriedmanHolmTestTables;
+import org.uma.jmetal.lab.experiment.component.impl.GenerateHtmlPages;
+import org.uma.jmetal.lab.experiment.component.impl.GenerateLatexTablesWithStatistics;
+import org.uma.jmetal.lab.experiment.component.impl.GenerateReferenceParetoFront;
+import org.uma.jmetal.lab.experiment.component.impl.GenerateWilcoxonTestTablesWithR;
 import org.uma.jmetal.lab.experiment.util.ExperimentAlgorithm;
 import org.uma.jmetal.lab.experiment.util.ExperimentProblem;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
@@ -219,13 +231,13 @@ public class ExperimentJmetalCommand {
 
     try {
 
-      //        new GenerateReferenceParetoFront(experiment).run();
-      //        new ComputeQualityIndicators<>(experiment).run();
-      //        new GenerateLatexTablesWithStatistics(experiment).run();
-      //        new GenerateFriedmanHolmTestTables<>(experiment).run();
-      //        new GenerateWilcoxonTestTablesWithR<>(experiment).run();
-      //        new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
-      //        new GenerateHtmlPages<>(experiment).run();
+      new GenerateReferenceParetoFront(experiment).run();
+      new ComputeQualityIndicators<>(experiment).run();
+      new GenerateLatexTablesWithStatistics(experiment).run();
+      new GenerateFriedmanHolmTestTables<>(experiment).run();
+      new GenerateWilcoxonTestTablesWithR<>(experiment).run();
+      new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
+      new GenerateHtmlPages<>(experiment).run();
 
       computeStatistics(experiment, objectives);
 
