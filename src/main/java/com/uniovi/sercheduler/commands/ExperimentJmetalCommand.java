@@ -188,6 +188,13 @@ public class ExperimentJmetalCommand {
                       .setPopulationSize(populationSize)
                       .setMaxEvaluations(executions)
                       .build();
+            } else if (f.equals("multi")) {
+              algorithm =
+                  new NSGAIIBuilder<>(
+                          problem, 50, offspringPopulationSize, crossover, mutation)
+                      .setTermination(termination)
+                      .setEvaluation(getEvaluator("multi", problem, objectives))
+                      .build();
             } else {
 
               algorithm =

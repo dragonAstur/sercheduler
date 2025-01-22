@@ -118,10 +118,10 @@ public abstract class FitnessCalculator {
                   new FitnessCalculatorRank(instanceData)),
               List.of(
                   new FitnessCalculatorSimple(instanceData),
-                  new FitnessCalculatorHeftEnergy(instanceData, "active"),
-                  new FitnessCalculatorHeftEnergy(instanceData, "semi-active"),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active"),
-                  new FitnessCalculatorMinEnergyUM(instanceData, "semi-active")));
+                  new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active")),
+              "none");
+
       case "multi-makespan", "multi-makespan-mono" ->
           new FitnessCalculatorMulti(
               instanceData,
@@ -129,7 +129,8 @@ public abstract class FitnessCalculator {
                   new FitnessCalculatorSimple(instanceData),
                   new FitnessCalculatorHeft(instanceData),
                   new FitnessCalculatorRank(instanceData)),
-              Collections.emptyList(),"makespan");
+              Collections.emptyList(),
+              "makespan");
       case "multi-energy-no-fvlt", "multi-energy-mono-no-fvlt" ->
           new FitnessCalculatorMulti(
               instanceData,
@@ -145,7 +146,8 @@ public abstract class FitnessCalculator {
               List.of(
                   new FitnessCalculatorSimple(instanceData),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active"),
-                  new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active")), "energy");
+                  new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active")),
+              "energy");
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }
@@ -369,7 +371,7 @@ public abstract class FitnessCalculator {
       }
     }
 
-// Use default value if no matching gap is found
+    // Use default value if no matching gap is found
     if (ast == null) {
       ast = parentsInfo.maxEst();
     }
