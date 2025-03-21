@@ -104,7 +104,7 @@ public class Operators implements Serializable {
       }
     } else if (newPosition > position) {
       for (int i = position + 1; i <= newPosition; i++) {
-        newPlan.set(i + 1, newPlan.get(i));
+        newPlan.set(i - 1, newPlan.get(i));
       }
     }
     // put the mutated element in the new position
