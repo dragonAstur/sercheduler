@@ -10,4 +10,5 @@ public record ExperimentConfig(
     int hostIncrement,
     String referenceSpeed,
     int independentRuns,
-    List<String> objectives) {}
+    List<String> objectives,
+    boolean jmetalAnalysis) {}

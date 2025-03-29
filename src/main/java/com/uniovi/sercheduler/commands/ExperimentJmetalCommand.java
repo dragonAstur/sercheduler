@@ -96,7 +96,8 @@ public class ExperimentJmetalCommand {
       @Option(shortNames = 'T') String type,
       @Option(shortNames = 'E', defaultValue = "100000") Integer executions,
       @Option(shortNames = 'S', defaultValue = "1") Long seed,
-      @Option(shortNames = 'C') String experimentConfigFile,
+      @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
+      @Option(shortNames = 'C' ) String experimentConfigFile,
       @Option(shortNames = 'P', defaultValue = "1") int maxParallel) {
 
     var experimentConfig = experimentConfigLoader.readFromFile(new File(experimentConfigFile));
@@ -107,7 +108,7 @@ public class ExperimentJmetalCommand {
 
     var fitness = experimentConfig.fitness();
 
-    var experimentBaseDirectory = "experiments";
+    var experimentBaseDirectory = experimentPath + "/executions";
     double mutationProbability = 0.1;
     int populationSize = 100;
     int offspringPopulationSize = 100;
@@ -190,8 +191,7 @@ public class ExperimentJmetalCommand {
                       .build();
             } else if (f.equals("multi")) {
               algorithm =
-                  new NSGAIIBuilder<>(
-                          problem, 50, offspringPopulationSize, crossover, mutation)
+                  new NSGAIIBuilder<>(problem, 50, offspringPopulationSize, crossover, mutation)
                       .setTermination(termination)
                       .setEvaluation(getEvaluator("multi", problem, objectives))
                       .build();
@@ -228,7 +228,6 @@ public class ExperimentJmetalCommand {
                     new Spread(),
                     new GenerationalDistance(),
                     new PISAHypervolume(),
-                    new NormalizedHypervolume(),
                     new InvertedGenerationalDistance(),
                     new InvertedGenerationalDistancePlus()))
             .setIndependentRuns(experimentConfig.independentRuns())
@@ -238,13 +237,15 @@ public class ExperimentJmetalCommand {
 
     try {
 
-      new GenerateReferenceParetoFront(experiment).run();
-      new ComputeQualityIndicators<>(experiment).run();
-      new GenerateLatexTablesWithStatistics(experiment).run();
-      new GenerateFriedmanHolmTestTables<>(experiment).run();
-      new GenerateWilcoxonTestTablesWithR<>(experiment).run();
-      new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
-      new GenerateHtmlPages<>(experiment).run();
+      if (experimentConfig.jmetalAnalysis()) {
+        new GenerateReferenceParetoFront(experiment).run();
+        new ComputeQualityIndicators<>(experiment).run();
+        new GenerateLatexTablesWithStatistics(experiment).run();
+        new GenerateFriedmanHolmTestTables<>(experiment).run();
+        new GenerateWilcoxonTestTablesWithR<>(experiment).run();
+        new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(2).run();
+        new GenerateHtmlPages<>(experiment).run();
+      }
 
       computeStatistics(experiment, objectives);
 
@@ -363,8 +364,9 @@ public class ExperimentJmetalCommand {
     try (FileWriter writer = new FileWriter(outputDirectory + "stats.csv")) {
 
       // TODO: Change to be compatible with more than two objectives
-      String objective1 = objectives.get(0).name();
-      String objective2 = objectives.get(1).name();
+      var tableObjectives = List.of(Objective.ENERGY, Objective.MAKESPAN);
+      String objective1 = tableObjectives.get(0).name();
+      String objective2 = tableObjectives.get(1).name();
 
       writer.write(
           String.format(
@@ -377,7 +379,7 @@ public class ExperimentJmetalCommand {
               objective2,
               objective2,
               objective2));
-      for (int i = 0; i < executionStatistics.get(objectives.get(0).name()).size(); i++) {
+      for (int i = 0; i < executionStatistics.get(tableObjectives.get(0).name()).size(); i++) {
         // Find the hosts number with a regex
         var workflowName = executionStatistics.get(objective1).get(i).workflow();
         Pattern pattern = Pattern.compile(".*-hosts-(\\d+)$");

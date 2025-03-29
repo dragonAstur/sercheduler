@@ -46,7 +46,7 @@ jMetal.log
 *.csv
 
 #project
-experiments
+executions
 
 #mac
 .DS_Store
