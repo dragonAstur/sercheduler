@@ -1,8 +1,8 @@
 {
   "fitness": [
     "simple-energy-mono",
-    "min-energy-UM-active-mono",
-    "fvlt-me-active-mono",
+    "min-energy-UM-mono-active",
+    "fvlt-me-mono-active",
     "multi-energy-mono",
     "multi-makespan-mono"
   ],
