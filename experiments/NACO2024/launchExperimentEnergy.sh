@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-java -jar target/sercheduler-0.0.1-SNAPSHOT.jar \
+java -jar ../../target/sercheduler-0.0.1-SNAPSHOT.jar \
 jmetal \
 -W workflows/ \
 -H hosts/ \
