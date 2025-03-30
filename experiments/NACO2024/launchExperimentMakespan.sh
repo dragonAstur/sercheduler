@@ -6,6 +6,5 @@ jmetal \
 -T scenario1 \
 --seed 1 \
 --executions 50000 \
--C experimentConfigEnergy.json \
+-C experimentConfigMakespan.json \
 --experimentPath makespan
--P 150
