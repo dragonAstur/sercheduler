@@ -1,7 +1,11 @@
 package com.uniovi.sercheduler.localsearch.operator;
 
-public interface NeighborhoodOperatorPositional<Source, Result> extends NeighborhoodOperator  {
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 
-    Result execute(Source actualSolution, int position);
+import java.util.List;
+
+public interface NeighborhoodOperatorPositional {
+
+    List<GeneratedNeighbor> execute(SchedulePermutationSolution actualSolution, int position);
 
 }

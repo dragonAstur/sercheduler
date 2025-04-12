@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 import static com.uniovi.sercheduler.localsearch.operator.NeighborUtils.getValidPositions;
 
 
-public class NeighborhoodInsertionPositional implements NeighborhoodOperatorPositional<SchedulePermutationSolution, List<GeneratedNeighbor>> {
+public class NeighborhoodInsertionPositional implements NeighborhoodOperatorPositional {
 
     @Override
     public List<GeneratedNeighbor> execute(SchedulePermutationSolution actualSolution, int position) {

@@ -10,41 +10,36 @@ import com.uniovi.sercheduler.service.PlanPair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NeighborhoodChangeHost implements NeighborhoodOperatorHost<SchedulePermutationSolution, List<GeneratedNeighbor>> {
+public class NeighborhoodChangeHostPositional implements NeighborhoodOperatorPositional {
 
     private final InstanceData instanceData;
 
-    public NeighborhoodChangeHost(InstanceData instanceData) {
+    public NeighborhoodChangeHostPositional(InstanceData instanceData) {
         this.instanceData = instanceData;
     }
 
     @Override
-    public List<GeneratedNeighbor> execute(SchedulePermutationSolution actualSolution) {
+    public List<GeneratedNeighbor> execute(SchedulePermutationSolution actualSolution, int position) {
 
         List<PlanPair> plan = List.copyOf(actualSolution.getPlan());
 
         List<GeneratedNeighbor> neighbors = new ArrayList<>();
 
-        for(int i = 0; i < plan.size(); i++) {
-
-            int position = i;
-
-            changeOneElementHost(plan, position).stream().map(neighborPlan ->
-                    new SchedulePermutationSolution(
+        //TODO: mirar si se puede cambiar simplemente por el método de los utils
+        changeOneElementHost(plan, position).stream().map(neighborPlan ->
+                new SchedulePermutationSolution(
                         actualSolution.variables().size(),
                         actualSolution.objectives().length,
                         null,
                         neighborPlan,
                         actualSolution.getArbiter()
-                    )
-            ).map(generatedSolution ->{
-                List<Movement> movements = new ArrayList<>();
-                movements.add(new ChangeHostMovement(position, NeighborUtils.getChildrenPositions(plan, position)));
-                return new GeneratedNeighbor(generatedSolution, movements);
-            }
-            ).forEach(neighbors::add);
-
-        }
+                )
+        ).map(generatedSolution ->{
+                    List<Movement> movements = new ArrayList<>();
+                    movements.add(new ChangeHostMovement(position, NeighborUtils.getChildrenPositions(plan, position)));
+                    return new GeneratedNeighbor(generatedSolution, movements);
+                }
+        ).forEach(neighbors::add);
 
         return neighbors;
     }
@@ -65,15 +60,5 @@ public class NeighborhoodChangeHost implements NeighborhoodOperatorHost<Schedule
         List<PlanPair> newPlan = new ArrayList<>(List.copyOf(plan));
         newPlan.set(position, new PlanPair(plan.get(position).task(), h));
         return List.copyOf(newPlan);
-    }
-
-    public List<List<PlanPair>> changehostToAllElements(List<PlanPair> plan) {
-
-        List<List<PlanPair>> neighbors = new ArrayList<>();
-
-        for(int i = 0; i < plan.size(); i++)
-            changeOneElementHost(plan, i);
-
-        return neighbors;
     }
 }
