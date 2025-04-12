@@ -1,18 +1,16 @@
-package com.uniovi.sercheduler.localsearch;
+package com.uniovi.sercheduler.localsearch.operator;
 
 import com.uniovi.sercheduler.dto.Host;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.localsearch.movement.ChangeHostMovement;
+import com.uniovi.sercheduler.localsearch.movement.Movement;
 import com.uniovi.sercheduler.service.PlanPair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
-import static com.uniovi.sercheduler.localsearch.NeighborUtils.createNeighborSolutions;
-import static com.uniovi.sercheduler.localsearch.NeighborUtils.getValidPositions;
-
-public class NeighborhoodChangeHost implements NeighborhoodOperator<SchedulePermutationSolution, List<GeneratedNeighbor>>{
+public class NeighborhoodChangeHost implements NeighborhoodOperatorHost<SchedulePermutationSolution, List<GeneratedNeighbor>> {
 
     private final InstanceData instanceData;
 
@@ -29,9 +27,9 @@ public class NeighborhoodChangeHost implements NeighborhoodOperator<SchedulePerm
 
         for(int i = 0; i < plan.size(); i++) {
 
-            int[] changedPlanPairs = new int[]{i};
+            int position = i;
 
-            changeOneElementHost(plan, i).stream().map(neighborPlan ->
+            changeOneElementHost(plan, position).stream().map(neighborPlan ->
                     new SchedulePermutationSolution(
                         actualSolution.variables().size(),
                         actualSolution.objectives().length,
@@ -39,8 +37,11 @@ public class NeighborhoodChangeHost implements NeighborhoodOperator<SchedulePerm
                         neighborPlan,
                         actualSolution.getArbiter()
                     )
-            ).map(generatedSolution ->
-                    new GeneratedNeighbor(generatedSolution, changedPlanPairs, -1, -1)
+            ).map(generatedSolution ->{
+                List<Movement> movements = new ArrayList<>();
+                movements.add(new ChangeHostMovement(position, NeighborUtils.getChildrenPositions(plan, position)));
+                return new GeneratedNeighbor(generatedSolution, movements);
+            }
             ).forEach(neighbors::add);
 
         }

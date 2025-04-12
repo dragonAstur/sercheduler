@@ -1,10 +1,14 @@
-package com.uniovi.sercheduler.localsearch;
+package com.uniovi.sercheduler.localsearch.operator;
 
+import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.service.PlanPair;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class NeighborUtils {
@@ -47,5 +51,15 @@ public class NeighborUtils {
         }
 
         return IntStream.range(positionLeft+1, positionRight).toArray();
+    }
+
+    protected static int[] getChildrenPositions(List<PlanPair> plan, int position){
+
+        Set<Task> children = new HashSet<>(plan.get(position).task().getChildren());
+
+        return IntStream.range(0, plan.size())
+                .filter(    pos -> children.contains(   plan.get(pos).task()    )
+        ).toArray();
+
     }
 }

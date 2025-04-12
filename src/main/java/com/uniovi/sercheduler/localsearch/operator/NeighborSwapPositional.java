@@ -1,6 +1,9 @@
-package com.uniovi.sercheduler.localsearch;
+package com.uniovi.sercheduler.localsearch.operator;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.localsearch.movement.InsertionMovement;
+import com.uniovi.sercheduler.localsearch.movement.Movement;
+import com.uniovi.sercheduler.localsearch.movement.SwapMovement;
 import com.uniovi.sercheduler.service.PlanPair;
 
 import java.util.ArrayList;
@@ -8,8 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.uniovi.sercheduler.localsearch.NeighborUtils.createNeighborSolutions;
-import static com.uniovi.sercheduler.localsearch.NeighborUtils.getValidPositions;
+import static com.uniovi.sercheduler.localsearch.operator.NeighborUtils.getValidPositions;
 
 public class NeighborSwapPositional implements NeighborhoodOperatorPositional<SchedulePermutationSolution, List<GeneratedNeighbor>> {
 
@@ -27,10 +29,6 @@ public class NeighborSwapPositional implements NeighborhoodOperatorPositional<Sc
             if(newPosition == position)
                 continue;
 
-            int[] changedPlanPairs = position < newPosition ?
-                    IntStream.rangeClosed(position, newPosition).toArray() :
-                    IntStream.rangeClosed(newPosition, position).toArray();
-
             SchedulePermutationSolution generatedSolution = new SchedulePermutationSolution(
                     actualSolution.variables().size(),
                     actualSolution.objectives().length,
@@ -39,7 +37,9 @@ public class NeighborSwapPositional implements NeighborhoodOperatorPositional<Sc
                     actualSolution.getArbiter()
             );
 
-            neighbors.add(new GeneratedNeighbor(generatedSolution, changedPlanPairs, position, newPosition));
+            List<Movement> movements = new ArrayList<>();
+            movements.add(new SwapMovement(position, newPosition));
+            neighbors.add(new GeneratedNeighbor(generatedSolution, movements));
 
         }
 
