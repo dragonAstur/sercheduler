@@ -62,4 +62,14 @@ public class NeighborUtils {
         ).toArray();
 
     }
+
+    protected static int[] getParentsPositions(List<PlanPair> plan, int position){
+
+        Set<Task> parents = new HashSet<>(plan.get(position).task().getParents());
+
+        return IntStream.range(0, plan.size())
+                .filter(    pos -> parents.contains(   plan.get(pos).task()    )
+                ).toArray();
+
+    }
 }

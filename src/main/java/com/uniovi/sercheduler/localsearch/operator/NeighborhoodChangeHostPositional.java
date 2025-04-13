@@ -35,9 +35,15 @@ public class NeighborhoodChangeHostPositional implements NeighborhoodOperatorPos
                         actualSolution.getArbiter()
                 )
         ).map(generatedSolution ->{
+
                     List<Movement> movements = new ArrayList<>();
-                    movements.add(new ChangeHostMovement(position, NeighborUtils.getChildrenPositions(plan, position)));
+
+                    movements.add(new ChangeHostMovement(position,
+                            NeighborUtils.getParentsPositions(plan, position),
+                            NeighborUtils.getChildrenPositions(plan, position)));
+
                     return new GeneratedNeighbor(generatedSolution, movements);
+
                 }
         ).forEach(neighbors::add);
 
@@ -50,7 +56,7 @@ public class NeighborhoodChangeHostPositional implements NeighborhoodOperatorPos
 
         for(var h : instanceData.hosts().values())
         {
-            changeForOneSpecificHost(plan, position, h);
+            neighbors.add(changeForOneSpecificHost(plan, position, h));
         }
 
         return neighbors;
