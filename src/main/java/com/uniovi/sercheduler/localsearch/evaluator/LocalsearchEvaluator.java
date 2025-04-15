@@ -4,6 +4,7 @@ import com.uniovi.sercheduler.dto.Host;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.movement.ChangeHostMovement;
+import com.uniovi.sercheduler.localsearch.movement.SwapHostMovement;
 import com.uniovi.sercheduler.service.PlanPair;
 
 import java.util.HashMap;
@@ -20,16 +21,16 @@ public class LocalsearchEvaluator {
         this.networkMatrix = new HashMap<>(networkMatrix);
     }
 
-    public double computeEnhancementChangeHost(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, ChangeHostMovement movement){
+    public double computeEnhancementChangeHost(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, ChangeHostMovement changeHostMovement){
         return originalSolution.getFitnessInfo().fitness().get("makespan")
-                - computeHostAssignationTimeEffects(originalSolution, movement)
-                + computeHostAssignationTimeEffects(generatedSolution, movement);
+                - computeHostAssignationTimeEffects(originalSolution, changeHostMovement)
+                + computeHostAssignationTimeEffects(generatedSolution, changeHostMovement);
     }
 
     private double computeHostAssignationTimeEffects(SchedulePermutationSolution solution, ChangeHostMovement hostMovement){
 
-        return computeDurationOfATask(solution.getPlan(), hostMovement.getFinalPosition(), hostMovement.getParentPositions())
-                + computeChildrenCommunicationsDuration(solution.getPlan(), hostMovement.getFinalPosition(), hostMovement.getChildrenPositions());
+        return computeDurationOfATask(solution.getPlan(), hostMovement.getPosition(), hostMovement.getParentPositions())
+                + computeChildrenCommunicationsDuration(solution.getPlan(), hostMovement.getPosition(), hostMovement.getChildrenPositions());
     }
 
     private double computeDurationOfATask(List<PlanPair> plan, int position, int[] parentsPositions) {
@@ -89,4 +90,23 @@ public class LocalsearchEvaluator {
         return Math.min(bandwidth, parentHost.getDiskSpeed());
     }
 
+    public double computeEnhancementSwapHost(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, SwapHostMovement swapHostMovement) {
+        return originalSolution.getFitnessInfo().fitness().get("makespan")
+                - computeFirstHostAssignationTimeEffects(originalSolution, swapHostMovement)
+                + computeFirstHostAssignationTimeEffects(generatedSolution, swapHostMovement)
+                - computeSecondHostAssignationTimeEffects(originalSolution, swapHostMovement)
+                + computeSecondHostAssignationTimeEffects(generatedSolution, swapHostMovement);
+    }
+
+    private double computeFirstHostAssignationTimeEffects(SchedulePermutationSolution solution, SwapHostMovement swapHostMovement){
+
+        return computeDurationOfATask(solution.getPlan(), swapHostMovement.getFirstPosition(), swapHostMovement.getFirstParentsPositions())
+                + computeChildrenCommunicationsDuration(solution.getPlan(), swapHostMovement.getFirstPosition(), swapHostMovement.getFirstChildrenPositions());
+    }
+
+    private double computeSecondHostAssignationTimeEffects(SchedulePermutationSolution solution, SwapHostMovement swapHostMovement){
+
+        return computeDurationOfATask(solution.getPlan(), swapHostMovement.getSecondPosition(), swapHostMovement.getSecondParentsPositions())
+                + computeChildrenCommunicationsDuration(solution.getPlan(), swapHostMovement.getSecondPosition(), swapHostMovement.getSecondChildrenPositions());
+    }
 }

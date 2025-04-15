@@ -5,19 +5,18 @@ import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
 
 public class SwapMovement implements Movement{
 
-    private int initialPosition;
-    private int finalPosition;
+    private int firstPosition;
+    private int secondPosition;
     int[] parentsPositions;
 
-    public SwapMovement(int initialPosition, int finalPosition, int[] parentsPositions) {
-        this.initialPosition = initialPosition;
-        this.finalPosition = finalPosition;
+    public SwapMovement(int firstPosition, int secondPosition, int[] parentsPositions) {
+        this.firstPosition = firstPosition;
+        this.secondPosition = secondPosition;
         this.parentsPositions = parentsPositions;
     }
 
-    @Override
-    public int getFinalPosition() {
-        return finalPosition;
+    public int getSecondPosition() {
+        return secondPosition;
     }
 
     @Override
@@ -25,8 +24,8 @@ public class SwapMovement implements Movement{
         return 0;
     }
 
-    public int getInitialPosition() {
-        return initialPosition;
+    public int getFirstPosition() {
+        return firstPosition;
     }
 
     public int[] getParentPositions() {

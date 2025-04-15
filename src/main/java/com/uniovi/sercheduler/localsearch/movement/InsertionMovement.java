@@ -18,8 +18,7 @@ public class InsertionMovement implements Movement{
         this.parentsPositions = parentsPositions;
     }
 
-    @Override
-    public int getFinalPosition() {
+    public int getPosition() {
         return finalPosition;
     }
 

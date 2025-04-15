@@ -15,8 +15,7 @@ public class ChangeHostMovement implements Movement {
         this.childrenPositions = childrenPositions;
     }
 
-    @Override
-    public int getFinalPosition() {
+    public int getPosition() {
         return position;
     }
 

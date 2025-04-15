@@ -53,7 +53,7 @@ public class NeighborhoodInsertionPositional implements NeighborhoodOperatorPosi
 
     }
 
-    public List<List<PlanPair>> insertInAllPossiblePositions(List<PlanPair> plan, int position){
+    /*public List<List<PlanPair>> insertInAllPossiblePositions(List<PlanPair> plan, int position){
 
         int[] validPositions = getValidPositions(plan, position);
 
@@ -70,7 +70,7 @@ public class NeighborhoodInsertionPositional implements NeighborhoodOperatorPosi
 
         return List.copyOf(neighborsPlans);
 
-    }
+    }*/
 
     private List<PlanPair> insertInOneSpecificPosition(List<PlanPair> plan, int position, int newPosition){
 
