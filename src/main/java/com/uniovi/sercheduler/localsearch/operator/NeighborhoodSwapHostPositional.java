@@ -3,11 +3,9 @@ package com.uniovi.sercheduler.localsearch.operator;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.movement.Movement;
 import com.uniovi.sercheduler.localsearch.movement.SwapHostMovement;
-import com.uniovi.sercheduler.localsearch.movement.SwapMovement;
 import com.uniovi.sercheduler.service.PlanPair;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.uniovi.sercheduler.localsearch.operator.NeighborUtils.getValidPositions;

@@ -28,7 +28,7 @@ public class ChangeHostMovement implements Movement {
         return childrenPositions;
     }
 
-    public int[] getParentPositions() {
+    public int[] getParentsPositions() {
         return parentPositions;
     }
 }

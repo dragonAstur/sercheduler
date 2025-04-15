@@ -18,13 +18,13 @@ public class InsertionMovement implements Movement{
         this.parentsPositions = parentsPositions;
     }
 
-    public int getPosition() {
+    public int getFinalPosition() {
         return finalPosition;
     }
 
     @Override
     public double computeEnhancement(LocalsearchEvaluator evaluator, SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution) {
-        return 0;
+        return evaluator.computeEnhancementInsertion(originalSolution, generatedSolution, this);
     }
 
     public int getInitialPosition() {

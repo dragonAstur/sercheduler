@@ -1,7 +1,6 @@
 package com.uniovi.sercheduler.localsearch.operator;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
-import com.uniovi.sercheduler.localsearch.movement.ChangeHostMovement;
 import com.uniovi.sercheduler.localsearch.movement.InsertionMovement;
 import com.uniovi.sercheduler.localsearch.movement.Movement;
 import com.uniovi.sercheduler.service.PlanPair;

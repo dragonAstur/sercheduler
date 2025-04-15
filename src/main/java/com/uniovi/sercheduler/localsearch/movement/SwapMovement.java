@@ -21,7 +21,7 @@ public class SwapMovement implements Movement{
 
     @Override
     public double computeEnhancement(LocalsearchEvaluator evaluator, SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution) {
-        return 0;
+        return evaluator.computeEnhancementSwap(originalSolution, generatedSolution, this);
     }
 
     public int getFirstPosition() {

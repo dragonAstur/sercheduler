@@ -25,7 +25,6 @@ public class NeighborhoodChangeHostPositional implements NeighborhoodOperatorPos
 
         List<GeneratedNeighbor> neighbors = new ArrayList<>();
 
-        //TODO: mirar si se puede cambiar simplemente por el método de los utils
         changeOneElementHost(plan, position).stream().map(neighborPlan ->
                 new SchedulePermutationSolution(
                         actualSolution.variables().size(),

@@ -53,7 +53,7 @@ public class NeighborUtils {
         return IntStream.range(positionLeft+1, positionRight).toArray();
     }
 
-    protected static int[] getChildrenPositions(List<PlanPair> plan, int position){
+    public static int[] getChildrenPositions(List<PlanPair> plan, int position){
 
         Set<Task> children = new HashSet<>(plan.get(position).task().getChildren());
 

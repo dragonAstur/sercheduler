@@ -1,24 +1,30 @@
 package com.uniovi.sercheduler.localsearch.evaluator;
 
 import com.uniovi.sercheduler.dto.Host;
+import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.movement.ChangeHostMovement;
+import com.uniovi.sercheduler.localsearch.movement.InsertionMovement;
 import com.uniovi.sercheduler.localsearch.movement.SwapHostMovement;
+import com.uniovi.sercheduler.localsearch.movement.SwapMovement;
 import com.uniovi.sercheduler.service.PlanPair;
+import com.uniovi.sercheduler.service.TaskSchedule;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class LocalsearchEvaluator {
 
     private Map<String, Map<String, Double>> computationMatrix;
     private Map<String, Map<String, Long>> networkMatrix;
 
-    public LocalsearchEvaluator(Map<String, Map<String, Double>> computationMatrix, Map<String, Map<String, Long>> networkMatrix) {
+    private InstanceData instanceData;
+
+    public LocalsearchEvaluator(Map<String, Map<String, Double>> computationMatrix, Map<String, Map<String, Long>> networkMatrix, InstanceData instanceData) {
         this.computationMatrix = new HashMap<>(computationMatrix);
         this.networkMatrix = new HashMap<>(networkMatrix);
+        this.instanceData = instanceData;
     }
 
     public double computeEnhancementChangeHost(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, ChangeHostMovement changeHostMovement){
@@ -29,7 +35,7 @@ public class LocalsearchEvaluator {
 
     private double computeHostAssignationTimeEffects(SchedulePermutationSolution solution, ChangeHostMovement hostMovement){
 
-        return computeDurationOfATask(solution.getPlan(), hostMovement.getPosition(), hostMovement.getParentPositions())
+        return computeDurationOfATask(solution.getPlan(), hostMovement.getPosition(), hostMovement.getParentsPositions())
                 + computeChildrenCommunicationsDuration(solution.getPlan(), hostMovement.getPosition(), hostMovement.getChildrenPositions());
     }
 
@@ -108,5 +114,81 @@ public class LocalsearchEvaluator {
 
         return computeDurationOfATask(solution.getPlan(), swapHostMovement.getSecondPosition(), swapHostMovement.getSecondParentsPositions())
                 + computeChildrenCommunicationsDuration(solution.getPlan(), swapHostMovement.getSecondPosition(), swapHostMovement.getSecondChildrenPositions());
+    }
+
+    public double computeEnhancementSwap(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, SwapMovement swapMovement) {
+
+        return originalSolution.getFitnessInfo().fitness().get("makespan")
+                - computeNewMakespan(originalSolution, generatedSolution,
+                Math.min(swapMovement.getFirstPosition(), swapMovement.getSecondPosition()));
+    }
+
+
+
+    public double computeNewMakespan(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, int firstChangePosition){
+
+        double makespan = 0D;
+
+        Map<String, Double> available = new HashMap<>(instanceData.hosts().size());
+        List<TaskSchedule> originalOrderedSchedule = new ArrayList<>(originalSolution.getFitnessInfo().schedule());
+        Map<String, TaskSchedule> originalSchedule = originalOrderedSchedule.stream()
+                                                        .collect(Collectors.toMap(ts -> ts.task().getName(), ts -> ts));
+        Map<String, TaskSchedule> newSchedule = new HashMap<>(instanceData.workflow().size());
+
+        for(int i = 0; i < generatedSolution.getPlan().size(); i ++){
+
+            Task t = generatedSolution.getPlan().get(i).task();
+            Host h = generatedSolution.getPlan().get(i).host();
+
+            double duration = originalSchedule.get(t.getName()).eft() - originalSchedule.get(t.getName()).ast();
+
+            if(i >= firstChangePosition){
+
+                double readyHost = available.getOrDefault(h.getName(), 0D);
+                double parentsMaxEft = computeParentsMaxEft(newSchedule, t);
+
+                double newAst = Math.max(readyHost, parentsMaxEft);
+                double newEft = newAst + duration;
+
+                available.put(h.getName(), newEft);
+                newSchedule.put(t.getName(), new TaskSchedule(t, newAst, newEft, h));
+
+                makespan = Math.max(makespan, newEft);
+
+            } else {
+                double originalEft = originalSchedule.get(t.getName()).eft();
+                double originalAst = originalSchedule.get(t.getName()).ast();
+
+                available.put(h.getName(), originalEft);
+                newSchedule.put(t.getName(), new TaskSchedule(t, originalAst, originalEft, h));
+
+                makespan = Math.max(makespan, originalEft);
+            }
+
+        }
+
+        /*var newOrderedSchedule =
+                newSchedule.values().stream().sorted(Comparator.comparing(TaskSchedule::ast)).toList();
+
+        generatedSolution.setFitnessInfo(
+                new FitnessInfo(Map.of("makespan", makespan), newOrderedSchedule, "localsearch")
+        );*/
+
+        return makespan;
+    }
+
+    private double computeParentsMaxEft(Map<String, TaskSchedule> newSchedule, Task task) {
+        return newSchedule.values().stream()
+                .filter(ts -> task.getParents().contains(ts.task()))
+                .mapToDouble(TaskSchedule::eft)
+                .max()
+                .orElse(0D);
+    }
+
+
+    public double computeEnhancementInsertion(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, InsertionMovement insertionMovement) {
+        return originalSolution.getFitnessInfo().fitness().get("makespan")
+                - computeNewMakespan(originalSolution, generatedSolution,
+                Math.min(insertionMovement.getInitialPosition(), insertionMovement.getFinalPosition()));
     }
 }
