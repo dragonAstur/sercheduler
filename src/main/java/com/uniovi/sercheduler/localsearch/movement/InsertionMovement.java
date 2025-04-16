@@ -22,11 +22,6 @@ public class InsertionMovement implements Movement{
         return finalPosition;
     }
 
-    @Override
-    public double computeEnhancement(LocalsearchEvaluator evaluator, SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution) {
-        return evaluator.computeEnhancementInsertion(originalSolution, generatedSolution, this);
-    }
-
     public int getInitialPosition() {
         return initialPosition;
     }
@@ -34,5 +29,16 @@ public class InsertionMovement implements Movement{
     public int[] getParentPositions() {
         return parentsPositions;
     }
+
+    @Override
+    public int getFirstChangePosition() {
+        return changedPlanPairs[0];
+    }
+
+    @Override
+    public int[] changedHostPositions() {
+        return new int[0];
+    }
+
 
 }

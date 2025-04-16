@@ -19,11 +19,6 @@ public class SwapMovement implements Movement{
         return secondPosition;
     }
 
-    @Override
-    public double computeEnhancement(LocalsearchEvaluator evaluator, SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution) {
-        return evaluator.computeEnhancementSwap(originalSolution, generatedSolution, this);
-    }
-
     public int getFirstPosition() {
         return firstPosition;
     }
@@ -31,5 +26,16 @@ public class SwapMovement implements Movement{
     public int[] getParentPositions() {
         return parentsPositions;
     }
+
+    @Override
+    public int getFirstChangePosition() {
+        return Math.min(firstPosition, secondPosition);
+    }
+
+    @Override
+    public int[] changedHostPositions() {
+        return new int[0];
+    }
+
 
 }

@@ -63,7 +63,7 @@ public class NeighborUtils {
 
     }
 
-    protected static int[] getParentsPositions(List<PlanPair> plan, int position){
+    public static int[] getParentsPositions(List<PlanPair> plan, int position){
 
         Set<Task> parents = new HashSet<>(plan.get(position).task().getParents());
 

@@ -4,10 +4,8 @@ import com.uniovi.sercheduler.dto.Host;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
-import com.uniovi.sercheduler.localsearch.movement.ChangeHostMovement;
-import com.uniovi.sercheduler.localsearch.movement.InsertionMovement;
-import com.uniovi.sercheduler.localsearch.movement.SwapHostMovement;
-import com.uniovi.sercheduler.localsearch.movement.SwapMovement;
+import com.uniovi.sercheduler.localsearch.movement.*;
+import com.uniovi.sercheduler.localsearch.operator.NeighborUtils;
 import com.uniovi.sercheduler.service.PlanPair;
 import com.uniovi.sercheduler.service.TaskSchedule;
 
@@ -27,33 +25,10 @@ public class LocalsearchEvaluator {
         this.instanceData = instanceData;
     }
 
-    public double computeEnhancementChangeHost(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, ChangeHostMovement changeHostMovement){
-        return originalSolution.getFitnessInfo().fitness().get("makespan")
-                - computeHostAssignationTimeEffects(originalSolution, changeHostMovement)
-                + computeHostAssignationTimeEffects(generatedSolution, changeHostMovement);
-    }
 
-    private double computeHostAssignationTimeEffects(SchedulePermutationSolution solution, ChangeHostMovement hostMovement){
 
-        return computeDurationOfATask(solution.getPlan(), hostMovement.getPosition(), hostMovement.getParentsPositions())
-                + computeChildrenCommunicationsDuration(solution.getPlan(), hostMovement.getPosition(), hostMovement.getChildrenPositions());
-    }
 
-    private double computeDurationOfATask(List<PlanPair> plan, int position, int[] parentsPositions) {
-
-        Task task = plan.get(position).task();
-        Host host = plan.get(position).host();
-
-        double diskReadStagingTime =
-                networkMatrix.get(task.getName()).get(task.getName()) / host.getDiskSpeed().doubleValue();
-        double taskCommunicationsTime = computeParentsCommunicationsDuration(plan, position, parentsPositions);
-        double computationTime = computationMatrix.get(task.getName()).get(host.getName());
-        double diskWriteTime = task.getOutput().getSizeInBits() / host.getDiskSpeed().doubleValue();
-
-        return diskReadStagingTime + taskCommunicationsTime + computationTime + diskWriteTime;
-    }
-
-    private double computeChildrenCommunicationsDuration(List<PlanPair> plan, int parentPos, int[] childrenPositions)
+    /*private double computeChildrenCommunicationsDuration(List<PlanPair> plan, int parentPos, int[] childrenPositions)
     {
 
         double childrenCommunicationsDuration = 0D;
@@ -68,77 +43,97 @@ public class LocalsearchEvaluator {
 
         return childrenCommunicationsDuration;
 
-    }
+    }*/
 
-    public double computeParentsCommunicationsDuration(List<PlanPair> plan, int childPos, int[] parentsPositions){
 
-        double parentsCommunicationsDuration = 0D;
 
-        for(int parentPos = 0; parentPos < parentsPositions.length; parentPos++){
 
-            double slowestSpeed = findHostSpeed(plan.get(childPos).host(), plan.get(parentPos).host());
 
-            parentsCommunicationsDuration +=
-                    networkMatrix.get(plan.get(childPos).task().getName()).get(plan.get(parentPos).task().getName()) / slowestSpeed;
-        }
+    double computeMakespanEnhancement(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
 
-        return parentsCommunicationsDuration;
-    }
+        if(originalSolution.getFitnessInfo() == null)
+            throw new IllegalArgumentException("The solution must have been evaluated first.");
 
-    public Long findHostSpeed(Host host, Host parentHost) {
+        Map<String, TaskSchedule> originalSchedule = obtainOriginalSchedule(originalSolution);
 
-        if (host.getName().equals(parentHost.getName())) {
-            return host.getDiskSpeed();
-        }
-
-        var bandwidth = Math.min(host.getNetworkSpeed(), parentHost.getNetworkSpeed());
-
-        return Math.min(bandwidth, parentHost.getDiskSpeed());
-    }
-
-    public double computeEnhancementSwapHost(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, SwapHostMovement swapHostMovement) {
-        return originalSolution.getFitnessInfo().fitness().get("makespan")
-                - computeFirstHostAssignationTimeEffects(originalSolution, swapHostMovement)
-                + computeFirstHostAssignationTimeEffects(generatedSolution, swapHostMovement)
-                - computeSecondHostAssignationTimeEffects(originalSolution, swapHostMovement)
-                + computeSecondHostAssignationTimeEffects(generatedSolution, swapHostMovement);
-    }
-
-    private double computeFirstHostAssignationTimeEffects(SchedulePermutationSolution solution, SwapHostMovement swapHostMovement){
-
-        return computeDurationOfATask(solution.getPlan(), swapHostMovement.getFirstPosition(), swapHostMovement.getFirstParentsPositions())
-                + computeChildrenCommunicationsDuration(solution.getPlan(), swapHostMovement.getFirstPosition(), swapHostMovement.getFirstChildrenPositions());
-    }
-
-    private double computeSecondHostAssignationTimeEffects(SchedulePermutationSolution solution, SwapHostMovement swapHostMovement){
-
-        return computeDurationOfATask(solution.getPlan(), swapHostMovement.getSecondPosition(), swapHostMovement.getSecondParentsPositions())
-                + computeChildrenCommunicationsDuration(solution.getPlan(), swapHostMovement.getSecondPosition(), swapHostMovement.getSecondChildrenPositions());
-    }
-
-    public double computeEnhancementSwap(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, SwapMovement swapMovement) {
+        if(movement.changedHostPositions().length != 0)
+            updateOriginalScheduleDurations(originalSchedule, generatedSolution.getPlan(), movement.changedHostPositions());
 
         return originalSolution.getFitnessInfo().fitness().get("makespan")
-                - computeNewMakespan(originalSolution, generatedSolution,
-                Math.min(swapMovement.getFirstPosition(), swapMovement.getSecondPosition()));
+                - computeNewMakespan(originalSchedule, generatedSolution.getPlan(), movement.getFirstChangePosition());
+    }
+
+    //TODO: try to make this better designed or figured out
+    private void updateOriginalScheduleDurations(Map<String, TaskSchedule> originalSchedule, List<PlanPair> plan, int[] changedHostPositions) {
+
+        //Tasks whose host have been changed and their positions in the plan as a key
+        Map<Task, Integer> changedHostTasks = new HashMap<>();
+
+        for(int i : changedHostPositions)
+            changedHostTasks.put(plan.get(i).task(), i);
+
+        for(Task t : changedHostTasks.keySet()){
+
+            int taskPos = changedHostTasks.get(t);
+            int[] taskParentsPos = NeighborUtils.getParentsPositions(plan, taskPos);
+
+            double newEft = originalSchedule.get(t.getName()).ast()
+                    + computeDurationOfATask(plan, taskPos, taskParentsPos);
+
+            TaskSchedule originalTaskSchedule = originalSchedule.get(t.getName());
+
+            originalSchedule.put(t.getName(),
+            new TaskSchedule(originalTaskSchedule.task(), originalTaskSchedule.ast(), newEft, originalTaskSchedule.host()));
+
+            //Now we have to update communications between children and their parent
+            /*Map<Task, Integer> changedHostTaskChildren = new HashMap<>();
+
+
+            for(Task childTask : t.getChildren())
+            {
+                TaskSchedule originalChildTaskSchedule = originalSchedule.get(childTask.getName());
+
+                double oldCommunicationTime = computeCommunicationTime(originalChildTaskSchedule.task(), originalChildTaskSchedule.host(),
+                        originalTaskSchedule.task(), originalChildTaskSchedule.host());
+
+                double newCommunicationTime = computeCommunicationTime(,,
+                        plan.get(taskPos).task(), plan.get(taskPos).host());
+
+
+                double newChildEft = originalChildTaskSchedule.eft() - oldCommunicationTime + newCommunicationTime;
+
+                originalSchedule.put(childTask.getName(),
+                        new TaskSchedule(originalChildTaskSchedule.task(), originalChildTaskSchedule.ast(), sjadhds, originalChildTaskSchedule.host()));
+            }*/
+        }
+
+    }
+
+    private double computeCommunicationTime(Task childTask, Host childHost, Task parentTask, Host parentHost){
+
+        double slowestSpeed = findHostSpeed(childHost, parentHost);
+
+        return networkMatrix.get(childTask.getName()).get(parentTask.getName()) / slowestSpeed;
+
     }
 
 
+    private static Map<String, TaskSchedule> obtainOriginalSchedule(SchedulePermutationSolution originalSolution) {
+        List<TaskSchedule> originalOrderedSchedule = new ArrayList<>(originalSolution.getFitnessInfo().schedule());
+        return originalOrderedSchedule.stream().collect(Collectors.toMap(ts -> ts.task().getName(), ts -> ts));
+    }
 
-    public double computeNewMakespan(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, int firstChangePosition){
+    public double computeNewMakespan(Map<String, TaskSchedule> originalSchedule, List<PlanPair> newPlan, int firstChangePosition){
 
         double makespan = 0D;
 
         Map<String, Double> available = new HashMap<>(instanceData.hosts().size());
-        List<TaskSchedule> originalOrderedSchedule = new ArrayList<>(originalSolution.getFitnessInfo().schedule());
-        Map<String, TaskSchedule> originalSchedule = originalOrderedSchedule.stream()
-                                                        .collect(Collectors.toMap(ts -> ts.task().getName(), ts -> ts));
         Map<String, TaskSchedule> newSchedule = new HashMap<>(instanceData.workflow().size());
 
-        for(int i = 0; i < generatedSolution.getPlan().size(); i ++){
+        for(int i = 0; i < newPlan.size(); i ++){
 
-            Task t = generatedSolution.getPlan().get(i).task();
-            Host h = generatedSolution.getPlan().get(i).host();
+            Task t = newPlan.get(i).task();
+            Host h = newPlan.get(i).host();
 
             double duration = originalSchedule.get(t.getName()).eft() - originalSchedule.get(t.getName()).ast();
 
@@ -185,10 +180,43 @@ public class LocalsearchEvaluator {
                 .orElse(0D);
     }
 
+    private double computeDurationOfATask(List<PlanPair> plan, int position, int[] parentsPositions) {
 
-    public double computeEnhancementInsertion(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, InsertionMovement insertionMovement) {
-        return originalSolution.getFitnessInfo().fitness().get("makespan")
-                - computeNewMakespan(originalSolution, generatedSolution,
-                Math.min(insertionMovement.getInitialPosition(), insertionMovement.getFinalPosition()));
+        Task task = plan.get(position).task();
+        Host host = plan.get(position).host();
+
+        double diskReadStagingTime =
+                networkMatrix.get(task.getName()).get(task.getName()) / host.getDiskSpeed().doubleValue();
+        double taskCommunicationsTime = computeParentsCommunicationsDuration(plan, position, parentsPositions);
+        double computationTime = computationMatrix.get(task.getName()).get(host.getName());
+        double diskWriteTime = task.getOutput().getSizeInBits() / host.getDiskSpeed().doubleValue();
+
+        return diskReadStagingTime + taskCommunicationsTime + computationTime + diskWriteTime;
+    }
+
+    public double computeParentsCommunicationsDuration(List<PlanPair> plan, int position, int[] parentsPositions){
+
+        double parentsCommunicationsDuration = 0D;
+
+        for(int parentPos = 0; parentPos < parentsPositions.length; parentPos++){
+
+            double slowestSpeed = findHostSpeed(plan.get(position).host(), plan.get(parentPos).host());
+
+            parentsCommunicationsDuration +=
+                    networkMatrix.get(plan.get(position).task().getName()).get(plan.get(parentPos).task().getName()) / slowestSpeed;
+        }
+
+        return parentsCommunicationsDuration;
+    }
+
+    public Long findHostSpeed(Host host, Host parentHost) {
+
+        if (host.getName().equals(parentHost.getName())) {
+            return host.getDiskSpeed();
+        }
+
+        var bandwidth = Math.min(host.getNetworkSpeed(), parentHost.getNetworkSpeed());
+
+        return Math.min(bandwidth, parentHost.getDiskSpeed());
     }
 }

@@ -27,11 +27,6 @@ public class SwapHostMovement implements Movement {
         return secondPosition;
     }
 
-    @Override
-    public double computeEnhancement(LocalsearchEvaluator evaluator, SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution) {
-        return evaluator.computeEnhancementSwapHost(originalSolution, generatedSolution, this);
-    }
-
     public int[] getFirstParentsPositions() {
         return firstParentsPositions;
     }
@@ -47,4 +42,16 @@ public class SwapHostMovement implements Movement {
     public int[] getSecondChildrenPositions() {
         return secondChildrenPositions;
     }
+
+    @Override
+    public int getFirstChangePosition() {
+        return Math.min(firstPosition, secondPosition);
+    }
+
+    @Override
+    public int[] changedHostPositions() {
+        return new int[]{firstPosition, secondPosition};
+    }
+
+
 }
