@@ -26,29 +26,6 @@ public class LocalsearchEvaluator {
     }
 
 
-
-
-    /*private double computeChildrenCommunicationsDuration(List<PlanPair> plan, int parentPos, int[] childrenPositions)
-    {
-
-        double childrenCommunicationsDuration = 0D;
-
-        for(int childPos = 0; childPos < childrenPositions.length; childPos++){
-
-            double slowestSpeed = findHostSpeed(plan.get(childPos).host(), plan.get(parentPos).host());
-
-            childrenCommunicationsDuration +=
-                    networkMatrix.get(plan.get(childPos).task().getName()).get(plan.get(parentPos).task().getName()) / slowestSpeed;
-        }
-
-        return childrenCommunicationsDuration;
-
-    }*/
-
-
-
-
-
     double computeMakespanEnhancement(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
 
         if(originalSolution.getFitnessInfo() == null)
@@ -63,50 +40,41 @@ public class LocalsearchEvaluator {
                 - computeNewMakespan(originalSchedule, generatedSolution.getPlan(), movement.getFirstChangePosition());
     }
 
-    //TODO: try to make this better designed or figured out
     private void updateOriginalScheduleDurations(Map<String, TaskSchedule> originalSchedule, List<PlanPair> plan, int[] changedHostPositions) {
 
-        //Tasks whose host have been changed and their positions in the plan as a key
-        Map<Task, Integer> changedHostTasks = new HashMap<>();
+        for(int taskPos : changedHostPositions){
 
-        for(int i : changedHostPositions)
-            changedHostTasks.put(plan.get(i).task(), i);
+            Task task = plan.get(taskPos).task();
 
-        for(Task t : changedHostTasks.keySet()){
-
-            int taskPos = changedHostTasks.get(t);
             int[] taskParentsPos = NeighborUtils.getParentsPositions(plan, taskPos);
 
-            double newEft = originalSchedule.get(t.getName()).ast()
+            double newEft = originalSchedule.get(task.getName()).ast()
                     + computeDurationOfATask(plan, taskPos, taskParentsPos);
 
-            TaskSchedule originalTaskSchedule = originalSchedule.get(t.getName());
+            TaskSchedule originalTaskSchedule = originalSchedule.get(task.getName());
 
-            originalSchedule.put(t.getName(),
-            new TaskSchedule(originalTaskSchedule.task(), originalTaskSchedule.ast(), newEft, originalTaskSchedule.host()));
+            originalSchedule.put(task.getName(),
+                new TaskSchedule(originalTaskSchedule.task(), originalTaskSchedule.ast(), newEft, originalTaskSchedule.host()));
 
-            //Now we have to update communications between children and their parent
-            /*Map<Task, Integer> changedHostTaskChildren = new HashMap<>();
+            //Updating children communications with this task
+            for(int childPos : NeighborUtils.getChildrenPositions(plan, taskPos)){
 
+                Task childTask = plan.get(childPos).task();
 
-            for(Task childTask : t.getChildren())
-            {
                 TaskSchedule originalChildTaskSchedule = originalSchedule.get(childTask.getName());
 
                 double oldCommunicationTime = computeCommunicationTime(originalChildTaskSchedule.task(), originalChildTaskSchedule.host(),
-                        originalTaskSchedule.task(), originalChildTaskSchedule.host());
+                        originalTaskSchedule.task(), originalTaskSchedule.host());
 
-                double newCommunicationTime = computeCommunicationTime(,,
+                double newCommunicationTime = computeCommunicationTime(plan.get(childPos).task(), plan.get(childPos).host(),
                         plan.get(taskPos).task(), plan.get(taskPos).host());
-
 
                 double newChildEft = originalChildTaskSchedule.eft() - oldCommunicationTime + newCommunicationTime;
 
                 originalSchedule.put(childTask.getName(),
-                        new TaskSchedule(originalChildTaskSchedule.task(), originalChildTaskSchedule.ast(), sjadhds, originalChildTaskSchedule.host()));
-            }*/
+                        new TaskSchedule(originalChildTaskSchedule.task(), originalChildTaskSchedule.ast(), newChildEft, originalChildTaskSchedule.host()));
+            }
         }
-
     }
 
     private double computeCommunicationTime(Task childTask, Host childHost, Task parentTask, Host parentHost){
@@ -161,13 +129,6 @@ public class LocalsearchEvaluator {
             }
 
         }
-
-        /*var newOrderedSchedule =
-                newSchedule.values().stream().sorted(Comparator.comparing(TaskSchedule::ast)).toList();
-
-        generatedSolution.setFitnessInfo(
-                new FitnessInfo(Map.of("makespan", makespan), newOrderedSchedule, "localsearch")
-        );*/
 
         return makespan;
     }
