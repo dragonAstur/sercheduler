@@ -26,7 +26,7 @@ public class LocalsearchEvaluator {
     }
 
 
-    double computeMakespanEnhancement(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
+    public double computeMakespanEnhancement(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
 
         if(originalSolution.getFitnessInfo() == null)
             throw new IllegalArgumentException("The solution must have been evaluated first.");
@@ -91,7 +91,7 @@ public class LocalsearchEvaluator {
         return originalOrderedSchedule.stream().collect(Collectors.toMap(ts -> ts.task().getName(), ts -> ts));
     }
 
-    public double computeNewMakespan(Map<String, TaskSchedule> originalSchedule, List<PlanPair> newPlan, int firstChangePosition){
+    private double computeNewMakespan(Map<String, TaskSchedule> originalSchedule, List<PlanPair> newPlan, int firstChangePosition){
 
         double makespan = 0D;
 
