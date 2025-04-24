@@ -11,7 +11,7 @@ import java.util.List;
 
 import static com.uniovi.sercheduler.localsearch.operator.NeighborUtils.getValidPositions;
 
-public class NeighborSwapPositional implements NeighborhoodOperatorPositional {
+public class NeighborhoodSwapPositional implements NeighborhoodOperatorPositional {
 
     @Override
     public List<GeneratedNeighbor> execute(SchedulePermutationSolution actualSolution, int position) {

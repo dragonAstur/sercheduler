@@ -55,6 +55,8 @@ public class NeighborhoodChangeHostPositional implements NeighborhoodOperatorPos
 
         for(var h : instanceData.hosts().values())
         {
+            if(plan.get(position).host().equals(h))
+                continue;
             neighbors.add(changeForOneSpecificHost(plan, position, h));
         }
 
