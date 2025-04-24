@@ -173,9 +173,9 @@ public class LocalsearchEvaluatorTest {
 
         FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
-        Map<String, Map<String, Double>> computationMatrix = fitnessCalculator.calculateComputationMatrix(UnitParser.parseUnits("1Gf"));
+        Map<String, Map<String, Double>> computationMatrix = fitnessCalculator.getComputationMatrix();
 
-        Map<String, Map<String, Long>> networkMatrix = fitnessCalculator.calculateNetworkMatrix();
+        Map<String, Map<String, Long>> networkMatrix = fitnessCalculator.getNetworkMatrix();
 
         //Evaluate the original solution
 
@@ -237,9 +237,9 @@ public class LocalsearchEvaluatorTest {
 
         FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
-        Map<String, Map<String, Double>> computationMatrix = fitnessCalculator.calculateComputationMatrix(UnitParser.parseUnits("1Gf"));
+        Map<String, Map<String, Double>> computationMatrix = fitnessCalculator.getComputationMatrix();
 
-        Map<String, Map<String, Long>> networkMatrix = fitnessCalculator.calculateNetworkMatrix();
+        Map<String, Map<String, Long>> networkMatrix = fitnessCalculator.getNetworkMatrix();
 
         //Evaluate the original solution
 

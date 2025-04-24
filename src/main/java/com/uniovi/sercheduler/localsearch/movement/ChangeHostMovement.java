@@ -36,7 +36,7 @@ public class ChangeHostMovement implements Movement {
 
     @Override
     public int[] changedHostPositions() {
-        return new int[0];
+        return new int[]{position};
     }
 
 

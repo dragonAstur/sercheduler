@@ -69,6 +69,14 @@ public class LocalsearchEvaluator {
                 double newCommunicationTime = computeCommunicationTime(plan.get(childPos).task(), plan.get(childPos).host(),
                         plan.get(taskPos).task(), plan.get(taskPos).host());
 
+
+                //----------------------- Changed lines -----------------------
+//                double newChildDuration = computeDurationOfATask(plan, childPos, NeighborUtils.getParentsPositions(plan, childPos)) - oldCommunicationTime + newCommunicationTime;
+//
+//                double newChildEft = originalChildTaskSchedule.ast() + newChildDuration;
+
+                //------------------------ Changed lines ---------------------
+
                 double newChildEft = originalChildTaskSchedule.eft() - oldCommunicationTime + newCommunicationTime;
 
                 originalSchedule.put(childTask.getName(),
@@ -159,12 +167,12 @@ public class LocalsearchEvaluator {
 
         double parentsCommunicationsDuration = 0D;
 
-        for(int parentPos = 0; parentPos < parentsPositions.length; parentPos++){
+        for(int i = 0; i < parentsPositions.length; i++){
 
-            double slowestSpeed = findHostSpeed(plan.get(position).host(), plan.get(parentPos).host());
+            var slowestSpeed = findHostSpeed(plan.get(position).host(), plan.get(parentsPositions[i]).host());
 
             parentsCommunicationsDuration +=
-                    networkMatrix.get(plan.get(position).task().getName()).get(plan.get(parentPos).task().getName()) / slowestSpeed;
+                    networkMatrix.get(plan.get(position).task().getName()).get(plan.get(parentsPositions[i]).task().getName()) / slowestSpeed.doubleValue();
         }
 
         return parentsCommunicationsDuration;
