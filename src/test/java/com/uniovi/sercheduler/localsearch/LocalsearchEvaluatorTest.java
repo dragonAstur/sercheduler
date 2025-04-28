@@ -264,7 +264,7 @@ public class LocalsearchEvaluatorTest {
             double makespanDifference = localsearchEvaluator.computeMakespanEnhancement(originalSolution, gn.generatedSolution(), gn.movements().get(0));
 
 
-            System.out.println("\n\nNEW GENERATED NEIGHBOR\n\tOriginal solution makespan: " + originalSolutionMakespan + "\n\tActual solution makespan: " + generatedSolutionMakespan + "\n\tDifference: " + makespanDifference + "\n\t\n\n");
+            //System.out.println("\n\nNEW GENERATED NEIGHBOR\n\tOriginal solution makespan: " + originalSolutionMakespan + "\n\tActual solution makespan: " + generatedSolutionMakespan + "\n\tDifference: " + makespanDifference + "\n\t\n\n");
 
             assertEquals(
                     originalSolutionMakespan - generatedSolutionMakespan,

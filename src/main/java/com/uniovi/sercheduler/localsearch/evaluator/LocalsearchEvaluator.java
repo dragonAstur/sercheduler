@@ -6,6 +6,7 @@ import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.movement.*;
 import com.uniovi.sercheduler.localsearch.operator.NeighborUtils;
+import com.uniovi.sercheduler.service.FitnessInfo;
 import com.uniovi.sercheduler.service.PlanPair;
 import com.uniovi.sercheduler.service.TaskSchedule;
 
@@ -25,6 +26,21 @@ public class LocalsearchEvaluator {
         this.instanceData = instanceData;
     }
 
+    public void calculateFitnessInfo(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
+
+        if(originalSolution.getFitnessInfo() == null)
+            throw new IllegalArgumentException("The solution must have been evaluated first.");
+
+        Map<String, TaskSchedule> originalSchedule = obtainOriginalSchedule(originalSolution);
+
+        if(movement.changedHostPositions().length != 0)
+            updateOriginalScheduleDurations(originalSchedule, generatedSolution.getPlan(), movement.changedHostPositions());
+
+        generatedSolution.setFitnessInfo(
+                computeNewFitnessInfo(originalSchedule, generatedSolution.getPlan(), movement.getFirstChangePosition())
+        );
+    }
+
 
     public double computeMakespanEnhancement(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
 
@@ -37,7 +53,7 @@ public class LocalsearchEvaluator {
             updateOriginalScheduleDurations(originalSchedule, generatedSolution.getPlan(), movement.changedHostPositions());
 
         return originalSolution.getFitnessInfo().fitness().get("makespan")
-                - computeNewMakespan(originalSchedule, generatedSolution.getPlan(), movement.getFirstChangePosition());
+                - computeNewFitnessInfo(originalSchedule, generatedSolution.getPlan(), movement.getFirstChangePosition()).fitness().get("makespan");
     }
 
     private void updateOriginalScheduleDurations(Map<String, TaskSchedule> originalSchedule, List<PlanPair> plan, int[] changedHostPositions) {
@@ -99,9 +115,9 @@ public class LocalsearchEvaluator {
         return originalOrderedSchedule.stream().collect(Collectors.toMap(ts -> ts.task().getName(), ts -> ts));
     }
 
-    private double computeNewMakespan(Map<String, TaskSchedule> originalSchedule, List<PlanPair> newPlan, int firstChangePosition){
+    private FitnessInfo computeNewFitnessInfo(Map<String, TaskSchedule> originalSchedule, List<PlanPair> newPlan, int firstChangePosition){
 
-        double makespan = 0D;
+        double newMakespan = 0D;
 
         Map<String, Double> available = new HashMap<>(instanceData.hosts().size());
         Map<String, TaskSchedule> newSchedule = new HashMap<>(instanceData.workflow().size());
@@ -124,7 +140,7 @@ public class LocalsearchEvaluator {
                 available.put(h.getName(), newEft);
                 newSchedule.put(t.getName(), new TaskSchedule(t, newAst, newEft, h));
 
-                makespan = Math.max(makespan, newEft);
+                newMakespan = Math.max(newMakespan, newEft);
 
             } else {
                 double originalEft = originalSchedule.get(t.getName()).eft();
@@ -133,12 +149,16 @@ public class LocalsearchEvaluator {
                 available.put(h.getName(), originalEft);
                 newSchedule.put(t.getName(), new TaskSchedule(t, originalAst, originalEft, h));
 
-                makespan = Math.max(makespan, originalEft);
+                newMakespan = Math.max(newMakespan, originalEft);
             }
 
         }
 
-        return makespan;
+        var newOrderedSchedule =
+                newSchedule.values().stream().sorted(Comparator.comparing(TaskSchedule::ast)).toList();
+
+        return new FitnessInfo(
+                Map.of("makespan", newMakespan, "energy", 0.0), newOrderedSchedule, "incremental evaluator");
     }
 
     private double computeParentsMaxEft(Map<String, TaskSchedule> newSchedule, Task task) {
