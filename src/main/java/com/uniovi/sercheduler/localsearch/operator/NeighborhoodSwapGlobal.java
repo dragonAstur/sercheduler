@@ -10,8 +10,8 @@ public class NeighborhoodSwapGlobal implements NeighborhoodOperatorGlobal {
 
     private NeighborhoodSwapPositional swapPositional;
 
-    public NeighborhoodSwapGlobal(NeighborhoodSwapPositional swapPositional){
-        this.swapPositional = swapPositional;
+    public NeighborhoodSwapGlobal(){
+        this.swapPositional = new NeighborhoodSwapPositional();
     }
 
     @Override

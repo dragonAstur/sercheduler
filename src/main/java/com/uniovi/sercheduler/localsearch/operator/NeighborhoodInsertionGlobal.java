@@ -10,8 +10,8 @@ public class NeighborhoodInsertionGlobal implements NeighborhoodOperatorGlobal {
 
     private NeighborhoodInsertionPositional insertionPositional;
 
-    public NeighborhoodInsertionGlobal(NeighborhoodInsertionPositional insertionPositional){
-        this.insertionPositional = insertionPositional;
+    public NeighborhoodInsertionGlobal(){
+        this.insertionPositional = new NeighborhoodInsertionPositional();
     }
 
     @Override

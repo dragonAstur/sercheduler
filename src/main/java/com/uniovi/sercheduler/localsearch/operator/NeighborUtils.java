@@ -35,19 +35,20 @@ public class NeighborUtils {
 
     protected static int[] getValidPositions(List<PlanPair> plan, int position){
 
-        int positionLeft = position;
-        boolean parentFound = false;
-        while (positionLeft >= 0 && !parentFound) {
+        int positionLeft = position - 1;
+        while (positionLeft >= 0) {
+            if (plan.get(position).task().getParents().contains(plan.get(positionLeft).task())) {
+                break;
+            }
             positionLeft--;
-            parentFound = plan.get(position).task().getParents().contains(plan.get(positionLeft).task());
         }
 
-        int positionRight = position;
-        boolean childFound = false;
-
-        while (positionRight < plan.size() - 1 && !childFound) {
+        int positionRight = position + 1;
+        while (positionRight < plan.size()) {
+            if (plan.get(position).task().getChildren().contains(plan.get(positionRight).task())) {
+                break;
+            }
             positionRight++;
-            childFound = plan.get(position).task().getChildren().contains(plan.get(positionRight).task());
         }
 
         return IntStream.range(positionLeft+1, positionRight).toArray();

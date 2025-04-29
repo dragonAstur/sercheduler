@@ -58,8 +58,7 @@ public class MaximumGradientStrategy {
         for(GeneratedNeighbor neighbor : neighborsList){
 
             neighborSolution = neighbor.generatedSolution();
-            //TODO: check if getLast() works
-            evaluator.calculateFitnessInfo(originalSolution, neighborSolution, neighbor.movements().getLast());
+            evaluator.calculateFitnessInfo(originalSolution, neighborSolution, neighbor.movements().get(neighbor.movements().size() - 1));
             neighborMakespan = neighborSolution.getFitnessInfo().fitness().get("makespan");
 
             if(bestMakespan > neighborMakespan){

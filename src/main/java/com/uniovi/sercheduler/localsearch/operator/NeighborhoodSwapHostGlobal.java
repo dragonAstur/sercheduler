@@ -10,8 +10,8 @@ public class NeighborhoodSwapHostGlobal implements NeighborhoodOperatorGlobal {
 
     private NeighborhoodSwapHostPositional swapHostPositional;
 
-    public NeighborhoodSwapHostGlobal(NeighborhoodSwapHostPositional swapHostPositional){
-        this.swapHostPositional = swapHostPositional;
+    public NeighborhoodSwapHostGlobal(){
+        this.swapHostPositional = new NeighborhoodSwapHostPositional();
     }
 
 
