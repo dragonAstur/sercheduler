@@ -52,25 +52,6 @@ public class NeighborhoodInsertionPositional implements NeighborhoodOperatorPosi
 
     }
 
-    /*public List<List<PlanPair>> insertInAllPossiblePositions(List<PlanPair> plan, int position){
-
-        int[] validPositions = getValidPositions(plan, position);
-
-        List<List<PlanPair>> neighborsPlans = new ArrayList<>();
-
-        for(int newPosition : validPositions) {
-
-            if(newPosition == position)
-                continue;
-
-            neighborsPlans.add(    insertInOneSpecificPosition(List.copyOf(plan), position, newPosition)    );
-
-        }
-
-        return List.copyOf(neighborsPlans);
-
-    }*/
-
     private List<PlanPair> insertInOneSpecificPosition(List<PlanPair> plan, int position, int newPosition){
 
         List<PlanPair> newPlan = new ArrayList<>(List.copyOf(plan));
