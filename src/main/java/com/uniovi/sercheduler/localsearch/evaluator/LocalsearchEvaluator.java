@@ -26,7 +26,7 @@ public class LocalsearchEvaluator {
         this.instanceData = instanceData;
     }
 
-    public void calculateFitnessInfo(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
+    public void evaluate(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
 
         if(originalSolution.getFitnessInfo() == null)
             throw new IllegalArgumentException("The solution must have been evaluated first.");

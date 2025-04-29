@@ -7,7 +7,6 @@ import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MaximumGradientStrategy {
@@ -58,7 +57,7 @@ public class MaximumGradientStrategy {
         for(GeneratedNeighbor neighbor : neighborsList){
 
             neighborSolution = neighbor.generatedSolution();
-            evaluator.calculateFitnessInfo(originalSolution, neighborSolution, neighbor.movements().get(neighbor.movements().size() - 1));
+            evaluator.evaluate(originalSolution, neighborSolution, neighbor.movements().get(neighbor.movements().size() - 1));
             neighborMakespan = neighborSolution.getFitnessInfo().fitness().get("makespan");
 
             if(bestMakespan > neighborMakespan){
