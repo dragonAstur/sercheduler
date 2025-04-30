@@ -15,7 +15,7 @@ public class NeighborhoodObserver implements Observer {
 
     public NeighborhoodObserver(){
         this.values = new ArrayList<>();
-        this.iteration = 0;
+        this.iteration = -1;
         this.executingTime = -1;
         this.reachedCost = -1;
     }
@@ -24,25 +24,21 @@ public class NeighborhoodObserver implements Observer {
         return new ArrayList<>(values);
     }
 
-    private void addDictionary(int iterationNumber){
-        values.set(iterationNumber, new HashMap<>());
-    }
-
     private void addDictionary(){
         values.add(new HashMap<>());
     }
 
     public int getIteration(){
-        return iteration;
+        return iteration+1;
     }
 
     public void newIteration(){
         iteration += 1;
-        addDictionary(iteration);
+        addDictionary();
     }
 
-    public void resetIteration(){
-        iteration = 0;
+    public void reset(){
+        iteration = -1;
     }
 
     public void setReachedCost(double reachedCost){
@@ -69,4 +65,12 @@ public class NeighborhoodObserver implements Observer {
         values.get(iteration).put("better_neighbors_improving_ratio", value);
     }
 
+    @Override
+    public String toString() {
+        return "NeighborhoodObserver{" +
+                "iteration=" + getIteration() +
+                ", executingTime=" + executingTime +
+                ", reachedCost=" + reachedCost +
+                '}';
+    }
 }

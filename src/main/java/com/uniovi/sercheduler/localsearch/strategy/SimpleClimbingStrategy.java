@@ -5,11 +5,10 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
-import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
+import com.uniovi.sercheduler.service.FitnessInfo;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -23,14 +22,15 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
     public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorLazy neighborhoodLazyOperator){
 
         long startingTime = System.currentTimeMillis();
-        getObserver().resetIteration();
+        getObserver().reset();
 
         //Generate an inicial random solution
         SchedulePermutationSolution actualSolution = problem.createSolution();
 
         //Evaluate this new created solution (this step is skipped in the pseudocode)
         FitnessCalculatorSimple fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-        fitnessCalculator.calculateFitness(actualSolution);
+        FitnessInfo fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
+        actualSolution.setFitnessInfo(fitnessInfo);
 
         //Initialize the control variable, a variable for storing their neighbors and a
         boolean upgradeFound;

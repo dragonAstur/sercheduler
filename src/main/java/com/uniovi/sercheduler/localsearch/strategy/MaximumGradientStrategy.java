@@ -4,10 +4,10 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
-import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
+import com.uniovi.sercheduler.service.FitnessInfo;
 
 import java.util.List;
 
@@ -20,14 +20,15 @@ public class MaximumGradientStrategy extends AbstractStrategy {
     public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorGlobal neighborhoodOperator){
 
         long startingTime = System.currentTimeMillis();
-        getObserver().resetIteration();
+        getObserver().reset();
 
         //Generate an inicial random solution
         SchedulePermutationSolution actualSolution = problem.createSolution();
 
         //Evaluate this new created solution (this step is skipped in the pseudocode)
         FitnessCalculatorSimple fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-        fitnessCalculator.calculateFitness(actualSolution);
+        FitnessInfo fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
+        actualSolution.setFitnessInfo(fitnessInfo);
 
         //Initialize the control variable, a variable for storing their neighbors and a
         boolean upgradeFound;
@@ -38,6 +39,9 @@ public class MaximumGradientStrategy extends AbstractStrategy {
         do{
 
             getObserver().newIteration();
+
+            //TODO: delete this
+            System.out.println("\tIteration number " + getObserver().getIteration());
 
             upgradeFound = false;
 
@@ -50,7 +54,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
             bestNeighbor = selectBestNeighbor(actualSolution, neighborsList, evaluator);
 
             //If there is an improvement, record it and update the best neighbor
-            if(bestNeighbor.getFitnessInfo().fitness().get("makespan") > actualSolution.getFitnessInfo().fitness().get("makespan")){
+            if(bestNeighbor.getFitnessInfo().fitness().get("makespan") < actualSolution.getFitnessInfo().fitness().get("makespan")){
                 actualSolution = bestNeighbor;
                 upgradeFound = true;
             }
