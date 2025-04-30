@@ -1,14 +1,11 @@
 package com.uniovi.sercheduler.localsearch.command;
 
-import com.uniovi.sercheduler.SerchedulerApplication;
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
-import com.uniovi.sercheduler.localsearch.operator.NeighborhoodInsertionGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
+import com.uniovi.sercheduler.localsearch.operator.NeighborhoodSwapGlobal;
 import com.uniovi.sercheduler.localsearch.strategy.MaximumGradientStrategy;
-import org.springframework.boot.Banner;
-import org.springframework.boot.SpringApplication;
 
 import java.io.File;
 import java.util.List;
@@ -30,17 +27,21 @@ public class LocalSearchRunnable {
                         new File(HOSTSFILE),
                         "441Gf",
                         "simple",
-                        154L,
+                        System.nanoTime(),
                         objectives,
                         Objective.MAKESPAN.objectiveName);
 
         NeighborhoodObserver observer = new NeighborhoodObserver();
+
+        //Here you can change the strategy
         MaximumGradientStrategy maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        NeighborhoodOperatorGlobal operator = new NeighborhoodInsertionGlobal();
+        //Here you can change the operator
+        NeighborhoodOperatorGlobal operator = new NeighborhoodSwapGlobal();
 
-        maximumGradientStrategy.execute(problem, operator);
-
-        System.out.println(observer);
+        for(int i = 0; i < 30; i++){
+            maximumGradientStrategy.execute(problem, operator);
+            System.out.println(observer);
+        }
     }
 }

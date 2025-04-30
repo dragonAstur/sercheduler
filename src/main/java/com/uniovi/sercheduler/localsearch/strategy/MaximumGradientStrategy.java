@@ -40,9 +40,6 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
             getObserver().newIteration();
 
-            //TODO: delete this
-            System.out.println("\tIteration number " + getObserver().getIteration());
-
             upgradeFound = false;
 
             //Generate new neighbors

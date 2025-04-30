@@ -39,6 +39,7 @@ public class NeighborhoodObserver implements Observer {
 
     public void reset(){
         iteration = -1;
+        values.clear();
     }
 
     public void setReachedCost(double reachedCost){
