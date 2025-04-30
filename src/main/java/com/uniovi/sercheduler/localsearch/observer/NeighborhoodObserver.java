@@ -10,14 +10,10 @@ public class NeighborhoodObserver implements Observer {
     private final List<Map<String, Double>> values;
 
     private int iteration;
-    private long executingTime;
-    private double reachedCost;
 
     public NeighborhoodObserver(){
         this.values = new ArrayList<>();
         this.iteration = -1;
-        this.executingTime = -1;
-        this.reachedCost = -1;
     }
 
     public List<Map<String, Double>> getValues(){
@@ -37,41 +33,36 @@ public class NeighborhoodObserver implements Observer {
         addDictionary();
     }
 
-    public void reset(){
-        iteration = -1;
-        values.clear();
-    }
-
     public void setReachedCost(double reachedCost){
-        this.reachedCost = reachedCost;
+        values.get(iteration).put("reached_cost", reachedCost);
     }
 
-    public void setExecutingTime(long executingTime){
-        this.executingTime = executingTime;
+    public void setExecutingTime(double executingTime){
+        values.get(iteration).put("executing_time", executingTime);
     }
 
-    public void setNeighborsNumber(double value){
-        values.get(iteration).put("neighbors_number", value);
+    public void setAvgNeighborsNumber(double value){
+        values.get(iteration).put("avg_neighbors_number", value);
     }
 
-    public void setBetterNeighborsRatio(double value){
-        values.get(iteration).put("improving_neighbors_ratio", value);
+    public void setAvgBetterNeighborsRatio(double value){
+        values.get(iteration).put("avg_better_neighbors_ratio", value);
     }
 
-    public void setAllNeighborsImprovingRatio(double value){
-        values.get(iteration).put("all_neighbors_improving_ratio", value);
+    public void setAvgAllNeighborsImprovingRatio(double value){
+        values.get(iteration).put("avg_all_neighbors_improving_ratio", value);
     }
 
-    public void setBetterNeighborsImprovingRatio(double value){
-        values.get(iteration).put("better_neighbors_improving_ratio", value);
+    public void setAvgBetterNeighborsImprovingRatio(double value){
+        values.get(iteration).put("avg_better_neighbors_improving_ratio", value);
+    }
+
+    public void setLocalSearchIterations(double value){
+        values.get(iteration).put("local_search_iterations", value);
     }
 
     @Override
     public String toString() {
-        return "NeighborhoodObserver{" +
-                "iteration=" + getIteration() +
-                ", executingTime=" + executingTime +
-                ", reachedCost=" + reachedCost +
-                '}';
+        return "Developing...";
     }
 }

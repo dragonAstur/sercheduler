@@ -13,14 +13,20 @@ import java.util.List;
 
 public class MaximumGradientStrategy extends AbstractStrategy {
 
+    private double sumOfBetterNeighborsRatio = 0;
+    private double sumOfAllNeighborsImprovingRatio = 0;
+    private double sumOfBetterNeighborsImprovingRatio = 0;
+
     public MaximumGradientStrategy(NeighborhoodObserver observer) {
         super(observer);
     }
 
     public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorGlobal neighborhoodOperator){
 
+        getObserver().newIteration();
+        int localSearchIterations = 0;
+        int numberOfGeneratedNeighborsSum = 0;
         long startingTime = System.currentTimeMillis();
-        getObserver().reset();
 
         //Generate an inicial random solution
         SchedulePermutationSolution actualSolution = problem.createSolution();
@@ -38,14 +44,14 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         do{
 
-            getObserver().newIteration();
+            localSearchIterations++;
 
             upgradeFound = false;
 
             //Generate new neighbors
             neighborsList = neighborhoodOperator.execute(actualSolution);
 
-            getObserver().setNeighborsNumber(neighborsList.size());
+            numberOfGeneratedNeighborsSum += neighborsList.size();
 
             //Take the best one
             bestNeighbor = selectBestNeighbor(actualSolution, neighborsList, evaluator);
@@ -58,8 +64,13 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         } while(upgradeFound);
 
-        getObserver().setReachedCost(actualSolution.getFitnessInfo().fitness().get("makespan"));
         getObserver().setExecutingTime(System.currentTimeMillis() - startingTime);
+        getObserver().setLocalSearchIterations(localSearchIterations);
+        getObserver().setReachedCost(actualSolution.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setAvgNeighborsNumber(numberOfGeneratedNeighborsSum * 1.0 / localSearchIterations);
+        getObserver().setAvgBetterNeighborsRatio(sumOfBetterNeighborsRatio / localSearchIterations);
+        getObserver().setAvgAllNeighborsImprovingRatio(sumOfAllNeighborsImprovingRatio / localSearchIterations);
+        getObserver().setAvgBetterNeighborsImprovingRatio(sumOfBetterNeighborsImprovingRatio / localSearchIterations);
 
         return actualSolution;
     }
@@ -89,18 +100,18 @@ public class MaximumGradientStrategy extends AbstractStrategy {
             if(neighborMakespan < originalMakespan){
                 numberOfBetterNeighbors++;
                 betterNeighborsImprovingRatioSum += neighborImprovingRatio;
-            }
 
-            if(bestMakespan > neighborMakespan){
-                bestMakespan = neighborMakespan;
-                bestSolution = neighborSolution;
+                if(bestMakespan > neighborMakespan){
+                    bestMakespan = neighborMakespan;
+                    bestSolution = neighborSolution;
+                }
             }
 
         }
 
-        getObserver().setBetterNeighborsRatio( (numberOfBetterNeighbors * 1.00) / neighborsList.size());
-        getObserver().setAllNeighborsImprovingRatio(allNeighborsImprovingRatioSum / neighborsList.size());
-        getObserver().setBetterNeighborsImprovingRatio(betterNeighborsImprovingRatioSum / neighborsList.size());
+        sumOfBetterNeighborsRatio += (numberOfBetterNeighbors * 1.00) / neighborsList.size();
+        sumOfAllNeighborsImprovingRatio += allNeighborsImprovingRatioSum / neighborsList.size();
+        sumOfBetterNeighborsImprovingRatio += betterNeighborsImprovingRatioSum / numberOfBetterNeighbors;
 
         return bestSolution;
     }

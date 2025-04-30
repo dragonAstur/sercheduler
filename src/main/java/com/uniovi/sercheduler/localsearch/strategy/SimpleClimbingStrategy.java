@@ -21,8 +21,10 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
     public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorLazy neighborhoodLazyOperator){
 
+        getObserver().newIteration();
+        int localSearchIterations = 0;
+        int numberOfGeneratedNeighborsSum = 0;
         long startingTime = System.currentTimeMillis();
-        getObserver().reset();
 
         //Generate an inicial random solution
         SchedulePermutationSolution actualSolution = problem.createSolution();
@@ -39,7 +41,8 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
         LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
 
         do{
-            getObserver().newIteration();
+
+            localSearchIterations++;
 
             upgradeFound = false;
 
@@ -65,7 +68,7 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
                     })
                     .findFirst();   //This find first is the laziness core
 
-            getObserver().setNeighborsNumber(counter.get());
+            numberOfGeneratedNeighborsSum += counter.get();
 
             //If there is an improvement, record it and update the best neighbor
             if (maybeBetterNeighbor.isPresent()) {
@@ -75,8 +78,10 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
         } while(upgradeFound);
 
-        getObserver().setReachedCost(actualSolution.getFitnessInfo().fitness().get("makespan"));
         getObserver().setExecutingTime(System.currentTimeMillis() - startingTime);
+        getObserver().setLocalSearchIterations(localSearchIterations);
+        getObserver().setReachedCost(actualSolution.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setAvgNeighborsNumber(numberOfGeneratedNeighborsSum * 1.0 / localSearchIterations);
 
         return actualSolution;
 
