@@ -3,15 +3,24 @@ package com.uniovi.sercheduler.localsearch.strategy;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
+import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
+import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 
 import java.util.List;
 
-public class MaximumGradientStrategy {
+public class MaximumGradientStrategy extends AbstractStrategy {
+
+    public MaximumGradientStrategy(NeighborhoodObserver observer) {
+        super(observer);
+    }
 
     public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorGlobal neighborhoodOperator){
+
+        long startingTime = System.currentTimeMillis();
+        getObserver().resetIteration();
 
         //Generate an inicial random solution
         SchedulePermutationSolution actualSolution = problem.createSolution();
@@ -27,10 +36,15 @@ public class MaximumGradientStrategy {
         LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
 
         do{
+
+            getObserver().newIteration();
+
             upgradeFound = false;
 
             //Generate new neighbors
             neighborsList = neighborhoodOperator.execute(actualSolution);
+
+            getObserver().setNeighborsNumber(neighborsList.size());
 
             //Take the best one
             bestNeighbor = selectBestNeighbor(actualSolution, neighborsList, evaluator);
@@ -43,16 +57,24 @@ public class MaximumGradientStrategy {
 
         } while(upgradeFound);
 
-        return actualSolution;
+        getObserver().setReachedCost(actualSolution.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setExecutingTime(System.currentTimeMillis() - startingTime);
 
+        return actualSolution;
     }
 
     private SchedulePermutationSolution selectBestNeighbor(SchedulePermutationSolution originalSolution, List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator) {
 
         SchedulePermutationSolution bestSolution = originalSolution;
-        double bestMakespan = originalSolution.getFitnessInfo().fitness().get("makespan");
+        double originalMakespan = originalSolution.getFitnessInfo().fitness().get("makespan");
+        double bestMakespan = originalMakespan;
         double neighborMakespan;
         SchedulePermutationSolution neighborSolution;
+
+        int numberOfBetterNeighbors = 0;
+        double neighborImprovingRatio = 0.0;
+        double allNeighborsImprovingRatioSum = 0.0;
+        double betterNeighborsImprovingRatioSum = 0.0;
 
         for(GeneratedNeighbor neighbor : neighborsList){
 
@@ -60,12 +82,24 @@ public class MaximumGradientStrategy {
             evaluator.evaluate(originalSolution, neighborSolution, neighbor.movements().get(neighbor.movements().size() - 1));
             neighborMakespan = neighborSolution.getFitnessInfo().fitness().get("makespan");
 
+            neighborImprovingRatio = (originalMakespan - neighborMakespan) / originalMakespan * 100;
+            allNeighborsImprovingRatioSum += neighborImprovingRatio;
+
+            if(neighborMakespan < originalMakespan){
+                numberOfBetterNeighbors++;
+                betterNeighborsImprovingRatioSum += neighborImprovingRatio;
+            }
+
             if(bestMakespan > neighborMakespan){
                 bestMakespan = neighborMakespan;
                 bestSolution = neighborSolution;
             }
 
         }
+
+        getObserver().setBetterNeighborsRatio( (numberOfBetterNeighbors * 1.00) / neighborsList.size());
+        getObserver().setAllNeighborsImprovingRatio(allNeighborsImprovingRatioSum / neighborsList.size());
+        getObserver().setBetterNeighborsImprovingRatio(betterNeighborsImprovingRatioSum / neighborsList.size());
 
         return bestSolution;
     }
