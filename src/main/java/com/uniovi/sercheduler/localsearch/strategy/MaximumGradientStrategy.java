@@ -111,7 +111,8 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         sumOfBetterNeighborsRatio += (numberOfBetterNeighbors * 1.00) / neighborsList.size();
         sumOfAllNeighborsImprovingRatio += allNeighborsImprovingRatioSum / neighborsList.size();
-        sumOfBetterNeighborsImprovingRatio += betterNeighborsImprovingRatioSum / numberOfBetterNeighbors;
+        if(numberOfBetterNeighbors > 0)
+            sumOfBetterNeighborsImprovingRatio += betterNeighborsImprovingRatioSum / numberOfBetterNeighbors;
 
         return bestSolution;
     }

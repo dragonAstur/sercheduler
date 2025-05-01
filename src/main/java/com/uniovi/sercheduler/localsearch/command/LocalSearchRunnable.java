@@ -4,8 +4,11 @@ import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
+import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodSwapGlobal;
+import com.uniovi.sercheduler.localsearch.operator.NeighborhoodSwapLazy;
 import com.uniovi.sercheduler.localsearch.strategy.MaximumGradientStrategy;
+import com.uniovi.sercheduler.localsearch.strategy.SimpleClimbingStrategy;
 
 import java.io.File;
 import java.util.List;
@@ -31,17 +34,34 @@ public class LocalSearchRunnable {
                         objectives,
                         Objective.MAKESPAN.objectiveName);
 
+        System.out.println("\n\nMaximum Gradient strategy\n\n");
+
         NeighborhoodObserver observer = new NeighborhoodObserver();
 
-        //Here you can change the strategy
         MaximumGradientStrategy maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         //Here you can change the operator
-        NeighborhoodOperatorGlobal operator = new NeighborhoodSwapGlobal();
+        NeighborhoodOperatorGlobal globalOperator = new NeighborhoodSwapGlobal();
 
         for(int i = 0; i < 30; i++){
-            maximumGradientStrategy.execute(problem, operator);
-            System.out.println(observer);
+            maximumGradientStrategy.execute(problem, globalOperator);
         }
+
+        System.out.println(observer);
+
+        System.out.println("\n\nSimple Climbing strategy\n\n");
+
+        observer = new NeighborhoodObserver();
+
+        SimpleClimbingStrategy simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        //Here you can change the operator
+        NeighborhoodOperatorLazy lazyOperator = new NeighborhoodSwapLazy();
+
+        for(int i = 0; i < 30; i++){
+            simpleClimbingStrategy.execute(problem, lazyOperator);
+        }
+
+        System.out.println(observer);
     }
 }

@@ -63,6 +63,31 @@ public class NeighborhoodObserver implements Observer {
 
     @Override
     public String toString() {
-        return "Developing...";
+
+        String result = "\n----------------------------------------------------------------------\n";
+
+        int iterationNumber;
+
+        for(int i = 0; i < values.size(); i++){
+
+            iterationNumber = i+1;
+
+            result += "\n\nResults for iteration number " + iterationNumber + ":\n" +
+                    "\t--> Best makespan reached: " + values.get(i).get("reached_cost") + "\n" +
+                    "\t--> Executing time: " + values.get(i).get("executing_time") + "\n" +
+                    "\t--> Number of local search iterations: " + values.get(i).get("local_search_iterations") + "\n" +
+                    "\t--> Average generated neighbors: " + values.get(i).get("avg_neighbors_number") + "\n";
+
+
+            if(values.get(i).containsKey("avg_better_neighbors_ratio")){
+                result += "\t--> Average percentage of neighbors that outperform their source solution: " + values.get(i).get("avg_better_neighbors_ratio") + "%\n" +
+                        "\t--> Average improvement ratio from all neighbors: " + values.get(i).get("avg_all_neighbors_improving_ratio") + "%\n" +
+                        "\t--> Average improvement ratio from neighbors that outperform their source solution: " + values.get(i).get("avg_better_neighbors_improving_ratio") + "%\n";
+            }
+        }
+
+        result += "\n----------------------------------------------------------------------\n";
+
+        return result;
     }
 }
