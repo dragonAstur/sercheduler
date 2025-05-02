@@ -14,7 +14,7 @@ public class Exporter {
     public static void export(NeighborhoodObserver observer, String fileName){
 
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("hoja");
+            /*Sheet sheet = workbook.createSheet("hoja");
 
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0).setCellValue("Iteration number");
@@ -50,7 +50,7 @@ public class Exporter {
             // Write the workbook to a file
             try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
                 workbook.write(outputStream);
-            }
+            }*/
 
         } catch (IOException e) {
             throw new RuntimeException(e);

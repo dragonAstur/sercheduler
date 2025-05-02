@@ -1,93 +1,131 @@
 package com.uniovi.sercheduler.localsearch.observer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class NeighborhoodObserver implements Observer {
 
-    private final List<Map<String, Double>> values;
+    private final List<ExecutionMetrics> executions;
 
-    private int iteration;
+    private final String strategyName;
+    private double reachedCost;
+    private long executionTime;
+    private int numberOfIterations;
+    private List<Integer> numberOfGeneratedNeighborsList;
+    private List<Double> betterNeighborsRatioList;
+    private List<Double> allNeighborsImprovingRatioList;
+    private List<Double> betterNeighborsImprovingRatioList;
 
-    public NeighborhoodObserver(){
-        this.values = new ArrayList<>();
-        this.iteration = -1;
+    public NeighborhoodObserver(String strategyName){
+        this.strategyName = strategyName;
+        this.executions = new ArrayList<>();
     }
 
-    public List<Map<String, Double>> getValues(){
-        return new ArrayList<>(values);
+    public List<ExecutionMetrics> getExecutions() {
+        return executions;
     }
 
-    private void addDictionary(){
-        values.add(new HashMap<>());
+    public void executionEnded(){
+        executions.add(
+                new ExecutionMetrics(
+                        strategyName,
+                        reachedCost,
+                        executionTime,
+                        numberOfIterations,
+                        new ArrayList<>(numberOfGeneratedNeighborsList),
+                        new ArrayList<>(betterNeighborsRatioList),
+                        new ArrayList<>(allNeighborsImprovingRatioList),
+                        new ArrayList<>(betterNeighborsImprovingRatioList)
+                )
+        );
     }
 
-    public int getIteration(){
-        return iteration+1;
+    public void executionStarted(){
+        reachedCost = 0.0;
+        executionTime = 0L;
+        numberOfIterations = 0;
+        numberOfGeneratedNeighborsList = new ArrayList<>();
+        betterNeighborsRatioList = new ArrayList<>();
+        allNeighborsImprovingRatioList = new ArrayList<>();
+        betterNeighborsImprovingRatioList = new ArrayList<>();
     }
 
-    public void newIteration(){
-        iteration += 1;
-        addDictionary();
+    public void setReachedCost(double reachedCost) {
+        this.reachedCost = reachedCost;
     }
 
-    public void setReachedCost(double reachedCost){
-        values.get(iteration).put("reached_cost", reachedCost);
+    public void setExecutionTime(long executionTime) {
+        this.executionTime = executionTime;
     }
 
-    public void setExecutingTime(double executingTime){
-        values.get(iteration).put("executing_time", executingTime);
+    public void setNumberOfIterations(int numberOfIterations) {
+        this.numberOfIterations = numberOfIterations;
     }
 
-    public void setAvgNeighborsNumber(double value){
-        values.get(iteration).put("avg_neighbors_number", value);
+    public void addNumberOfGeneratedNeighbors(Integer value){
+        numberOfGeneratedNeighborsList.add(value);
     }
 
-    public void setAvgBetterNeighborsRatio(double value){
-        values.get(iteration).put("avg_better_neighbors_ratio", value);
+    public void addBetterNeighborsRatio(Double value){
+        betterNeighborsRatioList.add(value);
     }
 
-    public void setAvgAllNeighborsImprovingRatio(double value){
-        values.get(iteration).put("avg_all_neighbors_improving_ratio", value);
+    public void addAllNeighborsImprovingRatio(Double value){
+        allNeighborsImprovingRatioList.add(value);
     }
 
-    public void setAvgBetterNeighborsImprovingRatio(double value){
-        values.get(iteration).put("avg_better_neighbors_improving_ratio", value);
-    }
-
-    public void setLocalSearchIterations(double value){
-        values.get(iteration).put("local_search_iterations", value);
+    public void addBetterNeighborsImprovingRatio(Double value){
+        betterNeighborsImprovingRatioList.add(value);
     }
 
     @Override
     public String toString() {
 
-        String result = "\n----------------------------------------------------------------------\n";
+        StringBuilder result = new StringBuilder("\n----------------------------------------------------------------------\n");
 
-        int iterationNumber;
+        for(int i = 0; i < executions.size(); i++){
 
-        for(int i = 0; i < values.size(); i++){
+            result.append("\n\nResults for execution number ")
+                    .append(i + 1)
+                    .append(":\n")
+                    .append("\t--> Strategy used: ")
+                    .append(executions.get(i).strategyName())
+                    .append("\n")
+                    .append("\t--> Best makespan reached: ")
+                    .append(executions.get(i).reachedCost())
+                    .append("\n")
+                    .append("\t--> Executing time: ")
+                    .append(executions.get(i).executionTime())
+                    .append("\n").append("\t--> Number of local search iterations: ")
+                    .append(executions.get(i).numberOfIterations())
+                    .append("\n");
 
-            iterationNumber = i+1;
+            result.append("\t--> Metrics for each iteration\n");
 
-            result += "\n\nResults for iteration number " + iterationNumber + ":\n" +
-                    "\t--> Best makespan reached: " + values.get(i).get("reached_cost") + "\n" +
-                    "\t--> Executing time: " + values.get(i).get("executing_time") + "\n" +
-                    "\t--> Number of local search iterations: " + values.get(i).get("local_search_iterations") + "\n" +
-                    "\t--> Average generated neighbors: " + values.get(i).get("avg_neighbors_number") + "\n";
-
-
-            if(values.get(i).containsKey("avg_better_neighbors_ratio")){
-                result += "\t--> Average percentage of neighbors that outperform their source solution: " + values.get(i).get("avg_better_neighbors_ratio") + "%\n" +
-                        "\t--> Average improvement ratio from all neighbors: " + values.get(i).get("avg_all_neighbors_improving_ratio") + "%\n" +
-                        "\t--> Average improvement ratio from neighbors that outperform their source solution: " + values.get(i).get("avg_better_neighbors_improving_ratio") + "%\n";
+            for(int j = 0; j < executions.get(i).numberOfIterations()-1; j++){
+                result.append("\t\tResults for iteration number ")
+                        .append(j+1)
+                        .append(":\n")
+                        .append("\t\t\t--> Number of generated neighbors: ")
+                        .append(executions.get(i).numberOfGeneratedNeighborsList().get(j))
+                        .append("\n");
+                if(!executions.get(i).betterNeighborsRatioList().isEmpty()) {
+                    result.append("\t\t\t--> Percentage of neighbors that outperform their source solution: ")
+                            .append(executions.get(i).betterNeighborsRatioList().get(j))
+                            .append("\n")
+                            .append("\t\t\t--> Improvement ratio from all neighbors: ")
+                            .append(executions.get(i).allNeighborsImprovingRatioList().get(j))
+                            .append("\n")
+                            .append("\t\t\t--> Improvement ratio from neighbors that outperform their source solution: ")
+                            .append(executions.get(i).betterNeighborsImprovingRatioList().get(j))
+                            .append("\n");
+                }
             }
+
         }
 
-        result += "\n----------------------------------------------------------------------\n";
+        result.append("\n----------------------------------------------------------------------\n");
 
-        return result;
+        return result.toString();
     }
 }

@@ -40,7 +40,7 @@ public class LocalSearchCommand {
 
         System.out.println("\n\nMaximum Gradient strategy\n\n");
 
-        NeighborhoodObserver observer = new NeighborhoodObserver();
+        NeighborhoodObserver observer = new NeighborhoodObserver("Maximum gradient");
 
         MaximumGradientStrategy maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
@@ -55,7 +55,7 @@ public class LocalSearchCommand {
 
         System.out.println("\n\nSimple Climbing strategy\n\n");
 
-        observer = new NeighborhoodObserver();
+        observer = new NeighborhoodObserver("Simple climbing");
 
         SimpleClimbingStrategy simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 

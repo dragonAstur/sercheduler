@@ -21,9 +21,8 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
     public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorLazy neighborhoodLazyOperator){
 
-        getObserver().newIteration();
+        getObserver().executionStarted();
         int localSearchIterations = 0;
-        int numberOfGeneratedNeighborsSum = 0;
         long startingTime = System.currentTimeMillis();
 
         //Generate an inicial random solution
@@ -40,9 +39,6 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
         Optional<GeneratedNeighbor> maybeBetterNeighbor;
         LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
 
-//        double sumOfBetterNeighborsImprovingRatio = 0;
-//        double originalMakespan;
-//        double neighborMakespan;
 
         do{
 
@@ -72,7 +68,7 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
                     })
                     .findFirst();   //This find first is the laziness core
 
-            numberOfGeneratedNeighborsSum += counter.get();
+            getObserver().addNumberOfGeneratedNeighbors( counter.get() );
 
             //If there is an improvement, record it and update the best neighbor
             if (maybeBetterNeighbor.isPresent()) {
@@ -87,11 +83,12 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
         } while(upgradeFound);
 
-        getObserver().setExecutingTime(System.currentTimeMillis() - startingTime);
-        getObserver().setLocalSearchIterations(localSearchIterations);
+        getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
+        getObserver().setNumberOfIterations(localSearchIterations);
         getObserver().setReachedCost(actualSolution.getFitnessInfo().fitness().get("makespan"));
-        getObserver().setAvgNeighborsNumber(numberOfGeneratedNeighborsSum * 1.0 / localSearchIterations);
-        //getObserver().setAvgBetterNeighborsImprovingRatio(sumOfBetterNeighborsImprovingRatio / localSearchIterations);
+        //getObserver().setAvgNeighborsNumber(numberOfGeneratedNeighborsSum * 1.0 / localSearchIterations);
+
+        getObserver().executionEnded();
 
         return actualSolution;
 
