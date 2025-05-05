@@ -2,6 +2,7 @@ package com.uniovi.sercheduler.localsearch.command;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
+import com.uniovi.sercheduler.localsearch.export.CSVExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXExporter;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
@@ -69,6 +70,8 @@ public class LocalSearchRunnable {
         System.out.println(observer);
 
         XLSXExporter.appendWorkbook(observer, "local_search_results");
+
+        CSVExporter.createCSV("local_search_results");
 
     }
 }

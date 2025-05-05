@@ -138,7 +138,7 @@ public class XLSXExporter {
         headerRow.createCell(3).setCellValue("Best makespan reached");
         headerRow.createCell(4).setCellValue("Improvement ratio with respect to last iteration");
         headerRow.createCell(5).setCellValue("Generated neighbors");
-        headerRow.createCell(6).setCellValue("Average percentage of neighbors that outperform their source solution)");
+        headerRow.createCell(6).setCellValue("Average percentage of neighbors that outperform their source solution");
         headerRow.createCell(7).setCellValue("Average improvement ratio from all neighbors");
         headerRow.createCell(8).setCellValue("Average improvement ratio from neighbors that outperform their source solution");
 
