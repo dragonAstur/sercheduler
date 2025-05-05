@@ -46,13 +46,13 @@ public class LocalSearchRunnable {
         //Here you can change the operator
         NeighborhoodOperatorGlobal globalOperator = new NeighborhoodSwapGlobal();
 
-        for(int i = 0; i < 30; i++){
+        for(int i = 0; i < 30; i++)
             maximumGradientStrategy.execute(problem, globalOperator);
-        }
 
         System.out.println(observer);
 
-        XLSXExporter.export(observer, "maximum_gradient_results");
+        XLSXExporter.createWorkbook("local_search_results");
+        XLSXExporter.appendWorkbook(observer, "local_search_results");
 
         System.out.println("\n\nSimple Climbing strategy\n\n");
 
@@ -63,12 +63,12 @@ public class LocalSearchRunnable {
         //Here you can change the operator
         NeighborhoodOperatorLazy lazyOperator = new NeighborhoodSwapLazy();
 
-        for(int i = 0; i < 30; i++){
+        for(int i = 0; i < 30; i++)
             simpleClimbingStrategy.execute(problem, lazyOperator);
-        }
 
         System.out.println(observer);
 
-        XLSXExporter.export(observer, "simple_climbing_results");
+        XLSXExporter.appendWorkbook(observer, "local_search_results");
+
     }
 }
