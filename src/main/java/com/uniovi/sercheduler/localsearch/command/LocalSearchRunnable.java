@@ -2,7 +2,7 @@ package com.uniovi.sercheduler.localsearch.command;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
-import com.uniovi.sercheduler.localsearch.export.Exporter;
+import com.uniovi.sercheduler.localsearch.export.XLSXExporter;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
@@ -52,7 +52,7 @@ public class LocalSearchRunnable {
 
         System.out.println(observer);
 
-        Exporter.export(observer, "maximum_gradient_results");
+        XLSXExporter.export(observer, "maximum_gradient_results");
 
         System.out.println("\n\nSimple Climbing strategy\n\n");
 
@@ -69,6 +69,6 @@ public class LocalSearchRunnable {
 
         System.out.println(observer);
 
-        Exporter.export(observer, "simple_climbing_results");
+        XLSXExporter.export(observer, "simple_climbing_results");
     }
 }

@@ -8,10 +8,11 @@ public class NeighborhoodObserver implements Observer {
     private final List<ExecutionMetrics> executions;
 
     private final String strategyName;
-    private double reachedCost;
+    private double totalReachedMakespan;
     private long executionTime;
     private int numberOfIterations;
     private List<Integer> numberOfGeneratedNeighborsList;
+    private List<Double> reachedMakespanList;
     private List<Double> betterNeighborsRatioList;
     private List<Double> allNeighborsImprovingRatioList;
     private List<Double> betterNeighborsImprovingRatioList;
@@ -29,10 +30,11 @@ public class NeighborhoodObserver implements Observer {
         executions.add(
                 new ExecutionMetrics(
                         strategyName,
-                        reachedCost,
+                        totalReachedMakespan,
                         executionTime,
                         numberOfIterations,
                         new ArrayList<>(numberOfGeneratedNeighborsList),
+                        new ArrayList<>(reachedMakespanList),
                         new ArrayList<>(betterNeighborsRatioList),
                         new ArrayList<>(allNeighborsImprovingRatioList),
                         new ArrayList<>(betterNeighborsImprovingRatioList)
@@ -41,17 +43,18 @@ public class NeighborhoodObserver implements Observer {
     }
 
     public void executionStarted(){
-        reachedCost = 0.0;
+        totalReachedMakespan = 0.0;
         executionTime = 0L;
         numberOfIterations = 0;
         numberOfGeneratedNeighborsList = new ArrayList<>();
+        reachedMakespanList = new ArrayList<>();
         betterNeighborsRatioList = new ArrayList<>();
         allNeighborsImprovingRatioList = new ArrayList<>();
         betterNeighborsImprovingRatioList = new ArrayList<>();
     }
 
-    public void setReachedCost(double reachedCost) {
-        this.reachedCost = reachedCost;
+    public void setTotalReachedMakespan(double totalReachedMakespan) {
+        this.totalReachedMakespan = totalReachedMakespan;
     }
 
     public void setExecutionTime(long executionTime) {
@@ -64,6 +67,10 @@ public class NeighborhoodObserver implements Observer {
 
     public void addNumberOfGeneratedNeighbors(Integer value){
         numberOfGeneratedNeighborsList.add(value);
+    }
+
+    public void addReachedMakespan(Double value){
+        reachedMakespanList.add(value);
     }
 
     public void addBetterNeighborsRatio(Double value){
@@ -92,7 +99,7 @@ public class NeighborhoodObserver implements Observer {
                     .append(executions.get(i).strategyName())
                     .append("\n")
                     .append("\t--> Best makespan reached: ")
-                    .append(executions.get(i).reachedCost())
+                    .append(executions.get(i).totalReachedMakespan())
                     .append("\n")
                     .append("\t--> Executing time: ")
                     .append(executions.get(i).executionTime())
@@ -127,5 +134,25 @@ public class NeighborhoodObserver implements Observer {
         result.append("\n----------------------------------------------------------------------\n");
 
         return result.toString();
+    }
+
+    public double avgReachedCost(){
+        return executions.stream().mapToDouble(ExecutionMetrics::totalReachedMakespan).sum() / executions.size();
+    }
+
+    public double avgExecutionTime(){
+        return executions.stream().mapToDouble(ExecutionMetrics::executionTime).sum() / executions.size();
+    }
+
+    public double avgIterations(){
+        return executions.stream().mapToDouble(ExecutionMetrics::numberOfIterations).sum() / executions.size();
+    }
+
+    public double avgGeneratedNeighbors(){
+        return executions.stream().mapToDouble(ExecutionMetrics::avgGeneratedNeighbors).sum() / executions.size();
+    }
+
+    public String getStrategyName(){
+        return strategyName;
     }
 }

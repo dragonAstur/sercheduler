@@ -73,20 +73,17 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
             //If there is an improvement, record it and update the best neighbor
             if (maybeBetterNeighbor.isPresent()) {
 
-//                originalMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
-//                neighborMakespan = maybeBetterNeighbor.get().generatedSolution().getFitnessInfo().fitness().get("makespan");
-//                sumOfBetterNeighborsImprovingRatio += (originalMakespan - neighborMakespan) / originalMakespan * 100;
-
                 actualSolution = maybeBetterNeighbor.get().generatedSolution();
                 upgradeFound = true;
             }
+
+            getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         } while(upgradeFound);
 
         getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
         getObserver().setNumberOfIterations(localSearchIterations);
-        getObserver().setReachedCost(actualSolution.getFitnessInfo().fitness().get("makespan"));
-        //getObserver().setAvgNeighborsNumber(numberOfGeneratedNeighborsSum * 1.0 / localSearchIterations);
+        getObserver().setTotalReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         getObserver().executionEnded();
 

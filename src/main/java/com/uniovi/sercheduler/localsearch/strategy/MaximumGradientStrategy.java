@@ -58,11 +58,13 @@ public class MaximumGradientStrategy extends AbstractStrategy {
                 upgradeFound = true;
             }
 
+            getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+
         } while(upgradeFound);
 
         getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
         getObserver().setNumberOfIterations(localSearchIterations);
-        getObserver().setReachedCost(actualSolution.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         getObserver().executionEnded();
 
