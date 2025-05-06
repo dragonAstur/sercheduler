@@ -8,4 +8,6 @@ import java.util.List;
 public interface NeighborhoodOperatorGlobal extends Operator<SchedulePermutationSolution, List<GeneratedNeighbor>> {
 
     List<GeneratedNeighbor> execute(SchedulePermutationSolution actualSolution);
+
+    String getName();
 }

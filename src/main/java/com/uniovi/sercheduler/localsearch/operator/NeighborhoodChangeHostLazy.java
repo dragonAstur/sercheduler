@@ -49,6 +49,11 @@ public class NeighborhoodChangeHostLazy implements NeighborhoodOperatorLazy {
                 );
     }
 
+    @Override
+    public String getName() {
+        return "ChangeHost";
+    }
+
     private List<List<PlanPair>> changeOneElementHost(List<PlanPair> plan, int position) {
 
         List<List<PlanPair>> neighbors = new ArrayList<>();

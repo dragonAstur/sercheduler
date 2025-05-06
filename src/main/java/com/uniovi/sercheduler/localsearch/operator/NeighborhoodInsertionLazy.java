@@ -51,6 +51,11 @@ public class NeighborhoodInsertionLazy implements NeighborhoodOperatorLazy{
                 });
     }
 
+    @Override
+    public String getName() {
+        return "Insertion";
+    }
+
     private List<PlanPair> insertInOneSpecificPosition(List<PlanPair> plan, int position, int newPosition){
 
         List<PlanPair> newPlan = new ArrayList<>(List.copyOf(plan));

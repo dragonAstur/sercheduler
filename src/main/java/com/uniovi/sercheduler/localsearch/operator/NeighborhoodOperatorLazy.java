@@ -9,4 +9,6 @@ public interface NeighborhoodOperatorLazy extends Operator<SchedulePermutationSo
 
     Stream<GeneratedNeighbor> execute(SchedulePermutationSolution actualSolution);
 
+    String getName();
+
 }

@@ -35,4 +35,9 @@ public class NeighborhoodChangeHostGlobal implements NeighborhoodOperatorGlobal 
 
         return neighbors;
     }
+
+    @Override
+    public String getName() {
+        return "ChangeHost";
+    }
 }

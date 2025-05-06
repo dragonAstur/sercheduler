@@ -48,6 +48,11 @@ public class NeighborhoodSwapLazy implements NeighborhoodOperatorLazy{
                 });
     }
 
+    @Override
+    public String getName() {
+        return "Swap";
+    }
+
     private List<PlanPair> swapWithOneSpecificPosition(List<PlanPair> plan, int position, int newPosition)
     {
         List<PlanPair> newPlan = new ArrayList<>(List.copyOf(plan));

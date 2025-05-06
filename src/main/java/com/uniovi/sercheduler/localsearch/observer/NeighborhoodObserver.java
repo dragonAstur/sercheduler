@@ -8,6 +8,7 @@ public class NeighborhoodObserver implements Observer {
     private final List<ExecutionMetrics> executions;
 
     private final String strategyName;
+    private final String operatorName;
     private double totalReachedMakespan;
     private long executionTime;
     private int numberOfIterations;
@@ -17,8 +18,9 @@ public class NeighborhoodObserver implements Observer {
     private List<Double> allNeighborsImprovingRatioList;
     private List<Double> betterNeighborsImprovingRatioList;
 
-    public NeighborhoodObserver(String strategyName){
+    public NeighborhoodObserver(String strategyName, String operatorName){
         this.strategyName = strategyName;
+        this.operatorName = operatorName;
         this.executions = new ArrayList<>();
     }
 

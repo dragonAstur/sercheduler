@@ -32,4 +32,9 @@ public class NeighborhoodSwapHostGlobal implements NeighborhoodOperatorGlobal {
 
         return neighbors;
     }
+
+    @Override
+    public String getName() {
+        return "SwapHost";
+    }
 }

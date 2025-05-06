@@ -44,12 +44,12 @@ public class LocalSearchCommand {
 
         System.out.println("\n\nMaximum Gradient strategy\n\n");
 
-        NeighborhoodObserver observer = new NeighborhoodObserver("DHC");
-
-        MaximumGradientStrategy maximumGradientStrategy = new MaximumGradientStrategy(observer);
-
         //Here you can change the operator
         NeighborhoodOperatorGlobal globalOperator = new NeighborhoodSwapGlobal();
+
+        NeighborhoodObserver observer = new NeighborhoodObserver("DHC", globalOperator.getName());
+
+        MaximumGradientStrategy maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++)
             maximumGradientStrategy.execute(problem, globalOperator);
@@ -64,12 +64,12 @@ public class LocalSearchCommand {
 
         System.out.println("\n\nSimple Climbing strategy\n\n");
 
-        observer = new NeighborhoodObserver("HC");
-
-        SimpleClimbingStrategy simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
-
         //Here you can change the operator
         NeighborhoodOperatorLazy lazyOperator = new NeighborhoodSwapLazy();
+
+        observer = new NeighborhoodObserver("HC", lazyOperator.getName());
+
+        SimpleClimbingStrategy simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++)
             simpleClimbingStrategy.execute(problem, lazyOperator);

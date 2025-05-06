@@ -30,4 +30,9 @@ public class NeighborhoodSwapGlobal implements NeighborhoodOperatorGlobal {
 
         return neighbors;
     }
+
+    @Override
+    public String getName() {
+        return "Swap";
+    }
 }
