@@ -55,6 +55,9 @@ public class LocalSearchRunnable {
         XLSXExporter.createWorkbook("local_search_results");
         XLSXExporter.appendWorkbook(observer, "local_search_results");
 
+        CSVExporter.createCSV("local_search_results");
+        CSVExporter.appendCSV(observer, "local_search_results");
+
         System.out.println("\n\nSimple Climbing strategy\n\n");
 
         observer = new NeighborhoodObserver("HC");
@@ -71,7 +74,6 @@ public class LocalSearchRunnable {
 
         XLSXExporter.appendWorkbook(observer, "local_search_results");
 
-        CSVExporter.createCSV("local_search_results");
-
+        CSVExporter.appendCSV(observer, "local_search_results");
     }
 }

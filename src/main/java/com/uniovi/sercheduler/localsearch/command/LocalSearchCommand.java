@@ -2,6 +2,8 @@ package com.uniovi.sercheduler.localsearch.command;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
+import com.uniovi.sercheduler.localsearch.export.CSVExporter;
+import com.uniovi.sercheduler.localsearch.export.XLSXExporter;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.*;
 import com.uniovi.sercheduler.localsearch.strategy.MaximumGradientStrategy;
@@ -28,45 +30,55 @@ public class LocalSearchCommand {
 
         List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
 
+        long seed = System.nanoTime();
+
         SchedulingProblem problem =
                 new SchedulingProblem(
                         new File(workflowFile),
                         new File(hostsFile),
                         "441Gf",
                         "simple",
-                        1L,
+                        seed,
                         objectives,
                         Objective.MAKESPAN.objectiveName);
 
         System.out.println("\n\nMaximum Gradient strategy\n\n");
 
-        NeighborhoodObserver observer = new NeighborhoodObserver("Maximum gradient");
+        NeighborhoodObserver observer = new NeighborhoodObserver("DHC");
 
         MaximumGradientStrategy maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         //Here you can change the operator
         NeighborhoodOperatorGlobal globalOperator = new NeighborhoodSwapGlobal();
 
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 30; i++)
             maximumGradientStrategy.execute(problem, globalOperator);
-        }
 
         System.out.println(observer);
 
+        XLSXExporter.createWorkbook("local_search_results");
+        XLSXExporter.appendWorkbook(observer, "local_search_results");
+
+        CSVExporter.createCSV("local_search_results");
+        CSVExporter.appendCSV(observer, "local_search_results");
+
         System.out.println("\n\nSimple Climbing strategy\n\n");
 
-        observer = new NeighborhoodObserver("Simple climbing");
+        observer = new NeighborhoodObserver("HC");
 
         SimpleClimbingStrategy simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         //Here you can change the operator
         NeighborhoodOperatorLazy lazyOperator = new NeighborhoodSwapLazy();
 
-        for(int i = 0; i < 30; i++){
+        for(int i = 0; i < 30; i++)
             simpleClimbingStrategy.execute(problem, lazyOperator);
-        }
 
         System.out.println(observer);
+
+        XLSXExporter.appendWorkbook(observer, "local_search_results");
+
+        CSVExporter.appendCSV(observer, "local_search_results");
 
     }
 }
