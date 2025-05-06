@@ -35,6 +35,6 @@ public class NeighborhoodSwapHostGlobal implements NeighborhoodOperatorGlobal {
 
     @Override
     public String getName() {
-        return "SwapHost";
+        return "swap_host";
     }
 }

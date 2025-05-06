@@ -56,11 +56,11 @@ public class LocalSearchCommand {
 
         System.out.println(observer);
 
-        XLSXExporter.createWorkbook("local_search_results");
-        XLSXExporter.appendWorkbook(observer, "local_search_results");
+        XLSXExporter.createWorkbook("local_search_results_" + globalOperator.getName());
+        XLSXExporter.appendWorkbook(observer, "local_search_results_" + globalOperator.getName());
 
-        CSVExporter.createCSV("local_search_results");
-        CSVExporter.appendCSV(observer, "local_search_results");
+        CSVExporter.createCSV("local_search_results_" + globalOperator.getName());
+        CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());
 
         System.out.println("\n\nSimple Climbing strategy\n\n");
 
@@ -76,9 +76,9 @@ public class LocalSearchCommand {
 
         System.out.println(observer);
 
-        XLSXExporter.appendWorkbook(observer, "local_search_results");
+        XLSXExporter.appendWorkbook(observer, "local_search_results_" + globalOperator.getName());
 
-        CSVExporter.appendCSV(observer, "local_search_results");
+        CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());
 
     }
 }
