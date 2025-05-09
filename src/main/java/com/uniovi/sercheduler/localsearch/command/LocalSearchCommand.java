@@ -28,7 +28,7 @@ public class LocalSearchCommand {
             @Option(shortNames = 'H', required = true) String hostsFile,
             @Option(shortNames = 'W', required = true) String workflowFile) {
 
-        List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
+        /*List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
 
         long seed = System.nanoTime();
 
@@ -78,7 +78,7 @@ public class LocalSearchCommand {
 
         XLSXExporter.appendWorkbook(observer, "local_search_results_" + globalOperator.getName());
 
-        CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());
+        CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());*/
 
     }
 }

@@ -101,7 +101,7 @@ public class NeighborhoodObserver implements Observer {
                     .append(executions.get(i).strategyName())
                     .append("\n")
                     .append("\t--> Best makespan reached: ")
-                    .append(executions.get(i).totalReachedMakespan())
+                    .append(executions.get(i).bestReachedMakespan())
                     .append("\n")
                     .append("\t--> Executing time: ")
                     .append(executions.get(i).executionTime())
@@ -139,7 +139,7 @@ public class NeighborhoodObserver implements Observer {
     }
 
     public double avgReachedCost(){
-        return executions.stream().mapToDouble(ExecutionMetrics::totalReachedMakespan).sum() / executions.size();
+        return executions.stream().mapToDouble(ExecutionMetrics::bestReachedMakespan).sum() / executions.size();
     }
 
     public double avgExecutionTime(){
@@ -156,5 +156,24 @@ public class NeighborhoodObserver implements Observer {
 
     public String getStrategyName(){
         return strategyName;
+    }
+
+    public double getWorstReachedMakespan(){
+        return executions.stream().mapToDouble(ExecutionMetrics::worstReachedMakespan).max().orElse(-1);
+    }
+
+    public double getBestReachedMakespan(){
+        return executions.stream().mapToDouble(ExecutionMetrics::bestReachedMakespan).min().orElse(-1);
+    }
+
+    public double standardDeviation(){
+
+        final double avgReachedMakespan = avgReachedCost();
+
+        return Math.sqrt(
+                executions.stream()
+                .mapToDouble(ExecutionMetrics::bestReachedMakespan)
+                .map(makespan -> Math.pow(makespan - avgReachedMakespan, 2)).sum() / executions.size()
+            );
     }
 }

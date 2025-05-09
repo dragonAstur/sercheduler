@@ -5,10 +5,7 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.export.CSVExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXExporter;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
-import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
-import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
-import com.uniovi.sercheduler.localsearch.operator.NeighborhoodSwapGlobal;
-import com.uniovi.sercheduler.localsearch.operator.NeighborhoodSwapLazy;
+import com.uniovi.sercheduler.localsearch.operator.*;
 import com.uniovi.sercheduler.localsearch.strategy.MaximumGradientStrategy;
 import com.uniovi.sercheduler.localsearch.strategy.SimpleClimbingStrategy;
 
@@ -41,7 +38,7 @@ public class LocalSearchRunnable {
         System.out.println("\n\nMaximum Gradient strategy\n\n");
 
         //Here you can change the operator
-        NeighborhoodOperatorGlobal globalOperator = new NeighborhoodSwapGlobal();
+        NeighborhoodOperatorGlobal globalOperator = new NeighborhoodSwapHostGlobal();
 
         NeighborhoodObserver observer = new NeighborhoodObserver("DHC", globalOperator.getName());
 
@@ -61,7 +58,7 @@ public class LocalSearchRunnable {
         System.out.println("\n\nSimple Climbing strategy\n\n");
 
         //Here you can change the operator
-        NeighborhoodOperatorLazy lazyOperator = new NeighborhoodSwapLazy();
+        NeighborhoodOperatorLazy lazyOperator = new NeighborhoodSwapHostLazy();
 
         observer = new NeighborhoodObserver("HC", lazyOperator.getName());
 

@@ -1,13 +1,7 @@
 package com.uniovi.sercheduler.localsearch.export;
 
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -109,7 +103,7 @@ public class CSVExporter {
             for(int i = 0; i < observer.getExecutions().size(); i++) {
                 newLine.append(observer.getExecutions().get(i).strategyName())
                         .append(";")
-                        .append(observer.getExecutions().get(i).totalReachedMakespan())
+                        .append(observer.getExecutions().get(i).bestReachedMakespan())
                         .append(";")
                         .append(observer.getExecutions().get(i).executionTime())
                         .append(";")

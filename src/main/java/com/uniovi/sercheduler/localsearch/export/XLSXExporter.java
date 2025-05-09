@@ -97,6 +97,9 @@ public class XLSXExporter {
         row.createCell(2).setCellValue(observer.avgExecutionTime());
         row.createCell(3).setCellValue(observer.avgIterations());
         row.createCell(4).setCellValue(observer.avgGeneratedNeighbors());
+        row.createCell(5).setCellValue(observer.getBestReachedMakespan());
+        row.createCell(6).setCellValue(observer.getWorstReachedMakespan());
+        row.createCell(7).setCellValue(observer.standardDeviation());
     }
 
     private static void appendDataSheet(Workbook workbook, NeighborhoodObserver observer) {
@@ -110,7 +113,7 @@ public class XLSXExporter {
             Row row = sheet.createRow(rowCounter + i);
             row.createCell(0).setCellValue(observer.getExecutions().get(i).strategyName());
             row.createCell(1).setCellValue(i + 1);
-            row.createCell(2).setCellValue(observer.getExecutions().get(i).totalReachedMakespan());
+            row.createCell(2).setCellValue(observer.getExecutions().get(i).bestReachedMakespan());
             row.createCell(3).setCellValue(observer.getExecutions().get(i).executionTime());
             row.createCell(4).setCellValue(observer.getExecutions().get(i).numberOfIterations());
             row.createCell(5).setCellValue(observer.getExecutions().get(i).avgGeneratedNeighbors());
@@ -153,6 +156,9 @@ public class XLSXExporter {
         headerRow.createCell(2).setCellValue("Avg(Exec_Time)");
         headerRow.createCell(3).setCellValue("Avg(LS_Iters)");
         headerRow.createCell(4).setCellValue("Avg(Neighb)");
+        headerRow.createCell(5).setCellValue("Best makespan");
+        headerRow.createCell(6).setCellValue("Worst makespan");
+        headerRow.createCell(7).setCellValue("Standard deviation");
 
     }
 
