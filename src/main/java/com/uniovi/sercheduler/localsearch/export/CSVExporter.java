@@ -73,20 +73,24 @@ public class CSVExporter {
 
         try (FileWriter writer = new FileWriter(fileName + "_resume.csv", true)) {
 
-            StringBuilder newLine = new StringBuilder();
+            String newLine = observer.getStrategyName() +
+                    ";" +
+                    observer.avgReachedCost() +
+                    ";" +
+                    observer.avgExecutionTime() +
+                    ";" +
+                    observer.avgIterations() +
+                    ";" +
+                    observer.avgGeneratedNeighbors() +
+                    ";" +
+                    observer.getBestReachedMakespan() +
+                    ";" +
+                    observer.getWorstReachedMakespan() +
+                    ";" +
+                    observer.standardDeviation() +
+                    "\n";
 
-            newLine.append(observer.getStrategyName())
-                    .append(";")
-                    .append(observer.avgReachedCost())
-                    .append(";")
-                    .append(observer.avgExecutionTime())
-                    .append(";")
-                    .append(observer.avgIterations())
-                    .append(";")
-                    .append(observer.avgGeneratedNeighbors())
-                    .append("\n");
-
-            writer.write(newLine.toString());
+            writer.write(newLine);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -140,28 +144,32 @@ public class CSVExporter {
 
         try (FileWriter writer = new FileWriter(fileName + "_detail.csv", false)) {
 
-            StringBuilder newLine = new StringBuilder();
+            String newLine = "Experiment" +
+                    ";" +
+                    "Run number" +
+                    ";" +
+                    "Iteration number" +
+                    ";" +
+                    "Best makespan reached" +
+                    ";" +
+                    "Improvement ratio with respect to last iteration" +
+                    ";" +
+                    "Generated neighbors" +
+                    ";" +
+                    "Average percentage of neighbors that outperform their source solution" +
+                    ";" +
+                    "Average improvement ratio from all neighbors" +
+                    ";" +
+                    "Average improvement ratio from neighbors that outperform their source solution" +
+                    ";" +
+                    "Best makespan" +
+                    ";" +
+                    "Worst makespan" +
+                    ";" +
+                    "Standard deviation" +
+                    "\n";
 
-            newLine.append("Experiment")
-                    .append(";")
-                    .append("Run number")
-                    .append(";")
-                    .append("Iteration number")
-                    .append(";")
-                    .append("Best makespan reached")
-                    .append(";")
-                    .append("Improvement ratio with respect to last iteration")
-                    .append(";")
-                    .append("Generated neighbors")
-                    .append(";")
-                    .append("Average percentage of neighbors that outperform their source solution")
-                    .append(";")
-                    .append("Average improvement ratio from all neighbors")
-                    .append(";")
-                    .append("Average improvement ratio from neighbors that outperform their source solution")
-                    .append("\n");
-
-            writer.write(newLine.toString());
+            writer.write(newLine);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -173,20 +181,18 @@ public class CSVExporter {
 
         try (FileWriter writer = new FileWriter(fileName + "_resume.csv", false)) {
 
-            StringBuilder newLine = new StringBuilder();
+            String newLine = "Method" +
+                    ";" +
+                    "Avg(Best_Mkp)" +
+                    ";" +
+                    "Avg(Exec_Time)" +
+                    ";" +
+                    "Avg(LS_Iters)" +
+                    ";" +
+                    "Avg(Neighb)" +
+                    "\n";
 
-            newLine.append("Method")
-                    .append(";")
-                    .append("Avg(Best_Mkp)")
-                    .append(";")
-                    .append("Avg(Exec_Time)")
-                    .append(";")
-                    .append("Avg(LS_Iters)")
-                    .append(";")
-                    .append("Avg(Neighb)")
-                    .append("\n");
-
-            writer.write(newLine.toString());
+            writer.write(newLine);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -198,28 +204,26 @@ public class CSVExporter {
 
         try (FileWriter writer = new FileWriter(fileName + "_data.csv", false)) {
 
-            StringBuilder newLine = new StringBuilder();
+            String newLine = "Method" +
+                    ";" +
+                    "Run number" +
+                    ";" +
+                    "Best makespan reached" +
+                    ";" +
+                    "Executing time" +
+                    ";" +
+                    "Number of local search iterations" +
+                    ";" +
+                    "Average generated neighbors" +
+                    ";" +
+                    "Average percentage of neighbors that outperform their source solution" +
+                    ";" +
+                    "Average improvement ratio from all neighbors" +
+                    ";" +
+                    "Average improvement ratio from neighbors that outperform their source solution" +
+                    "\n";
 
-            newLine.append("Method")
-                    .append(";")
-                    .append("Run number")
-                    .append(";")
-                    .append("Best makespan reached")
-                    .append(";")
-                    .append("Executing time")
-                    .append(";")
-                    .append("Number of local search iterations")
-                    .append(";")
-                    .append("Average generated neighbors")
-                    .append(";")
-                    .append("Average percentage of neighbors that outperform their source solution")
-                    .append(";")
-                    .append("Average improvement ratio from all neighbors")
-                    .append(";")
-                    .append("Average improvement ratio from neighbors that outperform their source solution")
-                    .append("\n");
-
-            writer.write(newLine.toString());
+            writer.write(newLine);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
