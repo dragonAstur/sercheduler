@@ -9,6 +9,8 @@ import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 import com.uniovi.sercheduler.service.FitnessInfo;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MaximumGradientStrategy extends AbstractStrategy {
@@ -46,6 +48,65 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
             //Generate new neighbors
             neighborsList = neighborhoodOperator.execute(actualSolution);
+
+            getObserver().addNumberOfGeneratedNeighbors( neighborsList.size() );
+
+            //Take the best one
+            bestNeighbor = selectBestNeighbor(actualSolution, neighborsList, evaluator);
+
+            //If there is an improvement, record it and update the best neighbor
+            if(bestNeighbor.getFitnessInfo().fitness().get("makespan") < actualSolution.getFitnessInfo().fitness().get("makespan")){
+                actualSolution = bestNeighbor;
+                upgradeFound = true;
+            }
+
+            getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+
+        } while(upgradeFound);
+
+        getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
+        getObserver().setNumberOfIterations(localSearchIterations);
+        getObserver().setTotalReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+
+        getObserver().executionEnded();
+
+        return actualSolution;
+    }
+
+    public SchedulePermutationSolution execute(SchedulingProblem problem, List<NeighborhoodOperatorGlobal> neighborhoodOperatorList){
+
+        getObserver().executionStarted();
+        int localSearchIterations = 0;
+        long startingTime = System.currentTimeMillis();
+
+        //Generate an inicial random solution
+        SchedulePermutationSolution actualSolution = problem.createSolution();
+
+        //Evaluate this new created solution (this step is skipped in the pseudocode)
+        FitnessCalculatorSimple fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
+        FitnessInfo fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
+        actualSolution.setFitnessInfo(fitnessInfo);
+
+        //Initialize the control variable, a variable for storing their neighbors and an incremental evaluator
+        boolean upgradeFound;
+        List<GeneratedNeighbor> neighborsList;
+        SchedulePermutationSolution bestNeighbor;
+        LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
+
+        do{
+
+            localSearchIterations++;
+
+            upgradeFound = false;
+
+            //Generate new neighbors
+            neighborsList = new ArrayList<>();
+
+            for(NeighborhoodOperatorGlobal neighborhoodOperator : neighborhoodOperatorList){
+                neighborsList.addAll(
+                    neighborhoodOperator.execute(actualSolution)
+                );
+            }
 
             getObserver().addNumberOfGeneratedNeighbors( neighborsList.size() );
 
