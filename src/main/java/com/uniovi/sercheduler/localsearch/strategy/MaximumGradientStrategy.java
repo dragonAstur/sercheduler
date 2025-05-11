@@ -132,6 +132,146 @@ public class MaximumGradientStrategy extends AbstractStrategy {
         return actualSolution;
     }
 
+    public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorGlobal neighborhoodOperator, Long limitTime){
+
+        getObserver().executionStarted();
+
+        long startingTime = System.currentTimeMillis();
+
+        SchedulePermutationSolution totalBestNeighbor = null;
+
+        SchedulePermutationSolution actualSolution;
+        FitnessCalculatorSimple fitnessCalculator;
+        FitnessInfo fitnessInfo;
+
+        //Initialize the control variable, a variable for storing their neighbors and a
+        boolean upgradeFound;
+        List<GeneratedNeighbor> neighborsList;
+        SchedulePermutationSolution bestNeighborInThisStart;
+
+        LocalsearchEvaluator evaluator;
+
+        do {
+
+            //Generate an inicial random solution
+            actualSolution = problem.createSolution();
+
+            //Evaluate this new created solution (this step is skipped in the pseudocode)
+            fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
+            fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
+            actualSolution.setFitnessInfo(fitnessInfo);
+
+            //If it is the first time, initialize the total best neighbor variable
+            if(totalBestNeighbor == null)
+                totalBestNeighbor = actualSolution;
+
+            evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
+
+            do {
+
+                upgradeFound = false;
+
+                //Generate new neighbors
+                neighborsList = neighborhoodOperator.execute(actualSolution);
+
+                //Take the best one
+                bestNeighborInThisStart = selectBestNeighbor(actualSolution, neighborsList, evaluator);
+
+                //If there is an improvement, record it and update the best neighbor in this start
+                if (bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") < actualSolution.getFitnessInfo().fitness().get("makespan")) {
+
+                    actualSolution = bestNeighborInThisStart;
+                    upgradeFound = true;
+
+                }
+
+            } while(upgradeFound);
+
+            if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
+                totalBestNeighbor = actualSolution;
+
+        } while(System.currentTimeMillis() - startingTime < limitTime);
+
+        getObserver().setTotalReachedMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
+
+        getObserver().executionEnded();
+
+        return totalBestNeighbor;
+    }
+
+    public SchedulePermutationSolution execute(SchedulingProblem problem, List<NeighborhoodOperatorGlobal> neighborhoodOperatorList, Long limitTime){
+
+        getObserver().executionStarted();
+
+        long startingTime = System.currentTimeMillis();
+
+        SchedulePermutationSolution totalBestNeighbor = null;
+
+        SchedulePermutationSolution actualSolution;
+        FitnessCalculatorSimple fitnessCalculator;
+        FitnessInfo fitnessInfo;
+
+        //Initialize the control variable, a variable for storing their neighbors and a
+        boolean upgradeFound;
+        List<GeneratedNeighbor> neighborsList;
+        SchedulePermutationSolution bestNeighborInThisStart;
+
+        LocalsearchEvaluator evaluator;
+
+        do {
+
+            //Generate an inicial random solution
+            actualSolution = problem.createSolution();
+
+            //Evaluate this new created solution (this step is skipped in the pseudocode)
+            fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
+            fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
+            actualSolution.setFitnessInfo(fitnessInfo);
+
+            //If it is the first time, initialize the total best neighbor variable
+            if(totalBestNeighbor == null)
+                totalBestNeighbor = actualSolution;
+
+            evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
+
+            do {
+
+                upgradeFound = false;
+
+                //Generate new neighbors
+                neighborsList = new ArrayList<>();
+
+                for(NeighborhoodOperatorGlobal neighborhoodOperator : neighborhoodOperatorList){
+                    neighborsList.addAll(
+                            neighborhoodOperator.execute(actualSolution)
+                    );
+                }
+
+                //Take the best one
+                bestNeighborInThisStart = selectBestNeighbor(actualSolution, neighborsList, evaluator);
+
+                //If there is an improvement, record it and update the best neighbor in this start
+                if (bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") < actualSolution.getFitnessInfo().fitness().get("makespan")) {
+
+                    actualSolution = bestNeighborInThisStart;
+                    upgradeFound = true;
+
+                }
+
+            } while(upgradeFound);
+
+            if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
+                totalBestNeighbor = actualSolution;
+
+        } while(System.currentTimeMillis() - startingTime < limitTime);
+
+        getObserver().setTotalReachedMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
+
+        getObserver().executionEnded();
+
+        return totalBestNeighbor;
+    }
+
     private SchedulePermutationSolution selectBestNeighbor(SchedulePermutationSolution originalSolution, List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator) {
 
         SchedulePermutationSolution bestSolution = originalSolution;
@@ -176,5 +316,4 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         return bestSolution;
     }
-
 }

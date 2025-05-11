@@ -23,6 +23,9 @@ public class LocalSearchRunnable {
 
         List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
 
+        String[] instancePath = WORFLOWFILE.split("/");
+        String instanceName = instancePath[instancePath.length-1];
+
         long seed = System.nanoTime();
 
         SchedulingProblem problem =
@@ -35,12 +38,18 @@ public class LocalSearchRunnable {
                         objectives,
                         Objective.MAKESPAN.objectiveName);
 
+
+
+
+
+
+
         System.out.println("\n\nMaximum Gradient strategy\n\n");
 
         //Here you can change the operator
         NeighborhoodOperatorGlobal globalOperator = new NeighborhoodSwapHostGlobal();
 
-        NeighborhoodObserver observer = new NeighborhoodObserver("DHC", globalOperator.getName());
+        NeighborhoodObserver observer = new NeighborhoodObserver("DHC", instanceName);
 
         MaximumGradientStrategy maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
@@ -55,12 +64,20 @@ public class LocalSearchRunnable {
         CSVExporter.createCSV("local_search_results_" + globalOperator.getName());
         CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());
 
+
+
+
+
+
+
+
+
         System.out.println("\n\nSimple Climbing strategy\n\n");
 
         //Here you can change the operator
         NeighborhoodOperatorLazy lazyOperator = new NeighborhoodSwapHostLazy();
 
-        observer = new NeighborhoodObserver("HC", lazyOperator.getName());
+        observer = new NeighborhoodObserver("HC", instanceName);
 
         SimpleClimbingStrategy simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
