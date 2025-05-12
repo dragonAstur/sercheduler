@@ -98,13 +98,13 @@ public class LocalSearchRunnable {
 
         final String fileName = "operators_experiment_results";
 
-        XLSXTableExporter.createWorkbook(fileName);
-        XLSXTableExporter.createInstanceSheet(fileName, instanceName);
+        /*XLSXTableExporter.createWorkbook(fileName);
+        XLSXTableExporter.createInstanceSheet(fileName, instanceName);*/
 
 
 
 
-        /*System.out.println("\n\nDHC | N1 operator\n\n");
+        System.out.println("\n\nDHC | N1 operator\n\n");
 
         globalOperator = new NeighborhoodChangeHostGlobal(problem.getInstanceData());
         observer = new NeighborhoodObserver("DHC", instanceName);
@@ -163,12 +163,12 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
         }
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N4");*/
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N4");
 
 
 
 
-        /*System.out.println("\n\nDHC | N1 U N2 operator\n\n");
+        System.out.println("\n\nDHC | N1 U N2 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
@@ -221,7 +221,7 @@ public class LocalSearchRunnable {
         }
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N4");
-*/
+
 
 
 
@@ -382,6 +382,22 @@ public class LocalSearchRunnable {
 
 
         System.out.println("\n\nDHC | VNS (random choice) operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                new NeighborhoodInsertionGlobal(),
+                new NeighborhoodSwapGlobal(),
+                new NeighborhoodSwapHostGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.executeVNS(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "VNS (random choice)");
 
 
 
@@ -666,6 +682,21 @@ public class LocalSearchRunnable {
 
 
         System.out.println("\n\nHC | VNS (random choice) operator\n\n");
+        lazyOperatorList = List.of(
+                new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                new NeighborhoodInsertionLazy(),
+                new NeighborhoodSwapLazy(),
+                new NeighborhoodSwapHostLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.executeVNS(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "VNS (random choice)");
 
     }
 }
