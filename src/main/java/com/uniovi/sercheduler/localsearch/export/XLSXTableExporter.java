@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -26,7 +27,7 @@ public class XLSXTableExporter {
 
     }
 
-    private static void createInstanceSheet(String fileName, String instanceName){
+    public static void createInstanceSheet(String fileName, String instanceName){
 
         try (Workbook workbook = new XSSFWorkbook()) {
 
@@ -55,11 +56,11 @@ public class XLSXTableExporter {
 
     }
 
-    private static void appendInstanceSheet(String fileName, String instanceName, NeighborhoodObserver observer, String operatorLabel){
+    public static void appendInstanceSheet(String fileName, String instanceName, NeighborhoodObserver observer, String operatorLabel){
 
-        try (Workbook workbook = new XSSFWorkbook()) {
+        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
 
-            Sheet sheet = workbook.createSheet(instanceName);
+            Sheet sheet = workbook.getSheet(instanceName);
 
             Row row = sheet.createRow( sheet.getLastRowNum() + 1 );
 
@@ -70,9 +71,9 @@ public class XLSXTableExporter {
                 row.createCell(i+1).setCellValue(observer.getExecutions().get(i-1).bestReachedMakespan());
 
             row.createCell(32).setCellValue("");
-            row.createCell(33).setCellValue(observer.getWorstReachedMakespan());
+            row.createCell(33).setCellValue(observer.getBestReachedMakespan());
             row.createCell(34).setCellValue(observer.avgReachedCost());
-            row.createCell(35).setCellValue(observer.getBestReachedMakespan());
+            row.createCell(35).setCellValue(observer.getWorstReachedMakespan());
             row.createCell(36).setCellValue(observer.standardDeviation());
 
             // Write the workbook to a file

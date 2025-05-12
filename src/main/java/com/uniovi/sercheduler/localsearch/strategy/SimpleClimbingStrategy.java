@@ -12,7 +12,6 @@ import com.uniovi.sercheduler.service.FitnessInfo;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -86,7 +85,7 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
         getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
         getObserver().setNumberOfIterations(localSearchIterations);
-        getObserver().setTotalReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         getObserver().executionEnded();
 
@@ -163,7 +162,7 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
         getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
         getObserver().setNumberOfIterations(localSearchIterations);
-        getObserver().setTotalReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         getObserver().executionEnded();
 
@@ -178,6 +177,7 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
         long startingTime = System.currentTimeMillis();
 
         SchedulePermutationSolution totalBestNeighbor = null;
+        double totalWorstMakespan = -1;
 
         SchedulePermutationSolution actualSolution;
         FitnessCalculatorSimple fitnessCalculator;
@@ -235,11 +235,14 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
             if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                 totalBestNeighbor = actualSolution;
+            else if(actualSolution.getFitnessInfo().fitness().get("makespan") > totalWorstMakespan)
+                totalWorstMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
 
         } while(System.currentTimeMillis() - startingTime < limitTime);
 
 
-        getObserver().setTotalReachedMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalWorstMakespan(totalWorstMakespan);
 
         getObserver().executionEnded();
 
@@ -254,6 +257,7 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
         long startingTime = System.currentTimeMillis();
 
         SchedulePermutationSolution totalBestNeighbor = null;
+        double totalWorstMakespan = -1;
 
         SchedulePermutationSolution actualSolution;
         FitnessCalculatorSimple fitnessCalculator;
@@ -317,11 +321,14 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
             if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                 totalBestNeighbor = actualSolution;
+            else if(actualSolution.getFitnessInfo().fitness().get("makespan") > totalWorstMakespan)
+                totalWorstMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
 
         } while(System.currentTimeMillis() - startingTime < limitTime);
 
 
-        getObserver().setTotalReachedMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalWorstMakespan(totalWorstMakespan);
 
         getObserver().executionEnded();
 

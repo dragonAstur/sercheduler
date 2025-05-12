@@ -10,7 +10,6 @@ import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 import com.uniovi.sercheduler.service.FitnessInfo;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MaximumGradientStrategy extends AbstractStrategy {
@@ -66,7 +65,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
         getObserver().setNumberOfIterations(localSearchIterations);
-        getObserver().setTotalReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         getObserver().executionEnded();
 
@@ -125,7 +124,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
         getObserver().setNumberOfIterations(localSearchIterations);
-        getObserver().setTotalReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         getObserver().executionEnded();
 
@@ -139,6 +138,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
         long startingTime = System.currentTimeMillis();
 
         SchedulePermutationSolution totalBestNeighbor = null;
+        double totalWorstMakespan = -1;
 
         SchedulePermutationSolution actualSolution;
         FitnessCalculatorSimple fitnessCalculator;
@@ -189,10 +189,13 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
             if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                 totalBestNeighbor = actualSolution;
+            else if(actualSolution.getFitnessInfo().fitness().get("makespan") > totalWorstMakespan)
+                totalWorstMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
 
         } while(System.currentTimeMillis() - startingTime < limitTime);
 
-        getObserver().setTotalReachedMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalWorstMakespan(totalWorstMakespan);
 
         getObserver().executionEnded();
 
@@ -206,6 +209,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
         long startingTime = System.currentTimeMillis();
 
         SchedulePermutationSolution totalBestNeighbor = null;
+        double totalWorstMakespan = -1;
 
         SchedulePermutationSolution actualSolution;
         FitnessCalculatorSimple fitnessCalculator;
@@ -262,10 +266,13 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
             if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                 totalBestNeighbor = actualSolution;
+            else if(actualSolution.getFitnessInfo().fitness().get("makespan") > totalWorstMakespan)
+                totalWorstMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
 
         } while(System.currentTimeMillis() - startingTime < limitTime);
 
-        getObserver().setTotalReachedMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
+        getObserver().setTotalWorstMakespan(totalWorstMakespan);
 
         getObserver().executionEnded();
 

@@ -9,7 +9,8 @@ public class NeighborhoodObserver implements Observer {
 
     private final String strategyName;
     private final String instanceName;
-    private double totalReachedMakespan;
+    private double totalBestMakespan;
+    private double totalWorstMakespan;
     private long executionTime;
     private int numberOfIterations;
     private List<Integer> numberOfGeneratedNeighborsList;
@@ -32,7 +33,7 @@ public class NeighborhoodObserver implements Observer {
         executions.add(
                 new ExecutionMetrics(
                         strategyName,
-                        totalReachedMakespan,
+                        totalBestMakespan,
                         executionTime,
                         numberOfIterations,
                         new ArrayList<>(numberOfGeneratedNeighborsList),
@@ -45,7 +46,8 @@ public class NeighborhoodObserver implements Observer {
     }
 
     public void executionStarted(){
-        totalReachedMakespan = 0.0;
+        totalBestMakespan = 0.0;
+        totalWorstMakespan = 0.0;
         executionTime = 0L;
         numberOfIterations = 0;
         numberOfGeneratedNeighborsList = new ArrayList<>();
@@ -55,8 +57,12 @@ public class NeighborhoodObserver implements Observer {
         betterNeighborsImprovingRatioList = new ArrayList<>();
     }
 
-    public void setTotalReachedMakespan(double totalReachedMakespan) {
-        this.totalReachedMakespan = totalReachedMakespan;
+    public void setTotalBestMakespan(double totalBestMakespan) {
+        this.totalBestMakespan = totalBestMakespan;
+    }
+
+    public void setTotalWorstMakespan(double totalWorstMakespan) {
+        this.totalWorstMakespan = totalWorstMakespan;
     }
 
     public void setExecutionTime(long executionTime) {

@@ -4,6 +4,7 @@ import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.export.CSVExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXExporter;
+import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.*;
 import com.uniovi.sercheduler.localsearch.strategy.MaximumGradientStrategy;
@@ -38,11 +39,10 @@ public class LocalSearchRunnable {
                         objectives,
                         Objective.MAKESPAN.objectiveName);
 
+        operatorsExperiment(instanceName, problem, 1000L);
+    }
 
-
-
-
-
+    private static void StrategiesExperiment(String instanceName, SchedulingProblem problem) {
 
         System.out.println("\n\nMaximum Gradient strategy\n\n");
 
@@ -67,11 +67,6 @@ public class LocalSearchRunnable {
 
 
 
-
-
-
-
-
         System.out.println("\n\nSimple Climbing strategy\n\n");
 
         //Here you can change the operator
@@ -89,5 +84,588 @@ public class LocalSearchRunnable {
         XLSXExporter.appendWorkbook(observer, "local_search_results_" + globalOperator.getName());
 
         CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());
+    }
+
+    private static void operatorsExperiment(String instanceName, SchedulingProblem problem, long timeLimit){
+
+        NeighborhoodOperatorGlobal globalOperator;
+        NeighborhoodOperatorLazy lazyOperator;
+        NeighborhoodObserver observer;
+        MaximumGradientStrategy maximumGradientStrategy;
+        SimpleClimbingStrategy simpleClimbingStrategy;
+        List<NeighborhoodOperatorGlobal> globalOperatorList;
+        List<NeighborhoodOperatorLazy> lazyOperatorList;
+
+        final String fileName = "operators_experiment_results";
+
+        XLSXTableExporter.createWorkbook(fileName);
+        XLSXTableExporter.createInstanceSheet(fileName, instanceName);
+
+
+
+
+        /*System.out.println("\n\nDHC | N1 operator\n\n");
+
+        globalOperator = new NeighborhoodChangeHostGlobal(problem.getInstanceData());
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1");
+
+
+
+
+        System.out.println("\n\nDHC | N2 operator\n\n");
+
+        globalOperator = new NeighborhoodInsertionGlobal();
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2");
+
+
+
+
+        System.out.println("\n\nDHC | N3 operator\n\n");
+
+        globalOperator = new NeighborhoodSwapGlobal();
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3");
+
+
+
+
+        System.out.println("\n\nDHC | N4 operator\n\n");
+
+        globalOperator = new NeighborhoodSwapHostGlobal();
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N4");*/
+
+
+
+
+        /*System.out.println("\n\nDHC | N1 U N2 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                new NeighborhoodInsertionGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2");
+
+
+
+
+        System.out.println("\n\nDHC | N1 U N3 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                new NeighborhoodSwapGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3");
+
+
+
+
+        System.out.println("\n\nDHC | N1 U N4 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                new NeighborhoodSwapHostGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N4");
+*/
+
+
+
+        System.out.println("\n\nDHC | N2 U N3 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodInsertionGlobal(),
+                new NeighborhoodSwapGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3");
+
+
+
+        System.out.println("\n\nDHC | N2 U N4 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodInsertionGlobal(),
+                new NeighborhoodSwapHostGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N4");
+
+
+
+
+        System.out.println("\n\nDHC | N3 U N4 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodSwapGlobal(),
+                new NeighborhoodSwapHostGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3 U N4");
+
+
+
+
+        System.out.println("\n\nDHC | N1 U N2 U N3 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                new NeighborhoodInsertionGlobal(),
+                new NeighborhoodSwapGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3");
+
+
+
+
+        System.out.println("\n\nDHC | N1 U N2 U N4 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                new NeighborhoodInsertionGlobal(),
+                new NeighborhoodSwapHostGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N4");
+
+
+
+
+        System.out.println("\n\nDHC | N1 U N3 U N4 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                new NeighborhoodSwapGlobal(),
+                new NeighborhoodSwapHostGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3 U N4");
+
+
+
+        System.out.println("\n\nDHC | N2 U N3 U N4 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodInsertionGlobal(),
+                new NeighborhoodSwapGlobal(),
+                new NeighborhoodSwapHostGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3 U N4");
+
+
+
+
+        System.out.println("\n\nDHC | N1 U N2 U N3 U N4 operator\n\n");
+
+        globalOperatorList = List.of(
+                new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                new NeighborhoodInsertionGlobal(),
+                new NeighborhoodSwapGlobal(),
+                new NeighborhoodSwapHostGlobal()
+        );
+        observer = new NeighborhoodObserver("DHC", instanceName);
+        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
+
+
+
+
+        System.out.println("\n\nDHC | VNS (random choice) operator\n\n");
+
+
+
+
+        System.out.println("\n\nHC | N1 operator\n\n");
+
+        lazyOperator = new NeighborhoodChangeHostLazy(problem.getInstanceData());
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1");
+
+
+
+
+        System.out.println("\n\nHC | N2 operator\n\n");
+
+        lazyOperator = new NeighborhoodInsertionLazy();
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2");
+
+
+
+
+        System.out.println("\n\nHC | N3 operator\n\n");
+
+        lazyOperator = new NeighborhoodSwapLazy();
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3");
+
+
+
+
+        System.out.println("\n\nHC | N4 operator\n\n");
+
+        lazyOperator = new NeighborhoodSwapHostLazy();
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N4");
+
+
+
+
+        System.out.println("\n\nHC | N1 U N2 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                new NeighborhoodInsertionLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2");
+
+
+
+
+        System.out.println("\n\nHC | N1 U N3 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                new NeighborhoodSwapLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3");
+
+
+
+
+        System.out.println("\n\nHC | N1 U N4 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                new NeighborhoodSwapHostLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N4");
+
+
+
+
+        System.out.println("\n\nHC | N2 U N3 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodInsertionLazy(),
+                new NeighborhoodSwapLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3");
+
+
+
+
+        System.out.println("\n\nHC | N2 U N4 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodInsertionLazy(),
+                new NeighborhoodSwapHostLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N4");
+
+
+
+
+        System.out.println("\n\nHC | N3 U N4 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodSwapLazy(),
+                new NeighborhoodSwapHostLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3 U N4");
+
+
+
+
+        System.out.println("\n\nHC | N1 U N2 U N3 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                new NeighborhoodInsertionLazy(),
+                new NeighborhoodSwapLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3");
+
+
+
+
+        System.out.println("\n\nHC | N1 U N2 U N4 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                new NeighborhoodInsertionLazy(),
+                new NeighborhoodSwapHostLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N4");
+
+
+
+
+        System.out.println("\n\nHC | N1 U N3 U N4 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                new NeighborhoodSwapLazy(),
+                new NeighborhoodSwapHostLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3 U N4");
+
+
+
+
+        System.out.println("\n\nHC | N2 U N3 U N4 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodInsertionLazy(),
+                new NeighborhoodSwapLazy(),
+                new NeighborhoodSwapHostLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3 U N4");
+
+
+
+
+        System.out.println("\n\nHC | N1 U N2 U N3 U N4 operator\n\n");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                new NeighborhoodInsertionLazy(),
+                new NeighborhoodSwapLazy(),
+                new NeighborhoodSwapHostLazy()
+        );
+        observer = new NeighborhoodObserver("HC", instanceName);
+        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
+
+
+
+
+        System.out.println("\n\nHC | VNS (random choice) operator\n\n");
+
     }
 }
