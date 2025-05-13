@@ -5,6 +5,7 @@ import java.util.List;
 
 public record ExecutionMetrics(String strategyName,
                                double bestReachedMakespan,
+                               double worstReachedMakespan,
                                long executionTime,
                                int numberOfIterations,
                                List<Integer> numberOfGeneratedNeighborsList,
@@ -46,10 +47,6 @@ public record ExecutionMetrics(String strategyName,
         }
 
         return result;
-    }
-
-    public double worstReachedMakespan(){
-        return reachedMakespanList.stream().mapToDouble(Double::doubleValue).max().orElse(Double.MAX_VALUE);
     }
 
 }

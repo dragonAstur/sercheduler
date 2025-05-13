@@ -17,8 +17,8 @@ public class XLSXTableExporter {
 
         try (Workbook workbook = new XSSFWorkbook()) {
 
-            createSummarySheet(fileName);
-            createBKPercentageSheet(fileName);
+            createSummarySheet(fileName, workbook);
+            createBKPercentageSheet(fileName, workbook);
 
             // Write the workbook to a file
             try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
@@ -91,64 +91,53 @@ public class XLSXTableExporter {
 
     }
 
-    private static void createSummarySheet(String fileName){
+    private static void createSummarySheet(String fileName, Workbook workbook){
 
-        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
+        Sheet sheet = workbook.createSheet("Summary");
+        Row headerRow = sheet.createRow(0);
 
-            Sheet sheet = workbook.createSheet("Summary");
-            Row headerRow = sheet.createRow(0);
+        headerRow.createCell(1).setCellValue("DHC");
+        headerRow.createCell(32).setCellValue("HC");
 
-            headerRow.createCell(1).setCellValue("DHC");
-            headerRow.createCell(32).setCellValue("HC");
+        headerRow = sheet.createRow(1);
 
-            headerRow = sheet.createRow(1);
+        headerRow.createCell(0).setCellValue("Instances");
 
-            headerRow.createCell(0).setCellValue("Instances");
+        headerRow.createCell(1).setCellValue("N1");
+        headerRow.createCell(2).setCellValue("N2");
+        headerRow.createCell(3).setCellValue("N3");
+        headerRow.createCell(4).setCellValue("N4");
+        headerRow.createCell(5).setCellValue("N1 U N2");
+        headerRow.createCell(6).setCellValue("N1 U N3");
+        headerRow.createCell(7).setCellValue("N1 U N4");
+        headerRow.createCell(8).setCellValue("N2 U N3");
+        headerRow.createCell(9).setCellValue("N2 U N4");
+        headerRow.createCell(10).setCellValue("N3 U N4");
+        headerRow.createCell(11).setCellValue("N1 U N2 U N3");
+        headerRow.createCell(12).setCellValue("N1 U N2 U N4");
+        headerRow.createCell(13).setCellValue("N1 U N3 U N4");
+        headerRow.createCell(14).setCellValue("N2 U N3 U N4");
+        headerRow.createCell(15).setCellValue("N1 U N2 U N3 U N4");
+        headerRow.createCell(16).setCellValue("VNS (random choice)");
 
-            headerRow.createCell(1).setCellValue("N1");
-            headerRow.createCell(2).setCellValue("N2");
-            headerRow.createCell(3).setCellValue("N3");
-            headerRow.createCell(4).setCellValue("N4");
-            headerRow.createCell(5).setCellValue("N1 U N2");
-            headerRow.createCell(6).setCellValue("N1 U N3");
-            headerRow.createCell(7).setCellValue("N1 U N4");
-            headerRow.createCell(8).setCellValue("N2 U N3");
-            headerRow.createCell(9).setCellValue("N2 U N4");
-            headerRow.createCell(10).setCellValue("N3 U N4");
-            headerRow.createCell(11).setCellValue("N1 U N2 U N3");
-            headerRow.createCell(12).setCellValue("N1 U N2 U N4");
-            headerRow.createCell(13).setCellValue("N1 U N3 U N4");
-            headerRow.createCell(14).setCellValue("N2 U N3 U N4");
-            headerRow.createCell(15).setCellValue("N1 U N2 U N3 U N4");
-            headerRow.createCell(16).setCellValue("VNS (random choice)");
+        headerRow.createCell(17).setCellValue("N1");
+        headerRow.createCell(18).setCellValue("N2");
+        headerRow.createCell(19).setCellValue("N3");
+        headerRow.createCell(20).setCellValue("N4");
+        headerRow.createCell(21).setCellValue("N1 U N2");
+        headerRow.createCell(22).setCellValue("N1 U N3");
+        headerRow.createCell(23).setCellValue("N1 U N4");
+        headerRow.createCell(24).setCellValue("N2 U N3");
+        headerRow.createCell(25).setCellValue("N2 U N4");
+        headerRow.createCell(26).setCellValue("N3 U N4");
+        headerRow.createCell(27).setCellValue("N1 U N2 U N3");
+        headerRow.createCell(28).setCellValue("N1 U N2 U N4");
+        headerRow.createCell(29).setCellValue("N1 U N3 U N4");
+        headerRow.createCell(30).setCellValue("N2 U N3 U N4");
+        headerRow.createCell(31).setCellValue("N1 U N2 U N3 U N4");
+        headerRow.createCell(32).setCellValue("VNS (random choice)");
 
-            headerRow.createCell(17).setCellValue("N1");
-            headerRow.createCell(18).setCellValue("N2");
-            headerRow.createCell(19).setCellValue("N3");
-            headerRow.createCell(20).setCellValue("N4");
-            headerRow.createCell(21).setCellValue("N1 U N2");
-            headerRow.createCell(22).setCellValue("N1 U N3");
-            headerRow.createCell(23).setCellValue("N1 U N4");
-            headerRow.createCell(24).setCellValue("N2 U N3");
-            headerRow.createCell(25).setCellValue("N2 U N4");
-            headerRow.createCell(26).setCellValue("N3 U N4");
-            headerRow.createCell(27).setCellValue("N1 U N2 U N3");
-            headerRow.createCell(28).setCellValue("N1 U N2 U N4");
-            headerRow.createCell(29).setCellValue("N1 U N3 U N4");
-            headerRow.createCell(30).setCellValue("N2 U N3 U N4");
-            headerRow.createCell(31).setCellValue("N1 U N2 U N3 U N4");
-            headerRow.createCell(32).setCellValue("VNS (random choice)");
-
-            headerRow.createCell(34).setCellValue("Execution time limit (milliseconds)");
-
-            // Write the workbook to a file
-            try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
-                workbook.write(outputStream);
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        headerRow.createCell(34).setCellValue("Execution time limit (milliseconds)");
 
     }
 
@@ -162,9 +151,6 @@ public class XLSXTableExporter {
             Row row = sheet.createRow(sheet.getLastRowNum() + 1);
 
             row.createCell(0).setCellValue(instanceName);
-
-            if(avgMakespanList.size() < 32)
-                throw new IllegalArgumentException("List must have at least 32 elements");
 
             for(int i = 0; i < avgMakespanList.size(); i++)
                 row.createCell(i+1).setCellValue( avgMakespanList.get(i) );
@@ -183,64 +169,53 @@ public class XLSXTableExporter {
     }
 
 
-    private static void createBKPercentageSheet(String fileName){
+    private static void createBKPercentageSheet(String fileName, Workbook workbook){
 
-        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
+        Sheet sheet = workbook.createSheet("%BK");
+        Row headerRow = sheet.createRow(0);
 
-            Sheet sheet = workbook.createSheet("%BK");
-            Row headerRow = sheet.createRow(0);
+        headerRow.createCell(1).setCellValue("DHC");
+        headerRow.createCell(32).setCellValue("HC");
 
-            headerRow.createCell(1).setCellValue("DHC");
-            headerRow.createCell(32).setCellValue("HC");
+        headerRow = sheet.createRow(1);
 
-            headerRow = sheet.createRow(1);
+        headerRow.createCell(0).setCellValue("Instances");
 
-            headerRow.createCell(0).setCellValue("Instances");
+        headerRow.createCell(1).setCellValue("N1");
+        headerRow.createCell(2).setCellValue("N2");
+        headerRow.createCell(3).setCellValue("N3");
+        headerRow.createCell(4).setCellValue("N4");
+        headerRow.createCell(5).setCellValue("N1 U N2");
+        headerRow.createCell(6).setCellValue("N1 U N3");
+        headerRow.createCell(7).setCellValue("N1 U N4");
+        headerRow.createCell(8).setCellValue("N2 U N3");
+        headerRow.createCell(9).setCellValue("N2 U N4");
+        headerRow.createCell(10).setCellValue("N3 U N4");
+        headerRow.createCell(11).setCellValue("N1 U N2 U N3");
+        headerRow.createCell(12).setCellValue("N1 U N2 U N4");
+        headerRow.createCell(13).setCellValue("N1 U N3 U N4");
+        headerRow.createCell(14).setCellValue("N2 U N3 U N4");
+        headerRow.createCell(15).setCellValue("N1 U N2 U N3 U N4");
+        headerRow.createCell(16).setCellValue("VNS (random choice)");
 
-            headerRow.createCell(1).setCellValue("N1");
-            headerRow.createCell(2).setCellValue("N2");
-            headerRow.createCell(3).setCellValue("N3");
-            headerRow.createCell(4).setCellValue("N4");
-            headerRow.createCell(5).setCellValue("N1 U N2");
-            headerRow.createCell(6).setCellValue("N1 U N3");
-            headerRow.createCell(7).setCellValue("N1 U N4");
-            headerRow.createCell(8).setCellValue("N2 U N3");
-            headerRow.createCell(9).setCellValue("N2 U N4");
-            headerRow.createCell(10).setCellValue("N3 U N4");
-            headerRow.createCell(11).setCellValue("N1 U N2 U N3");
-            headerRow.createCell(12).setCellValue("N1 U N2 U N4");
-            headerRow.createCell(13).setCellValue("N1 U N3 U N4");
-            headerRow.createCell(14).setCellValue("N2 U N3 U N4");
-            headerRow.createCell(15).setCellValue("N1 U N2 U N3 U N4");
-            headerRow.createCell(16).setCellValue("VNS (random choice)");
+        headerRow.createCell(17).setCellValue("N1");
+        headerRow.createCell(18).setCellValue("N2");
+        headerRow.createCell(19).setCellValue("N3");
+        headerRow.createCell(20).setCellValue("N4");
+        headerRow.createCell(21).setCellValue("N1 U N2");
+        headerRow.createCell(22).setCellValue("N1 U N3");
+        headerRow.createCell(23).setCellValue("N1 U N4");
+        headerRow.createCell(24).setCellValue("N2 U N3");
+        headerRow.createCell(25).setCellValue("N2 U N4");
+        headerRow.createCell(26).setCellValue("N3 U N4");
+        headerRow.createCell(27).setCellValue("N1 U N2 U N3");
+        headerRow.createCell(28).setCellValue("N1 U N2 U N4");
+        headerRow.createCell(29).setCellValue("N1 U N3 U N4");
+        headerRow.createCell(30).setCellValue("N2 U N3 U N4");
+        headerRow.createCell(31).setCellValue("N1 U N2 U N3 U N4");
+        headerRow.createCell(32).setCellValue("VNS (random choice)");
 
-            headerRow.createCell(17).setCellValue("N1");
-            headerRow.createCell(18).setCellValue("N2");
-            headerRow.createCell(19).setCellValue("N3");
-            headerRow.createCell(20).setCellValue("N4");
-            headerRow.createCell(21).setCellValue("N1 U N2");
-            headerRow.createCell(22).setCellValue("N1 U N3");
-            headerRow.createCell(23).setCellValue("N1 U N4");
-            headerRow.createCell(24).setCellValue("N2 U N3");
-            headerRow.createCell(25).setCellValue("N2 U N4");
-            headerRow.createCell(26).setCellValue("N3 U N4");
-            headerRow.createCell(27).setCellValue("N1 U N2 U N3");
-            headerRow.createCell(28).setCellValue("N1 U N2 U N4");
-            headerRow.createCell(29).setCellValue("N1 U N3 U N4");
-            headerRow.createCell(30).setCellValue("N2 U N3 U N4");
-            headerRow.createCell(31).setCellValue("N1 U N2 U N3 U N4");
-            headerRow.createCell(32).setCellValue("VNS (random choice)");
-
-            headerRow.createCell(34).setCellValue("Execution time limit (milliseconds)");
-
-            // Write the workbook to a file
-            try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
-                workbook.write(outputStream);
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        headerRow.createCell(34).setCellValue("Execution time limit (milliseconds)");
 
     }
 
@@ -253,9 +228,6 @@ public class XLSXTableExporter {
             Row row = sheet.createRow(sheet.getLastRowNum() + 1);
 
             row.createCell(0).setCellValue(instanceName);
-
-            if(bestKnownPercentageList.size() < 32)
-                throw new IllegalArgumentException("List must have at least 32 elements");
 
             for(int i = 0; i < bestKnownPercentageList.size(); i++)
                 row.createCell(i+1).setCellValue( bestKnownPercentageList.get(i) );

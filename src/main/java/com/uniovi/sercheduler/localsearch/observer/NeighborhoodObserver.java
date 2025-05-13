@@ -34,6 +34,7 @@ public class NeighborhoodObserver implements Observer {
                 new ExecutionMetrics(
                         strategyName,
                         totalBestMakespan,
+                        totalWorstMakespan,
                         executionTime,
                         numberOfIterations,
                         new ArrayList<>(numberOfGeneratedNeighborsList),
@@ -46,10 +47,10 @@ public class NeighborhoodObserver implements Observer {
     }
 
     public void executionStarted(){
-        totalBestMakespan = 0.0;
-        totalWorstMakespan = 0.0;
-        executionTime = 0L;
-        numberOfIterations = 0;
+        totalBestMakespan = -1;
+        totalWorstMakespan = -1;
+        executionTime = -1L;
+        numberOfIterations = -1;
         numberOfGeneratedNeighborsList = new ArrayList<>();
         reachedMakespanList = new ArrayList<>();
         betterNeighborsRatioList = new ArrayList<>();
