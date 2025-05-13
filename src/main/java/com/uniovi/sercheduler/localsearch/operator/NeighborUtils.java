@@ -73,4 +73,15 @@ public class NeighborUtils {
                 ).toArray();
 
     }
+
+    public static List<Double> computeBestKnownPercentageList(List<Double> bestKnownCostList){
+
+        double bestKnownCost = bestKnownCostList.stream().mapToDouble(Double::doubleValue).min().orElse(-1);
+
+        return  bestKnownCostList.stream()
+                .map(
+                     cost ->   (cost - bestKnownCost) / bestKnownCost * 100
+                ).toList();
+
+    }
 }
