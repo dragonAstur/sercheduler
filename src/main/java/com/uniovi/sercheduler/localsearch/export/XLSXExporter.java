@@ -98,7 +98,7 @@ public class XLSXExporter {
         row.createCell(3).setCellValue(observer.avgIterations());
         row.createCell(4).setCellValue(observer.avgGeneratedNeighbors());
         row.createCell(5).setCellValue(observer.getBestReachedMakespan());
-        row.createCell(6).setCellValue(observer.getWorstReachedMakespan());
+        row.createCell(6).setCellValue(observer.getBiggerBestReachedMakespan());
         row.createCell(7).setCellValue(observer.standardDeviation());
     }
 

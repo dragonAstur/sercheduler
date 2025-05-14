@@ -16,8 +16,8 @@ import java.util.List;
 
 public class LocalSearchRunnable {
 
-    public static final String WORFLOWFILE = "src/test/resources/epigenomics.json";
-    public static final String HOSTSFILE = "src/test/resources/extreme/hosts-8.json";
+    public static final String WORFLOWFILE = "src/test/resources/1000genome.json";
+    public static final String HOSTSFILE = "src/test/resources/extreme/hosts-4.json";
 
 
 
@@ -107,7 +107,7 @@ public class LocalSearchRunnable {
 
         final String fileName = "operators_experiment_results";
 
-        XLSXTableExporter.createWorkbook(fileName);
+        /*XLSXTableExporter.createWorkbook(fileName);*/
         XLSXTableExporter.createInstanceSheet(fileName, instanceName);
 
 
