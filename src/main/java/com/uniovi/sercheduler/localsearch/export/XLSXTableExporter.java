@@ -77,7 +77,7 @@ public class XLSXTableExporter {
             row.createCell(32).setCellValue("");
             row.createCell(33).setCellValue(observer.getBestReachedMakespan());
             row.createCell(34).setCellValue(observer.avgReachedCost());
-            row.createCell(35).setCellValue(observer.getWorstReachedMakespan());
+            row.createCell(35).setCellValue(observer.getBiggerBestReachedMakespan());
             row.createCell(36).setCellValue(observer.standardDeviation());
 
             // Write the workbook to a file
@@ -97,7 +97,7 @@ public class XLSXTableExporter {
         Row headerRow = sheet.createRow(0);
 
         headerRow.createCell(1).setCellValue("DHC");
-        headerRow.createCell(32).setCellValue("HC");
+        headerRow.createCell(17).setCellValue("HC");
 
         headerRow = sheet.createRow(1);
 
@@ -175,7 +175,7 @@ public class XLSXTableExporter {
         Row headerRow = sheet.createRow(0);
 
         headerRow.createCell(1).setCellValue("DHC");
-        headerRow.createCell(32).setCellValue("HC");
+        headerRow.createCell(17).setCellValue("HC");
 
         headerRow = sheet.createRow(1);
 

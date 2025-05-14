@@ -165,8 +165,8 @@ public class NeighborhoodObserver implements Observer {
         return strategyName;
     }
 
-    public double getWorstReachedMakespan(){
-        return executions.stream().mapToDouble(ExecutionMetrics::worstReachedMakespan).max().orElse(-1);
+    public double getBiggerBestReachedMakespan(){
+        return executions.stream().mapToDouble(ExecutionMetrics::bestReachedMakespan).max().orElse(-1);
     }
 
     public double getBestReachedMakespan(){
