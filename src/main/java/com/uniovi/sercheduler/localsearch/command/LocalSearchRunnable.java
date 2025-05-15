@@ -16,8 +16,8 @@ import java.util.List;
 
 public class LocalSearchRunnable {
 
-    public static final String WORFLOWFILE = "src/test/resources/1000genome.json";
-    public static final String HOSTSFILE = "src/test/resources/extreme/hosts-4.json";
+    public static final String WORFLOWFILE = "src/test/resources/soykb.json";
+    public static final String HOSTSFILE = "src/test/resources/extreme/hosts-8.json";
 
 
 

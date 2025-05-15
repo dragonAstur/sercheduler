@@ -18,6 +18,8 @@ import java.util.stream.StreamSupport;
 
 public class SimpleClimbingStrategy extends AbstractStrategy {
 
+    private final double UPGRADE_THRESHOLD = 0.01;
+
     public SimpleClimbingStrategy(NeighborhoodObserver observer) {
         super(observer);
     }
@@ -66,8 +68,9 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
                         evaluator.evaluate(finalActualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
 
-                        return neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan") <
-                                finalActualSolution.getFitnessInfo().fitness().get("makespan");
+                        return finalActualSolution.getFitnessInfo().fitness().get("makespan")
+                                - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
+                                > UPGRADE_THRESHOLD;
                     })
                     .findFirst();   //This breaks the laziness
 
@@ -143,8 +146,9 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
                         evaluator.evaluate(finalActualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
 
-                        return neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan") <
-                                finalActualSolution.getFitnessInfo().fitness().get("makespan");
+                        return finalActualSolution.getFitnessInfo().fitness().get("makespan")
+                                - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
+                                > UPGRADE_THRESHOLD;
                     })
                     .findFirst();   //This breaks the laziness
 
@@ -219,8 +223,9 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
                             evaluator.evaluate(finalActualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
 
-                            return neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan") <
-                                    finalActualSolution.getFitnessInfo().fitness().get("makespan");
+                            return finalActualSolution.getFitnessInfo().fitness().get("makespan")
+                                    - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
+                                    > UPGRADE_THRESHOLD;
                         })
                         .findFirst();   //This breaks the laziness
 
@@ -305,8 +310,9 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
                             evaluator.evaluate(finalActualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
 
-                            return neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan") <
-                                    finalActualSolution.getFitnessInfo().fitness().get("makespan");
+                            return finalActualSolution.getFitnessInfo().fitness().get("makespan")
+                                    - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
+                                    > UPGRADE_THRESHOLD;
                         })
                         .findFirst();   //This breaks the laziness
 
@@ -390,8 +396,9 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
                             evaluator.evaluate(finalActualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
 
-                            return neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan") <
-                                    finalActualSolution.getFitnessInfo().fitness().get("makespan");
+                            return finalActualSolution.getFitnessInfo().fitness().get("makespan")
+                                    - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
+                                    > UPGRADE_THRESHOLD;
                         })
                         .findFirst();   //This breaks the laziness
 

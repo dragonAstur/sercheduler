@@ -15,6 +15,7 @@ import java.util.Random;
 
 public class MaximumGradientStrategy extends AbstractStrategy {
 
+    private final double UPGRADE_THRESHOLD = 0.01;
 
     public MaximumGradientStrategy(NeighborhoodObserver observer) {
         super(observer);
@@ -55,7 +56,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
             bestNeighbor = selectBestNeighbor(actualSolution, neighborsList, evaluator);
 
             //If there is an improvement, record it and update the best neighbor
-            if(bestNeighbor.getFitnessInfo().fitness().get("makespan") < actualSolution.getFitnessInfo().fitness().get("makespan")){
+            if(actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighbor.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD){
                 actualSolution = bestNeighbor;
                 upgradeFound = true;
             }
@@ -114,7 +115,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
             bestNeighbor = selectBestNeighbor(actualSolution, neighborsList, evaluator);
 
             //If there is an improvement, record it and update the best neighbor
-            if(bestNeighbor.getFitnessInfo().fitness().get("makespan") < actualSolution.getFitnessInfo().fitness().get("makespan")){
+            if(actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighbor.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD){
                 actualSolution = bestNeighbor;
                 upgradeFound = true;
             }
@@ -179,7 +180,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
                 bestNeighborInThisStart = selectBestNeighbor(actualSolution, neighborsList, evaluator);
 
                 //If there is an improvement, record it and update the best neighbor in this start
-                if (bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") < actualSolution.getFitnessInfo().fitness().get("makespan")) {
+                if (actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD) {
 
                     actualSolution = bestNeighborInThisStart;
                     upgradeFound = true;
@@ -256,7 +257,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
                 bestNeighborInThisStart = selectBestNeighbor(actualSolution, neighborsList, evaluator);
 
                 //If there is an improvement, record it and update the best neighbor in this start
-                if (bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") < actualSolution.getFitnessInfo().fitness().get("makespan")) {
+                if (actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD) {
 
                     actualSolution = bestNeighborInThisStart;
                     upgradeFound = true;
@@ -332,7 +333,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
                 bestNeighborInThisStart = selectBestNeighbor(actualSolution, neighborsList, evaluator);
 
                 //If there is an improvement, record it and update the best neighbor in this start
-                if (bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") < actualSolution.getFitnessInfo().fitness().get("makespan")) {
+                if (actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD) {
 
                     actualSolution = bestNeighborInThisStart;
                     upgradeFound = true;
