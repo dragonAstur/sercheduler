@@ -8,4 +8,3 @@ jmetal \
 --executions 50000 \
 -C experimentConfigEnergy.json \
 --experimentPath energy
--P 150

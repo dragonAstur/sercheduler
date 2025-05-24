@@ -2,6 +2,7 @@ package com.uniovi.sercheduler.service;
 
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
+import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,15 +12,25 @@ public class FitnessCalculatorRank extends FitnessCalculatorSimple {
 
   List<Task> heftRanking;
 
+  private final ArrayList<MultiResult> evaluationsHistory;
+
   /**
    * Full constructor.
    *
    * @param instanceData Information related to the instance.
    */
-  public FitnessCalculatorRank(InstanceData instanceData) {
-    super(instanceData);
+  public FitnessCalculatorRank(InstanceData instanceData,  ArrayList<MultiResult> evaluationsHistory) {
+    super(instanceData,
+            evaluationsHistory);
 
     heftRanking = calculateHeftRanking().keySet().stream().toList();
+    this.evaluationsHistory = evaluationsHistory;
+  }
+
+  public FitnessCalculatorRank(InstanceData instanceData) {
+    super(instanceData);
+    heftRanking = calculateHeftRanking().keySet().stream().toList();
+    this.evaluationsHistory = new ArrayList<>();
   }
 
   /**
@@ -42,5 +53,9 @@ public class FitnessCalculatorRank extends FitnessCalculatorSimple {
   @Override
   public String fitnessName(){
     return "rank";
+  }
+
+  public ArrayList<MultiResult> getEvaluationsHistory() {
+    return evaluationsHistory;
   }
 }

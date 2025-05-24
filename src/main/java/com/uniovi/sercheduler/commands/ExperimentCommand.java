@@ -160,7 +160,8 @@ public class ExperimentCommand {
             fitness,
             seed,
             objectives,
-            Objective.MAKESPAN.objectiveName);
+            Objective.MAKESPAN.objectiveName
+        ,executions);
 
     Operators operators = new Operators(problem.getInstanceData(), random);
     CrossoverOperator<SchedulePermutationSolution> crossover = new ScheduleCrossover(1, operators);

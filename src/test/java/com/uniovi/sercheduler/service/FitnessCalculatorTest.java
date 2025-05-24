@@ -9,10 +9,8 @@ import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.util.UnitParser;
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.junit.jupiter.api.Test;
 
 public class FitnessCalculatorTest {
@@ -230,7 +228,8 @@ public class FitnessCalculatorTest {
                 new FitnessCalculatorSimple(instanceData),
                 new FitnessCalculatorHeft(instanceData),
                 new FitnessCalculatorRank(instanceData)),
-            Collections.emptyList());
+            Collections.emptyList(),
+                new ArrayList<>());
 
     List<PlanPair> plan =
         List.of(

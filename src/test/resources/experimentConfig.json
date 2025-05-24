@@ -1,21 +1,17 @@
 {
   "fitness": [
-    "simple",
-    "multi-energy"
-
+    "multi"
   ],
   "workflows": [
-
-    "montage-chameleon-2mass-005d-001",
-    "soykb-chameleon-10fastq-10ch-001"
+    "montage-chameleon-2mass-005d-001"
   ],
-  "minHosts": 2,
+  "minHosts": 16,
   "maxHosts": 16,
   "hostIncrement": 2,
   "referenceSpeed": "121.6Gf",
-  "independentRuns": 5,
+  "independentRuns": 3,
   "objectives": [
     "energy", "makespan"
   ],
-  "jmetalAnalysis": true
+  "jmetalAnalysis": false
 }

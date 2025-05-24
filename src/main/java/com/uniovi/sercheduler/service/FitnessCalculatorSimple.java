@@ -1,15 +1,30 @@
 package com.uniovi.sercheduler.service;
 
 import com.uniovi.sercheduler.dto.InstanceData;
+import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
 /** Implementation for calculating the makespan using DNC model. */
 public class FitnessCalculatorSimple extends FitnessCalculator {
+
+  private final ArrayList<MultiResult> evaluationsHistory;
+
+
+  public FitnessCalculatorSimple(InstanceData instanceData, ArrayList<MultiResult> evaluationsHistory) {
+    super(instanceData);
+    this.evaluationsHistory = evaluationsHistory;
+
+  }
+
   public FitnessCalculatorSimple(InstanceData instanceData) {
     super(instanceData);
+    this.evaluationsHistory = new ArrayList<>();
+
   }
 
   /**
@@ -57,6 +72,13 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
     }
 
     double energy = energyActive + energyStandBy;
+//    evaluationsHistory.add(
+//            new MultiResult(
+//                    makespan,
+//                    energy,
+//                    fitnessName(),
+//                    "any"));
+
     return new FitnessInfo(
         Map.of("makespan", makespan, "energy", energy), orderedSchedule, fitnessName());
   }
@@ -64,5 +86,9 @@ public class FitnessCalculatorSimple extends FitnessCalculator {
   @Override
   public String fitnessName() {
     return "simple";
+  }
+
+  public ArrayList<MultiResult> getEvaluationsHistory() {
+    return evaluationsHistory;
   }
 }

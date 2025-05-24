@@ -1,8 +1,10 @@
 package com.uniovi.sercheduler.commands;
 
 import com.uniovi.sercheduler.dao.Objective;
+import com.uniovi.sercheduler.jmetal.algorithm.NSGAIIBuilderMulti;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadedEvaluation;
+import com.uniovi.sercheduler.jmetal.evaluation.SequentialEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
@@ -97,8 +99,7 @@ public class ExperimentJmetalCommand {
       @Option(shortNames = 'E', defaultValue = "100000") Integer executions,
       @Option(shortNames = 'S', defaultValue = "1") Long seed,
       @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
-      @Option(shortNames = 'C' ) String experimentConfigFile,
-      @Option(shortNames = 'P', defaultValue = "1") int maxParallel) {
+      @Option(shortNames = 'C') String experimentConfigFile) {
 
     var experimentConfig = experimentConfigLoader.readFromFile(new File(experimentConfigFile));
 
@@ -116,6 +117,7 @@ public class ExperimentJmetalCommand {
     List<ExperimentProblem<SchedulePermutationSolution>> problemList = new ArrayList<>();
     List<ExperimentAlgorithm<SchedulePermutationSolution, List<SchedulePermutationSolution>>>
         algorithmList = new ArrayList<>();
+    List<SchedulingProblem> schedulingProblemList = new ArrayList<>();
 
     var objectives = experimentConfig.objectives().stream().map(Objective::of).toList();
 
@@ -133,7 +135,8 @@ public class ExperimentJmetalCommand {
                 "simple",
                 seed,
                 objectives,
-                objectives.get(0).objectiveName);
+                objectives.get(0).objectiveName,
+                executions);
 
         var experimentProblem = new ExperimentProblem<>(baseProblem);
         problemList.add(experimentProblem);
@@ -149,7 +152,9 @@ public class ExperimentJmetalCommand {
                   f,
                   seed,
                   objectives,
-                  objectives.get(0).objectiveName);
+                  objectives.get(0).objectiveName,
+                  executions);
+          schedulingProblemList.add(problem);
 
           Operators operators = new Operators(problem.getInstanceData(), random);
           CrossoverOperator<SchedulePermutationSolution> crossover =
@@ -191,7 +196,7 @@ public class ExperimentJmetalCommand {
                       .build();
             } else if (f.equals("multi")) {
               algorithm =
-                  new NSGAIIBuilder<>(problem, 50, offspringPopulationSize, crossover, mutation)
+                  new NSGAIIBuilderMulti(problem, 50, 50, crossover, mutation)
                       .setTermination(termination)
                       .setEvaluation(getEvaluator("multi", problem, objectives))
                       .build();
@@ -226,15 +231,18 @@ public class ExperimentJmetalCommand {
                 List.of(
                     new Epsilon(),
                     new Spread(),
-                    new GenerationalDistance(),
                     new PISAHypervolume(),
-                    new InvertedGenerationalDistance(),
-                    new InvertedGenerationalDistancePlus()))
+                    new InvertedGenerationalDistance()))
             .setIndependentRuns(experimentConfig.independentRuns())
-            .setNumberOfCores(maxParallel)
             .build();
     new ExecuteAlgorithms<>(experiment).run();
 
+    var problems = experiment.getProblemList();
+    problems.forEach(System.out::println);
+    var algorithms = experiment.getAlgorithmList();
+    algorithms.forEach(System.out::println);
+    // schedulingProblemList.get(0).getEvaluationsHistory().stream().filter(m ->
+    // m.objective().equals("makespan")).forEach(System.out::println);
     try {
 
       if (experimentConfig.jmetalAnalysis()) {
@@ -260,7 +268,7 @@ public class ExperimentJmetalCommand {
       String evaluator, Problem<SchedulePermutationSolution> problem, List<Objective> objectives) {
     return switch (evaluator) {
       case "simple" -> new SequentialEvaluation<>(problem);
-      case "multi" -> new MultiThreadEvaluationMulti(0, problem, objectives.get(1).objectiveName);
+      case "multi" -> new SequentialEvaluationMulti(0, problem, objectives.get(1).objectiveName);
       default -> new MultiThreadedEvaluation(0, problem);
     };
   }

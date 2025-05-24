@@ -4,15 +4,11 @@ import com.uniovi.sercheduler.dto.Host;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.dto.TaskFile;
+import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.service.support.ScheduleGap;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -80,9 +76,11 @@ public abstract class FitnessCalculator {
    *
    * @param fitness The requested fitness.
    * @param instanceData The data related to the problem.
+   * @param evaluationsHistory Contains the result of every evaluation done.
    * @return The Fitness calculator.
    */
-  public static FitnessCalculator getFitness(String fitness, InstanceData instanceData) {
+  public static FitnessCalculator getFitness(
+      String fitness, InstanceData instanceData, ArrayList<MultiResult> evaluationsHistory) {
     return switch (fitness) {
       case "simple",
           "simple-mono",
@@ -90,7 +88,7 @@ public abstract class FitnessCalculator {
           "simple-makespan-mono",
           "simple-energy",
           "simple-energy-mono" ->
-          new FitnessCalculatorSimple(instanceData);
+          new FitnessCalculatorSimple(instanceData, evaluationsHistory);
       case "heft", "heft-makespan-mono", "heft-spea2", "heft-pesa2" ->
           new FitnessCalculatorHeft(instanceData);
       case "heft-energy-active", "heft-energy-mono-active" ->
@@ -108,46 +106,50 @@ public abstract class FitnessCalculator {
       case "fvlt-me-semi-active", "fvlt-me-mono-semi-active" ->
           new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "semi-active");
 
-      case "rank", "rank-makespan", "rank-makespan-mono" -> new FitnessCalculatorRank(instanceData);
+      case "rank", "rank-makespan", "rank-makespan-mono" -> new FitnessCalculatorRank(instanceData, evaluationsHistory);
       case "multi" ->
           new FitnessCalculatorMulti(
               instanceData,
               List.of(
-                  new FitnessCalculatorSimple(instanceData),
+                  new FitnessCalculatorSimple(instanceData, new ArrayList<>(evaluationsHistory.size())),
                   new FitnessCalculatorHeft(instanceData),
-                  new FitnessCalculatorRank(instanceData)),
+                  new FitnessCalculatorRank(instanceData, new ArrayList<>(evaluationsHistory.size()))),
               List.of(
-                  new FitnessCalculatorSimple(instanceData),
+                  new FitnessCalculatorSimple(instanceData, new ArrayList<>(evaluationsHistory.size())),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active"),
                   new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active")),
-              "none");
+              "none",
+              evaluationsHistory);
 
       case "multi-makespan", "multi-makespan-mono" ->
           new FitnessCalculatorMulti(
               instanceData,
               List.of(
-                  new FitnessCalculatorSimple(instanceData),
+                  new FitnessCalculatorSimple(instanceData, new ArrayList<>(evaluationsHistory.size())),
                   new FitnessCalculatorHeft(instanceData),
-                  new FitnessCalculatorRank(instanceData)),
+                  new FitnessCalculatorRank(instanceData, new ArrayList<>(evaluationsHistory.size()))),
               Collections.emptyList(),
-              "makespan");
+              "makespan",
+              evaluationsHistory);
       case "multi-energy-no-fvlt", "multi-energy-mono-no-fvlt" ->
           new FitnessCalculatorMulti(
               instanceData,
               Collections.emptyList(),
               List.of(
-                  new FitnessCalculatorSimple(instanceData),
+                  new FitnessCalculatorSimple(instanceData, new ArrayList<>(evaluationsHistory.size())),
                   new FitnessCalculatorHeftEnergy(instanceData, "active"),
-                  new FitnessCalculatorMinEnergyUM(instanceData, "active")));
+                  new FitnessCalculatorMinEnergyUM(instanceData, "active")),
+              evaluationsHistory);
       case "multi-energy", "multi-energy-mono" ->
           new FitnessCalculatorMulti(
               instanceData,
               Collections.emptyList(),
               List.of(
-                  new FitnessCalculatorSimple(instanceData),
+                  new FitnessCalculatorSimple(instanceData, new ArrayList<>(evaluationsHistory.size())),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active"),
                   new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active")),
-              "energy");
+              "energy",
+              evaluationsHistory);
       default -> throw new IllegalStateException("Unexpected value: " + fitness);
     };
   }
@@ -156,7 +158,8 @@ public abstract class FitnessCalculator {
    * Calculates the time it takes to execute a task in each host.
    *
    * <p>The runtime from the workflow comes in second, but we don't know the flops, so we need to
-   * calculate them with a simple rule of three.
+   *
+   * <p>calculate them with a simple rule of three.
    *
    * @param referenceFlops The flops of the hardware that executed the workflow the first time.
    * @return A matrix with the time it takes to execute in each host.

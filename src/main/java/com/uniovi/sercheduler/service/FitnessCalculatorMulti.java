@@ -1,8 +1,10 @@
 package com.uniovi.sercheduler.service;
 
 import com.uniovi.sercheduler.dto.InstanceData;
+import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
-import com.uniovi.sercheduler.util.ThreadSafeStringArray;
+
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.slf4j.Logger;
@@ -13,12 +15,12 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
 
   static final Logger LOG = LoggerFactory.getLogger(FitnessCalculatorMulti.class);
 
-  ThreadSafeStringArray fitnessUsage = ThreadSafeStringArray.getInstance();
-
-  List<FitnessCalculator> fitnessCalculatorsMakespan;
-  List<FitnessCalculator> fitnessCalculatorsEnergy;
+  private final List<FitnessCalculator> fitnessCalculatorsMakespan;
+  private final List<FitnessCalculator> fitnessCalculatorsEnergy;
 
   String overrideObjective;
+
+  private final ArrayList<MultiResult> evaluationsHistory;
 
   /**
    * Basic constructor
@@ -28,22 +30,26 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
   public FitnessCalculatorMulti(
       InstanceData instanceData,
       List<FitnessCalculator> fitnessCalculatorsMakespan,
-      List<FitnessCalculator> fitnessCalculatorsEnergy) {
+      List<FitnessCalculator> fitnessCalculatorsEnergy,
+      ArrayList<MultiResult> evaluationsHistory) {
     super(instanceData);
     this.fitnessCalculatorsMakespan = fitnessCalculatorsMakespan;
     this.fitnessCalculatorsEnergy = fitnessCalculatorsEnergy;
     this.overrideObjective = "none";
+    this.evaluationsHistory = evaluationsHistory;
   }
 
   public FitnessCalculatorMulti(
       InstanceData instanceData,
       List<FitnessCalculator> fitnessCalculatorsMakespan,
       List<FitnessCalculator> fitnessCalculatorsEnergy,
-      String overrideObjective) {
+      String overrideObjective,
+      ArrayList<MultiResult> evaluationsHistory) {
     super(instanceData);
     this.fitnessCalculatorsMakespan = fitnessCalculatorsMakespan;
     this.fitnessCalculatorsEnergy = fitnessCalculatorsEnergy;
     this.overrideObjective = overrideObjective;
+    this.evaluationsHistory = evaluationsHistory;
   }
 
   /**
@@ -55,7 +61,8 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
   public FitnessInfo calculateFitness(SchedulePermutationSolution solution) {
     List<FitnessCalculator> fitnessCalculators;
 
-    if ((solution.getArbiter().equals("energy") || overrideObjective.equals("energy"))  && !overrideObjective.equals("makespan")) {
+    if ((solution.getArbiter().equals("energy") || overrideObjective.equals("energy"))
+        && !overrideObjective.equals("makespan")) {
       fitnessCalculators = fitnessCalculatorsEnergy;
     } else if (solution.getArbiter().equals("makespan") || overrideObjective.equals("makespan")) {
       fitnessCalculators = fitnessCalculatorsMakespan;
@@ -71,7 +78,12 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
             .min(Comparator.comparing(f -> f.fitness().get(objective)))
             .orElseThrow();
 
-    fitnessUsage.setValue(fitness.fitnessFunction(), fitness.fitness().get("makespan"));
+//    evaluationsHistory.add(
+//        new MultiResult(
+//            fitness.fitness().get("makespan"),
+//            fitness.fitness().get("energy"),
+//            fitness.fitnessFunction(),
+//            solution.getArbiter()));
 
     return fitness;
   }

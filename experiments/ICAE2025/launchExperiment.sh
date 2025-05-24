@@ -5,6 +5,5 @@ jmetal \
 -H hosts/ \
 -T scenario1 \
 --seed 1 \
---executions 50000 \
--C experimentConfig.json \
--P 150
+--executions 100000 \
+-C experimentConfig.json

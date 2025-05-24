@@ -2,6 +2,7 @@ package com.uniovi.sercheduler.jmetal.problem;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.dto.InstanceData;
+import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import com.uniovi.sercheduler.parser.HostFileLoader;
 import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowFileLoader;
@@ -11,6 +12,7 @@ import com.uniovi.sercheduler.service.PlanGenerator;
 import com.uniovi.sercheduler.service.PlanPair;
 import com.uniovi.sercheduler.util.UnitParser;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.uma.jmetal.problem.permutationproblem.PermutationProblem;
@@ -27,6 +29,8 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   private String name;
   private List<Objective> objectives;
   private String defaultArbiter;
+  private ArrayList<MultiResult> evaluationsHistory;
+
 
   /**
    * Full constructor.
@@ -44,15 +48,19 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
       String fitness,
       Long seed,
       List<Objective> objectives,
-      String defaultArbiter) {
+      String defaultArbiter,
+      int evaluations) {
     this.workflowLoader = new WorkflowFileLoader();
     this.hostLoader = new HostFileLoader();
     this.instanceData = loadData(workflowFile, hostsFile, referenceSpeed);
-    this.fitnessCalculator = FitnessCalculator.getFitness(fitness, instanceData);
+    this.evaluationsHistory = new ArrayList<>(evaluations);
+    this.fitnessCalculator = FitnessCalculator.getFitness(fitness, instanceData, evaluationsHistory);
     this.planGenerator = new PlanGenerator(new Random(seed), instanceData);
     this.name = "Scheduling problem";
     this.objectives = objectives;
     this.defaultArbiter = defaultArbiter;
+
+
   }
 
   /**
@@ -73,15 +81,18 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
       String fitness,
       Long seed,
       List<Objective> objectives,
-      String defaultArbiter) {
+      String defaultArbiter,
+      int evaluations) {
     this.name = name;
     this.workflowLoader = new WorkflowFileLoader();
     this.hostLoader = new HostFileLoader();
     this.instanceData = loadData(workflowFile, hostsFile, referenceSpeed);
-    this.fitnessCalculator = FitnessCalculator.getFitness(fitness, instanceData);
+    this.evaluationsHistory = new ArrayList<>(evaluations);
+    this.fitnessCalculator = FitnessCalculator.getFitness(fitness, instanceData, evaluationsHistory);
     this.planGenerator = new PlanGenerator(new Random(seed), instanceData);
     this.objectives = objectives;
     this.defaultArbiter = defaultArbiter;
+
   }
 
   /**
@@ -181,5 +192,9 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
 
   public InstanceData getInstanceData() {
     return instanceData;
+  }
+
+  public ArrayList<MultiResult> getEvaluationsHistory() {
+    return evaluationsHistory;
   }
 }
