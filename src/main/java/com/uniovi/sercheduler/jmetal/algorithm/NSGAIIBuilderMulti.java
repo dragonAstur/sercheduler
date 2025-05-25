@@ -102,7 +102,6 @@ public class NSGAIIBuilderMulti {
   }
 
   public MultiEvolutionaryAlgorithm build() {
-    System.out.println("Building NSGAII algorithm");
     return new MultiEvolutionaryAlgorithm(
         name, createInitialPopulation, evaluation, termination, selection, variation, replacement);
   }

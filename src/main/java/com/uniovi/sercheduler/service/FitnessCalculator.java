@@ -107,7 +107,7 @@ public abstract class FitnessCalculator {
           new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "semi-active");
 
       case "rank", "rank-makespan", "rank-makespan-mono" -> new FitnessCalculatorRank(instanceData, evaluationsHistory);
-      case "multi" ->
+      case "multi", "multi-double-eval" ->
           new FitnessCalculatorMulti(
               instanceData,
               List.of(

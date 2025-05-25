@@ -200,7 +200,14 @@ public class ExperimentJmetalCommand {
                       .setTermination(termination)
                       .setEvaluation(getEvaluator("multi", problem, objectives))
                       .build();
-            } else {
+            } else if (f.equals("multi-double-eval")) {
+              algorithm =
+                      new NSGAIIBuilderMulti(problem, 50, 50, crossover, mutation)
+                              .setTermination(new TerminationByEvaluations(executions * 2))
+                              .setEvaluation(getEvaluator("multi", problem, objectives))
+                              .build();
+            }
+            else {
 
               algorithm =
                   new NSGAIIBuilder<>(
