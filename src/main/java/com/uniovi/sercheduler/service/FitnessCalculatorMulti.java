@@ -78,6 +78,11 @@ public class FitnessCalculatorMulti extends FitnessCalculator {
             .min(Comparator.comparing(f -> f.fitness().get(objective)))
             .orElseThrow();
 
+    solution.setMultiResult(new MultiResult(
+            fitness.fitness().get("makespan"),
+            fitness.fitness().get("energy"),
+            fitness.fitnessFunction(),
+            solution.getArbiter()));
 //    evaluationsHistory.add(
 //        new MultiResult(
 //            fitness.fitness().get("makespan"),

@@ -2,7 +2,6 @@ package com.uniovi.sercheduler.commands;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.algorithm.NSGAIIBuilderMulti;
-import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadedEvaluation;
 import com.uniovi.sercheduler.jmetal.evaluation.SequentialEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
@@ -61,7 +60,6 @@ import org.uma.jmetal.qualityindicator.impl.Epsilon;
 import org.uma.jmetal.qualityindicator.impl.GenerationalDistance;
 import org.uma.jmetal.qualityindicator.impl.InvertedGenerationalDistance;
 import org.uma.jmetal.qualityindicator.impl.InvertedGenerationalDistancePlus;
-import org.uma.jmetal.qualityindicator.impl.NormalizedHypervolume;
 import org.uma.jmetal.qualityindicator.impl.Spread;
 import org.uma.jmetal.qualityindicator.impl.hypervolume.impl.PISAHypervolume;
 
@@ -202,12 +200,11 @@ public class ExperimentJmetalCommand {
                       .build();
             } else if (f.equals("multi-double-eval")) {
               algorithm =
-                      new NSGAIIBuilderMulti(problem, 50, 50, crossover, mutation)
-                              .setTermination(new TerminationByEvaluations(executions * 2))
-                              .setEvaluation(getEvaluator("multi", problem, objectives))
-                              .build();
-            }
-            else {
+                  new NSGAIIBuilderMulti(problem, 50, 50, crossover, mutation)
+                      .setTermination(new TerminationByEvaluations(executions * 2))
+                      .setEvaluation(getEvaluator("multi", problem, objectives))
+                      .build();
+            } else {
 
               algorithm =
                   new NSGAIIBuilder<>(
@@ -236,20 +233,15 @@ public class ExperimentJmetalCommand {
             .setReferenceFrontDirectory(experimentBaseDirectory + "/Scheduling/referenceFronts")
             .setIndicatorList(
                 List.of(
-                    new Epsilon(),
-                    new Spread(),
                     new PISAHypervolume(),
-                    new InvertedGenerationalDistance()))
+                    new InvertedGenerationalDistance(),
+                    new InvertedGenerationalDistancePlus(),
+                    new GenerationalDistance(),
+                    new Epsilon(),
+                    new Spread()))
             .setIndependentRuns(experimentConfig.independentRuns())
             .build();
     new ExecuteAlgorithms<>(experiment).run();
-
-    var problems = experiment.getProblemList();
-    problems.forEach(System.out::println);
-    var algorithms = experiment.getAlgorithmList();
-    algorithms.forEach(System.out::println);
-    // schedulingProblemList.get(0).getEvaluationsHistory().stream().filter(m ->
-    // m.objective().equals("makespan")).forEach(System.out::println);
     try {
 
       if (experimentConfig.jmetalAnalysis()) {
@@ -407,7 +399,7 @@ public class ExperimentJmetalCommand {
         writer.write(
             String.format(
                 "%s,%s,%s,%d,%f,%f,%f,%f,%f,%f,%f,%f\n",
-                executionStatistics.get(objective1).get(i).excutionName(),
+                executionStatistics.get(objective1).get(i).executionName(),
                 executionStatistics.get(objective1).get(i).algorithm(),
                 executionStatistics.get(objective1).get(i).workflow(),
                 hostsNumber,
@@ -424,5 +416,8 @@ public class ExperimentJmetalCommand {
   }
 
   private record ExecutionStat(
-      String excutionName, String workflow, String algorithm, DoubleSummaryStatistics statistics) {}
+      String executionName,
+      String workflow,
+      String algorithm,
+      DoubleSummaryStatistics statistics) {}
 }

@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.jmetal.algorithm;
 
+import com.uniovi.sercheduler.dto.analysis.GenerationInfo;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.component.algorithm.EvolutionaryAlgorithm;
@@ -13,6 +14,7 @@ import org.uma.jmetal.util.observable.Observable;
 import org.uma.jmetal.util.observable.ObservableEntity;
 import org.uma.jmetal.util.observable.impl.DefaultObservable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ public class MultiEvolutionaryAlgorithm
   private int evaluations;
   private final Observable<Map<String, Object>> observable;
   private final String name;
+  private ArrayList<GenerationInfo> generationsHistory;
 
   public MultiEvolutionaryAlgorithm(
       String name,
@@ -60,6 +63,11 @@ public class MultiEvolutionaryAlgorithm
     this.initTime = System.currentTimeMillis();
     this.population = this.createInitialPopulation.create();
     this.population = this.evaluation.evaluate(this.population);
+    this.generationsHistory = new ArrayList<>(evaluations / population.size());
+
+    // We add our first generation
+    updateGenerationsHistory();
+
     this.initProgress();
 
     while (!this.termination.isMet(this.attributes)) {
@@ -68,11 +76,62 @@ public class MultiEvolutionaryAlgorithm
           this.variation.variate(this.population, matingPopulation);
       offspringPopulation = this.evaluation.evaluate(offspringPopulation);
       this.population = this.replacement.replace(this.population, offspringPopulation);
-      // TODO Update evaluationHistory
+      updateGenerationsHistory();
       this.updateProgress();
     }
 
     this.totalComputingTime = System.currentTimeMillis() - this.initTime;
+  }
+
+  private void updateGenerationsHistory() {
+
+    double totalEnergy = 0;
+    double totalMakespan = 0;
+
+    int standardEnergy = 0;
+    int f1Energy = 0;
+    int f2Energy = 0;
+
+    int standardMakespan = 0;
+    int f1Makespan = 0;
+    int f2Makespan = 0;
+
+    int objectiveEnergy = 0;
+    int objectiveMakespan = 0;
+
+    for (var solution : this.population) {
+      if (solution.getMultiResult().objective().equals("energy")) {
+
+        switch (solution.getMultiResult().fitness()) {
+          case "simple" -> standardEnergy++;
+          case "min-energy-UM" -> f1Energy++;
+          case "fvlt-me" -> f2Energy++;
+        }
+        objectiveEnergy++;
+      } else {
+
+        switch (solution.getMultiResult().fitness()) {
+          case "simple" -> standardMakespan++;
+          case "rank" -> f1Makespan++;
+          case "heft" -> f2Makespan++;
+        }
+        objectiveMakespan++;
+      }
+      totalMakespan += solution.getMultiResult().makespan();
+      totalEnergy += solution.getMultiResult().energy();
+    }
+    generationsHistory.add(
+        new GenerationInfo(
+            totalMakespan / population().size(),
+            totalEnergy / population.size(),
+            objectiveEnergy,
+            objectiveMakespan,
+            standardEnergy,
+            f1Energy,
+            f2Energy,
+            standardMakespan,
+            f1Makespan,
+            f2Makespan));
   }
 
   protected void initProgress() {
@@ -150,5 +209,9 @@ public class MultiEvolutionaryAlgorithm
 
   public Evaluation<SchedulePermutationSolution> evaluation() {
     return this.evaluation;
+  }
+
+  public ArrayList<GenerationInfo> getGenerationsHistory() {
+    return generationsHistory;
   }
 }

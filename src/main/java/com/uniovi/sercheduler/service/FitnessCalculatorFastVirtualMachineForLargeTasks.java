@@ -92,7 +92,7 @@ public class FitnessCalculatorFastVirtualMachineForLargeTasks extends FitnessCal
 
   @Override
   public String fitnessName() {
-    return "heft-energy";
+    return "fvlt-me";
   }
 
   private EftAndAst calculateHeftTaskCostSemiActive(
