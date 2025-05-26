@@ -1,9 +1,11 @@
 {
   "fitness": [
-    "multi"
+    "multi",
+    "simple"
   ],
   "workflows": [
-    "montage-chameleon-2mass-005d-001"
+    "montage-chameleon-2mass-005d-001",
+    "montage-chameleon-2mass-01d-001"
   ],
   "minHosts": 16,
   "maxHosts": 16,
