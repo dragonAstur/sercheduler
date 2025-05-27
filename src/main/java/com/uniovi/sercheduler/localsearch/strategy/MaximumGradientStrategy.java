@@ -187,7 +187,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
                 }
 
-            } while(upgradeFound);
+            } while(upgradeFound && System.currentTimeMillis() - startingTime < limitTime);
 
             if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                 totalBestNeighbor = actualSolution;
@@ -264,7 +264,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
                 }
 
-            } while(upgradeFound);
+            } while(upgradeFound && System.currentTimeMillis() - startingTime < limitTime);
 
             if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                 totalBestNeighbor = actualSolution;
@@ -340,7 +340,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
                 }
 
-            } while(upgradeFound);
+            } while(upgradeFound && System.currentTimeMillis() - startingTime < limitTime);
 
             if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                 totalBestNeighbor = actualSolution;

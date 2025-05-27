@@ -17,7 +17,7 @@ import java.util.List;
 public class LocalSearchRunnable {
 
     public static final String WORFLOWFILE = "src/test/resources/soykb.json";
-    public static final String HOSTSFILE = "src/test/resources/extreme/hosts-8.json";
+    public static final String HOSTSFILE = "src/test/resources/extreme/hosts-4.json";
 
 
 
@@ -45,7 +45,7 @@ public class LocalSearchRunnable {
                         objectives,
                         Objective.MAKESPAN.objectiveName);
 
-        operatorsExperiment(instanceName, problem, 1000L);
+        operatorsExperiment(instanceName + "_v2", problem, 1000L);
     }
 
     private static void StrategiesExperiment(String instanceName, SchedulingProblem problem) {
