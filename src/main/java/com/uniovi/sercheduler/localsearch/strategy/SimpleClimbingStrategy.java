@@ -7,9 +7,11 @@ import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
+import com.uniovi.sercheduler.service.FitnessCalculator;
 import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 import com.uniovi.sercheduler.service.FitnessInfo;
 
+import javax.swing.plaf.IconUIResource;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -26,74 +28,11 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
     public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorLazy neighborhoodLazyOperator){
 
-        getObserver().executionStarted();
-        int localSearchIterations = 0;
-        long startingTime = System.currentTimeMillis();
+        List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList = new ArrayList<>();
 
-        //Generate an inicial random solution
-        SchedulePermutationSolution actualSolution = problem.createSolution();
+        neighborhoodLazyOperatorList.add(neighborhoodLazyOperator);
 
-        //Evaluate this new created solution (this step is skipped in the pseudocode)
-        FitnessCalculatorSimple fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-        FitnessInfo fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-        actualSolution.setFitnessInfo(fitnessInfo);
-
-        //Initialize the control variable, a variable for storing their neighbors and a
-        boolean upgradeFound;
-        Stream<GeneratedNeighbor> neighbors;
-        Optional<GeneratedNeighbor> maybeBetterNeighbor;
-        LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
-
-
-        do{
-
-            localSearchIterations++;
-
-            upgradeFound = false;
-
-            //Lazy computation of all the neighbors
-            neighbors = neighborhoodLazyOperator.execute(actualSolution);
-
-            final SchedulePermutationSolution finalActualSolution = actualSolution; //This is just for functional programming technical problems
-
-            //As we are using laziness, for counting how many neighbours have been really computed, we cannot use
-            //a variable that is no effectively final, so we use a Java class called 'AtomicInteger'
-            AtomicInteger counter = new AtomicInteger();
-
-            //Find the first neighbor that is better than the source
-            maybeBetterNeighbor = neighbors
-                    .filter(neighbor -> {
-
-                        counter.incrementAndGet();
-
-                        evaluator.evaluate(finalActualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
-
-                        return finalActualSolution.getFitnessInfo().fitness().get("makespan")
-                                - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
-                                > UPGRADE_THRESHOLD;
-                    })
-                    .findFirst();   //This breaks the laziness
-
-            getObserver().addNumberOfGeneratedNeighbors( counter.get() );
-
-            //If there is an improvement, record it and update the best neighbor
-            if (maybeBetterNeighbor.isPresent()) {
-
-                actualSolution = maybeBetterNeighbor.get().generatedSolution();
-                upgradeFound = true;
-            }
-
-            getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
-
-        } while(upgradeFound);
-
-        getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
-        getObserver().setNumberOfIterations(localSearchIterations);
-        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
-
-        getObserver().executionEnded();
-
-        return actualSolution;
+        return execute(problem, neighborhoodLazyOperatorList);
 
     }
 
@@ -103,20 +42,15 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
         int localSearchIterations = 0;
         long startingTime = System.currentTimeMillis();
 
+        FitnessCalculator fitnessCalculator = createFitnessCalculator(problem);
         //Generate an inicial random solution
-        SchedulePermutationSolution actualSolution = problem.createSolution();
-
-        //Evaluate this new created solution (this step is skipped in the pseudocode)
-        FitnessCalculatorSimple fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-        FitnessInfo fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-        actualSolution.setFitnessInfo(fitnessInfo);
+        SchedulePermutationSolution actualSolution = createInitialSolution(problem, fitnessCalculator);
+        LocalsearchEvaluator evaluator = createLocalSearchEvaluator(problem, fitnessCalculator);
 
         //Initialize the control variable, a variable for storing their neighbors and a
         boolean upgradeFound;
         Stream<GeneratedNeighbor> neighbors;
         Optional<GeneratedNeighbor> maybeBetterNeighbor;
-        LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
-        List<Supplier<Stream<GeneratedNeighbor>>> operators;
 
         do{
 
@@ -124,39 +58,20 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
             upgradeFound = false;
 
-            final SchedulePermutationSolution finalActualSolution = actualSolution; //This is just for functional programming technical problems
-
             //Lazy computation of all the neighbors
-            operators = new ArrayList<>();
-
-            for(NeighborhoodOperatorLazy neighborhoodLazyOperator : neighborhoodLazyOperatorList)
-                operators.add(() -> neighborhoodLazyOperator.execute(finalActualSolution));
-
-            neighbors = lazyRandomEvaluation(operators);
+            neighbors = generateNeighbors(neighborhoodLazyOperatorList, actualSolution);
 
             //As we are using laziness, for counting how many neighbours have been really computed, we cannot use
             //a variable that is no effectively final, so we use a Java class called 'AtomicInteger'
             AtomicInteger counter = new AtomicInteger();
 
             //Find the first neighbor that is better than the source
-            maybeBetterNeighbor = neighbors
-                    .filter(neighbor -> {
-
-                        counter.incrementAndGet();
-
-                        evaluator.evaluate(finalActualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
-
-                        return finalActualSolution.getFitnessInfo().fitness().get("makespan")
-                                - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
-                                > UPGRADE_THRESHOLD;
-                    })
-                    .findFirst();   //This breaks the laziness
+            maybeBetterNeighbor = selectBestNeighbor(actualSolution, neighbors, evaluator, counter);
 
             getObserver().addNumberOfGeneratedNeighbors( counter.get() );
 
             //If there is an improvement, record it and update the best neighbor
             if (maybeBetterNeighbor.isPresent()) {
-
                 actualSolution = maybeBetterNeighbor.get().generatedSolution();
                 upgradeFound = true;
             }
@@ -175,146 +90,64 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
     }
 
+
     public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorLazy neighborhoodLazyOperator, Long limitTime){
 
-        getObserver().executionStarted();
+        List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList = new ArrayList<>();
 
-        long startingTime = System.currentTimeMillis();
+        neighborhoodLazyOperatorList.add(neighborhoodLazyOperator);
 
-        SchedulePermutationSolution totalBestNeighbor = null;
-        double totalWorstMakespan = -1;
-
-        SchedulePermutationSolution actualSolution;
-        FitnessCalculatorSimple fitnessCalculator;
-        FitnessInfo fitnessInfo;
-
-        //Initialize the control variable, a variable for storing their neighbors and a
-        boolean upgradeFound;
-        Stream<GeneratedNeighbor> neighbors;
-        Optional<GeneratedNeighbor> maybeBetterNeighborInThisStart;
-
-        do {
-            //Generate an inicial random solution
-            actualSolution = problem.createSolution();
-
-            //Evaluate this new created solution (this step is skipped in the pseudocode)
-            fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-            fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-            actualSolution.setFitnessInfo(fitnessInfo);
-
-            //If it is the first time, initialize the total best neighbor variable
-            if(totalBestNeighbor == null)
-                totalBestNeighbor = actualSolution;
-
-            LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
-
-            do{
-
-                upgradeFound = false;
-
-                //Lazy computation of all the neighbors
-                neighbors = neighborhoodLazyOperator.execute(actualSolution);
-
-                final SchedulePermutationSolution finalActualSolution = actualSolution; //This is just for functional programming technical problems
-
-                //Find the first neighbor that is better than the source
-                maybeBetterNeighborInThisStart = neighbors
-                        .filter(neighbor -> {
-
-                            evaluator.evaluate(finalActualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
-
-                            return finalActualSolution.getFitnessInfo().fitness().get("makespan")
-                                    - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
-                                    > UPGRADE_THRESHOLD;
-                        })
-                        .findFirst();   //This breaks the laziness
-
-                //If there is an improvement, record it and update the best neighbor
-                if (maybeBetterNeighborInThisStart.isPresent()) {
-
-                    actualSolution = maybeBetterNeighborInThisStart.get().generatedSolution();
-                    upgradeFound = true;
-
-                }
-
-            } while(upgradeFound && System.currentTimeMillis() - startingTime < limitTime);
-
-            if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
-                totalBestNeighbor = actualSolution;
-            else if(actualSolution.getFitnessInfo().fitness().get("makespan") > totalWorstMakespan)
-                totalWorstMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
-
-        } while(System.currentTimeMillis() - startingTime < limitTime);
-
-
-        getObserver().setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
-        getObserver().setTotalWorstMakespan(totalWorstMakespan);
-
-        getObserver().executionEnded();
-
-        return totalBestNeighbor;
+        return execute(problem, neighborhoodLazyOperatorList, limitTime);
 
     }
 
     public SchedulePermutationSolution execute(SchedulingProblem problem, List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList, Long limitTime){
 
         getObserver().executionStarted();
-
+        int localSearchIterations = 0;
         long startingTime = System.currentTimeMillis();
 
         SchedulePermutationSolution totalBestNeighbor = null;
         double totalWorstMakespan = -1;
 
+        FitnessCalculator fitnessCalculator;
         SchedulePermutationSolution actualSolution;
-        FitnessCalculatorSimple fitnessCalculator;
-        FitnessInfo fitnessInfo;
+        LocalsearchEvaluator evaluator;
 
         //Initialize the control variable, a variable for storing their neighbors and a
         boolean upgradeFound;
         Stream<GeneratedNeighbor> neighbors;
         Optional<GeneratedNeighbor> maybeBetterNeighborInThisStart;
-        List<Supplier<Stream<GeneratedNeighbor>>> operators;
 
         do {
-            //Generate an inicial random solution
-            actualSolution = problem.createSolution();
+            //Create a fitness calculator
+            fitnessCalculator = createFitnessCalculator(problem);
 
-            //Evaluate this new created solution (this step is skipped in the pseudocode)
-            fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-            fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-            actualSolution.setFitnessInfo(fitnessInfo);
+            //Generate an inicial random solution
+            actualSolution = createInitialSolution(problem, fitnessCalculator);
 
             //If it is the first time, initialize the total best neighbor variable
             if(totalBestNeighbor == null)
                 totalBestNeighbor = actualSolution;
 
-            LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
+            evaluator = createLocalSearchEvaluator(problem, fitnessCalculator);
 
             do{
 
+                localSearchIterations++;
+
                 upgradeFound = false;
 
-                final SchedulePermutationSolution finalActualSolution = actualSolution; //This is just for functional programming technical problems
 
                 //Lazy computation of all the neighbors
-                operators = new ArrayList<>();
+                neighbors = generateNeighbors(neighborhoodLazyOperatorList, actualSolution);
 
-                for(NeighborhoodOperatorLazy neighborhoodLazyOperator : neighborhoodLazyOperatorList)
-                    operators.add(() -> neighborhoodLazyOperator.execute(finalActualSolution));
-
-                neighbors = lazyRandomEvaluation(operators);
+                //As we are using laziness, for counting how many neighbours have been really computed, we cannot use
+                //a variable that is no effectively final, so we use a Java class called 'AtomicInteger'
+                AtomicInteger counter = new AtomicInteger();
 
                 //Find the first neighbor that is better than the source
-                maybeBetterNeighborInThisStart = neighbors
-                        .filter(neighbor -> {
-
-                            evaluator.evaluate(finalActualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
-
-                            return finalActualSolution.getFitnessInfo().fitness().get("makespan")
-                                    - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
-                                    > UPGRADE_THRESHOLD;
-                        })
-                        .findFirst();   //This breaks the laziness
+                maybeBetterNeighborInThisStart = selectBestNeighbor(actualSolution, neighbors, evaluator, counter);
 
                 //If there is an improvement, record it and update the best neighbor
                 if (maybeBetterNeighborInThisStart.isPresent()) {
@@ -323,6 +156,8 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
                     upgradeFound = true;
 
                 }
+
+                getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
             } while(upgradeFound && System.currentTimeMillis() - startingTime < limitTime);
 
@@ -336,6 +171,10 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
         getObserver().setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
         getObserver().setTotalWorstMakespan(totalWorstMakespan);
+
+        getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
+        getObserver().setNumberOfIterations(localSearchIterations);
+        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         getObserver().executionEnded();
 
@@ -346,15 +185,15 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
     public SchedulePermutationSolution executeVNS(SchedulingProblem problem, List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList, Long limitTime){
 
         getObserver().executionStarted();
-
+        int localSearchIterations = 0;
         long startingTime = System.currentTimeMillis();
 
         SchedulePermutationSolution totalBestNeighbor = null;
         double totalWorstMakespan = -1;
 
+        FitnessCalculator fitnessCalculator;
         SchedulePermutationSolution actualSolution;
-        FitnessCalculatorSimple fitnessCalculator;
-        FitnessInfo fitnessInfo;
+        LocalsearchEvaluator evaluator;
 
         //Initialize the control variable, a variable for storing their neighbors and a
         boolean upgradeFound;
@@ -365,42 +204,35 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
         NeighborhoodOperatorLazy chosenOperator;
 
         do {
-            //Generate an inicial random solution
-            actualSolution = problem.createSolution();
+            //Create a fitness calculator
+            fitnessCalculator = createFitnessCalculator(problem);
 
-            //Evaluate this new created solution (this step is skipped in the pseudocode)
-            fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-            fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-            actualSolution.setFitnessInfo(fitnessInfo);
+            //Generate an inicial random solution
+            actualSolution = createInitialSolution(problem, fitnessCalculator);
 
             //If it is the first time, initialize the total best neighbor variable
             if(totalBestNeighbor == null)
                 totalBestNeighbor = actualSolution;
 
-            LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
+            evaluator = createLocalSearchEvaluator(problem, fitnessCalculator);
 
             chosenOperator = neighborhoodLazyOperatorList.get( random.nextInt(0, neighborhoodLazyOperatorList.size()) );
 
             do{
 
-                upgradeFound = false;
+                localSearchIterations++;
 
-                final SchedulePermutationSolution finalActualSolution = actualSolution; //This is just for functional programming technical problems
+                upgradeFound = false;
 
                 //Lazy computation of all the neighbors
                 neighbors = chosenOperator.execute(actualSolution);
 
+                //As we are using laziness, for counting how many neighbours have been really computed, we cannot use
+                //a variable that is no effectively final, so we use a Java class called 'AtomicInteger'
+                AtomicInteger counter = new AtomicInteger();
+
                 //Find the first neighbor that is better than the source
-                maybeBetterNeighborInThisStart = neighbors
-                        .filter(neighbor -> {
-
-                            evaluator.evaluate(finalActualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
-
-                            return finalActualSolution.getFitnessInfo().fitness().get("makespan")
-                                    - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
-                                    > UPGRADE_THRESHOLD;
-                        })
-                        .findFirst();   //This breaks the laziness
+                maybeBetterNeighborInThisStart = selectBestNeighbor(actualSolution, neighbors, evaluator, counter);
 
                 //If there is an improvement, record it and update the best neighbor
                 if (maybeBetterNeighborInThisStart.isPresent()) {
@@ -417,16 +249,41 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
             else if(actualSolution.getFitnessInfo().fitness().get("makespan") > totalWorstMakespan)
                 totalWorstMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
 
+            getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+
         } while(System.currentTimeMillis() - startingTime < limitTime);
 
 
         getObserver().setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
         getObserver().setTotalWorstMakespan(totalWorstMakespan);
 
+        getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
+        getObserver().setNumberOfIterations(localSearchIterations);
+        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+
         getObserver().executionEnded();
 
         return totalBestNeighbor;
 
+    }
+
+    private Optional<GeneratedNeighbor> selectBestNeighbor(SchedulePermutationSolution actualSolution, Stream<GeneratedNeighbor> neighbors, LocalsearchEvaluator evaluator, AtomicInteger counter) {
+        return neighbors
+                .filter(neighbor -> {
+
+                    counter.incrementAndGet();
+
+                    evaluator.evaluate(actualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
+
+                    return checkImprovement(actualSolution, neighbor);
+                })
+                .findFirst();
+    }
+
+    private boolean checkImprovement(SchedulePermutationSolution actualSolution, GeneratedNeighbor neighbor){
+        return actualSolution.getFitnessInfo().fitness().get("makespan")
+                - neighbor.generatedSolution().getFitnessInfo().fitness().get("makespan")
+                > UPGRADE_THRESHOLD;
     }
 
     private <T> Stream<T> lazyRandomEvaluation(List<Supplier<Stream<T>>> streamSuppliers) {
@@ -470,6 +327,36 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
                 Spliterators.spliteratorUnknownSize(randomizedIterator, Spliterator.ORDERED),
                 false
         );
+    }
+
+    private FitnessCalculator createFitnessCalculator(SchedulingProblem problem){
+        return new FitnessCalculatorSimple(problem.getInstanceData());
+    }
+
+    private SchedulePermutationSolution createInitialSolution(SchedulingProblem problem, FitnessCalculator fitnessCalculator){
+        SchedulePermutationSolution actualSolution = problem.createSolution();
+
+        //Evaluate this new created solution (this step is skipped in the pseudocode)
+
+        FitnessInfo fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
+        actualSolution.setFitnessInfo(fitnessInfo);
+
+        return actualSolution;
+    }
+
+    private LocalsearchEvaluator createLocalSearchEvaluator(SchedulingProblem problem, FitnessCalculator fitnessCalculator){
+
+        return new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
+    }
+
+    private Stream<GeneratedNeighbor> generateNeighbors(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList, SchedulePermutationSolution actualSolution){
+
+        List<Supplier<Stream<GeneratedNeighbor>>> operators = new ArrayList<>();
+
+        for(NeighborhoodOperatorLazy neighborhoodLazyOperator : neighborhoodLazyOperatorList)
+            operators.add(() -> neighborhoodLazyOperator.execute(actualSolution));
+
+        return lazyRandomEvaluation(operators);
     }
 
 }

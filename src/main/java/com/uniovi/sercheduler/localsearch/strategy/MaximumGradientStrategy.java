@@ -6,6 +6,7 @@ import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
+import com.uniovi.sercheduler.service.FitnessCalculator;
 import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 import com.uniovi.sercheduler.service.FitnessInfo;
 
@@ -23,55 +24,11 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
     public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorGlobal neighborhoodOperator){
 
-        getObserver().executionStarted();
-        int localSearchIterations = 0;
-        long startingTime = System.currentTimeMillis();
+        List<NeighborhoodOperatorGlobal> neighborhoodOperatorList = new ArrayList<>();
 
-        //Generate an inicial random solution
-        SchedulePermutationSolution actualSolution = problem.createSolution();
+        neighborhoodOperatorList.add(neighborhoodOperator);
 
-        //Evaluate this new created solution (this step is skipped in the pseudocode)
-        FitnessCalculatorSimple fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-        FitnessInfo fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-        actualSolution.setFitnessInfo(fitnessInfo);
-
-        //Initialize the control variable, a variable for storing their neighbors and a
-        boolean upgradeFound;
-        List<GeneratedNeighbor> neighborsList;
-        SchedulePermutationSolution bestNeighbor;
-        LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
-
-        do{
-
-            localSearchIterations++;
-
-            upgradeFound = false;
-
-            //Generate new neighbors
-            neighborsList = neighborhoodOperator.execute(actualSolution);
-
-            getObserver().addNumberOfGeneratedNeighbors( neighborsList.size() );
-
-            //Take the best one
-            bestNeighbor = selectBestNeighbor(actualSolution, neighborsList, evaluator);
-
-            //If there is an improvement, record it and update the best neighbor
-            if(actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighbor.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD){
-                actualSolution = bestNeighbor;
-                upgradeFound = true;
-            }
-
-            getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
-
-        } while(upgradeFound);
-
-        getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
-        getObserver().setNumberOfIterations(localSearchIterations);
-        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
-
-        getObserver().executionEnded();
-
-        return actualSolution;
+        return execute(problem, neighborhoodOperatorList);
     }
 
     public SchedulePermutationSolution execute(SchedulingProblem problem, List<NeighborhoodOperatorGlobal> neighborhoodOperatorList){
@@ -80,19 +37,15 @@ public class MaximumGradientStrategy extends AbstractStrategy {
         int localSearchIterations = 0;
         long startingTime = System.currentTimeMillis();
 
+        FitnessCalculator fitnessCalculator = createFitnessCalculator(problem);
         //Generate an inicial random solution
-        SchedulePermutationSolution actualSolution = problem.createSolution();
-
-        //Evaluate this new created solution (this step is skipped in the pseudocode)
-        FitnessCalculatorSimple fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-        FitnessInfo fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-        actualSolution.setFitnessInfo(fitnessInfo);
+        SchedulePermutationSolution actualSolution = createInitialSolution(problem, fitnessCalculator);
+        LocalsearchEvaluator evaluator = createLocalSearchEvaluator(problem, fitnessCalculator);
 
         //Initialize the control variable, a variable for storing their neighbors and an incremental evaluator
         boolean upgradeFound;
         List<GeneratedNeighbor> neighborsList;
         SchedulePermutationSolution bestNeighbor;
-        LocalsearchEvaluator evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
 
         do{
 
@@ -101,13 +54,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
             upgradeFound = false;
 
             //Generate new neighbors
-            neighborsList = new ArrayList<>();
-
-            for(NeighborhoodOperatorGlobal neighborhoodOperator : neighborhoodOperatorList){
-                neighborsList.addAll(
-                    neighborhoodOperator.execute(actualSolution)
-                );
-            }
+            neighborsList = generateNeighbors(neighborhoodOperatorList, actualSolution);
 
             getObserver().addNumberOfGeneratedNeighbors( neighborsList.size() );
 
@@ -115,7 +62,7 @@ public class MaximumGradientStrategy extends AbstractStrategy {
             bestNeighbor = selectBestNeighbor(actualSolution, neighborsList, evaluator);
 
             //If there is an improvement, record it and update the best neighbor
-            if(actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighbor.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD){
+            if(checkImprovement(actualSolution, bestNeighbor)){
                 actualSolution = bestNeighbor;
                 upgradeFound = true;
             }
@@ -135,134 +82,66 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
     public SchedulePermutationSolution execute(SchedulingProblem problem, NeighborhoodOperatorGlobal neighborhoodOperator, Long limitTime){
 
-        getObserver().executionStarted();
+        List<NeighborhoodOperatorGlobal> neighborhoodOperatorList = new ArrayList<>();
 
-        long startingTime = System.currentTimeMillis();
+        neighborhoodOperatorList.add(neighborhoodOperator);
 
-        SchedulePermutationSolution totalBestNeighbor = null;
-        double totalWorstMakespan = -1;
-
-        SchedulePermutationSolution actualSolution;
-        FitnessCalculatorSimple fitnessCalculator;
-        FitnessInfo fitnessInfo;
-
-        //Initialize the control variable, a variable for storing their neighbors and a
-        boolean upgradeFound;
-        List<GeneratedNeighbor> neighborsList;
-        SchedulePermutationSolution bestNeighborInThisStart;
-
-        LocalsearchEvaluator evaluator;
-
-        do {
-
-            //Generate an inicial random solution
-            actualSolution = problem.createSolution();
-
-            //Evaluate this new created solution (this step is skipped in the pseudocode)
-            fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-            fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-            actualSolution.setFitnessInfo(fitnessInfo);
-
-            //If it is the first time, initialize the total best neighbor variable
-            if(totalBestNeighbor == null)
-                totalBestNeighbor = actualSolution;
-
-            evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
-
-            do {
-
-                upgradeFound = false;
-
-                //Generate new neighbors
-                neighborsList = neighborhoodOperator.execute(actualSolution);
-
-                //Take the best one
-                bestNeighborInThisStart = selectBestNeighbor(actualSolution, neighborsList, evaluator);
-
-                //If there is an improvement, record it and update the best neighbor in this start
-                if (actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD) {
-
-                    actualSolution = bestNeighborInThisStart;
-                    upgradeFound = true;
-
-                }
-
-            } while(upgradeFound && System.currentTimeMillis() - startingTime < limitTime);
-
-            if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
-                totalBestNeighbor = actualSolution;
-            else if(actualSolution.getFitnessInfo().fitness().get("makespan") > totalWorstMakespan)
-                totalWorstMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
-
-        } while(System.currentTimeMillis() - startingTime < limitTime);
-
-        getObserver().setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
-        getObserver().setTotalWorstMakespan(totalWorstMakespan);
-
-        getObserver().executionEnded();
-
-        return totalBestNeighbor;
+        return execute(problem, neighborhoodOperatorList, limitTime);
     }
 
     public SchedulePermutationSolution execute(SchedulingProblem problem, List<NeighborhoodOperatorGlobal> neighborhoodOperatorList, Long limitTime){
 
         getObserver().executionStarted();
-
+        int localSearchIterations = 0;
         long startingTime = System.currentTimeMillis();
 
         SchedulePermutationSolution totalBestNeighbor = null;
         double totalWorstMakespan = -1;
 
+        FitnessCalculator fitnessCalculator;
         SchedulePermutationSolution actualSolution;
-        FitnessCalculatorSimple fitnessCalculator;
-        FitnessInfo fitnessInfo;
+        LocalsearchEvaluator evaluator;
 
         //Initialize the control variable, a variable for storing their neighbors and a
         boolean upgradeFound;
         List<GeneratedNeighbor> neighborsList;
         SchedulePermutationSolution bestNeighborInThisStart;
 
-        LocalsearchEvaluator evaluator;
-
         do {
 
-            //Generate an inicial random solution
-            actualSolution = problem.createSolution();
+            //Create a fitness calculator
+            fitnessCalculator = createFitnessCalculator(problem);
 
-            //Evaluate this new created solution (this step is skipped in the pseudocode)
-            fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-            fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-            actualSolution.setFitnessInfo(fitnessInfo);
+            //Generate an inicial random solution
+            actualSolution = createInitialSolution(problem, fitnessCalculator);
 
             //If it is the first time, initialize the total best neighbor variable
             if(totalBestNeighbor == null)
                 totalBestNeighbor = actualSolution;
 
-            evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
+            evaluator = createLocalSearchEvaluator(problem, fitnessCalculator);
 
             do {
+
+                localSearchIterations++;
 
                 upgradeFound = false;
 
                 //Generate new neighbors
-                neighborsList = new ArrayList<>();
-
-                for(NeighborhoodOperatorGlobal neighborhoodOperator : neighborhoodOperatorList){
-                    neighborsList.addAll(
-                            neighborhoodOperator.execute(actualSolution)
-                    );
-                }
+                neighborsList = generateNeighbors(neighborhoodOperatorList, actualSolution);
 
                 //Take the best one
                 bestNeighborInThisStart = selectBestNeighbor(actualSolution, neighborsList, evaluator);
 
                 //If there is an improvement, record it and update the best neighbor in this start
-                if (actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD) {
+                if (checkImprovement(actualSolution, bestNeighborInThisStart)) {
 
                     actualSolution = bestNeighborInThisStart;
                     upgradeFound = true;
 
                 }
+
+                getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
             } while(upgradeFound && System.currentTimeMillis() - startingTime < limitTime);
 
@@ -275,6 +154,10 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         getObserver().setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
         getObserver().setTotalWorstMakespan(totalWorstMakespan);
+
+        getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
+        getObserver().setNumberOfIterations(localSearchIterations);
+        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         getObserver().executionEnded();
 
@@ -284,61 +167,61 @@ public class MaximumGradientStrategy extends AbstractStrategy {
     public SchedulePermutationSolution executeVNS(SchedulingProblem problem, List<NeighborhoodOperatorGlobal> neighborhoodOperatorList, Long limitTime){
 
         getObserver().executionStarted();
-
+        int localSearchIterations = 0;
         long startingTime = System.currentTimeMillis();
 
         SchedulePermutationSolution totalBestNeighbor = null;
         double totalWorstMakespan = -1;
 
+        FitnessCalculator fitnessCalculator;
         SchedulePermutationSolution actualSolution;
-        FitnessCalculatorSimple fitnessCalculator;
-        FitnessInfo fitnessInfo;
+        LocalsearchEvaluator evaluator;
 
         //Initialize the control variable, a variable for storing their neighbors and a
         boolean upgradeFound;
         List<GeneratedNeighbor> neighborsList;
         SchedulePermutationSolution bestNeighborInThisStart;
 
-        LocalsearchEvaluator evaluator;
-
         Random random = new Random();
         NeighborhoodOperatorGlobal chosenOperator;
 
         do {
 
-            //Generate an inicial random solution
-            actualSolution = problem.createSolution();
+            //Create a fitness calculator
+            fitnessCalculator = createFitnessCalculator(problem);
 
-            //Evaluate this new created solution (this step is skipped in the pseudocode)
-            fitnessCalculator = new FitnessCalculatorSimple(problem.getInstanceData());
-            fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-            actualSolution.setFitnessInfo(fitnessInfo);
+            //Generate an inicial random solution
+            actualSolution = createInitialSolution(problem, fitnessCalculator);
 
             //If it is the first time, initialize the total best neighbor variable
             if(totalBestNeighbor == null)
                 totalBestNeighbor = actualSolution;
 
-            evaluator = new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
+            evaluator = createLocalSearchEvaluator(problem, fitnessCalculator);
 
             chosenOperator = neighborhoodOperatorList.get( random.nextInt(0, neighborhoodOperatorList.size()) );
 
             do {
 
+                localSearchIterations++;
+
                 upgradeFound = false;
 
                 //Generate new neighbors
-                neighborsList = chosenOperator.execute(actualSolution);
+                neighborsList = chosenOperator.execute(actualSolution); //TODO: check if this can be extracted into a method (maybe not)
 
                 //Take the best one
                 bestNeighborInThisStart = selectBestNeighbor(actualSolution, neighborsList, evaluator);
 
                 //If there is an improvement, record it and update the best neighbor in this start
-                if (actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighborInThisStart.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD) {
+                if (checkImprovement(actualSolution, bestNeighborInThisStart)) {
 
                     actualSolution = bestNeighborInThisStart;
                     upgradeFound = true;
 
                 }
+
+                getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
             } while(upgradeFound && System.currentTimeMillis() - startingTime < limitTime);
 
@@ -347,17 +230,23 @@ public class MaximumGradientStrategy extends AbstractStrategy {
             else if(actualSolution.getFitnessInfo().fitness().get("makespan") > totalWorstMakespan)
                 totalWorstMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
 
+            getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+
         } while(System.currentTimeMillis() - startingTime < limitTime);
 
         getObserver().setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
         getObserver().setTotalWorstMakespan(totalWorstMakespan);
+
+        getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
+        getObserver().setNumberOfIterations(localSearchIterations);
+        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         getObserver().executionEnded();
 
         return totalBestNeighbor;
     }
 
-    private SchedulePermutationSolution selectBestNeighbor(SchedulePermutationSolution originalSolution, List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator) {
+    private SchedulePermutationSolution selectBestNeighbor(SchedulePermutationSolution originalSolution, List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator){
 
         SchedulePermutationSolution bestSolution = originalSolution;
         double originalMakespan = originalSolution.getFitnessInfo().fitness().get("makespan");
@@ -400,5 +289,42 @@ public class MaximumGradientStrategy extends AbstractStrategy {
             getObserver().addBetterNeighborsImprovingRatio( 0.0 );
 
         return bestSolution;
+    }
+
+    private FitnessCalculator createFitnessCalculator(SchedulingProblem problem){
+        return new FitnessCalculatorSimple(problem.getInstanceData());
+    }
+
+    private SchedulePermutationSolution createInitialSolution(SchedulingProblem problem, FitnessCalculator fitnessCalculator){
+        SchedulePermutationSolution actualSolution = problem.createSolution();
+
+        //Evaluate this new created solution (this step is skipped in the pseudocode)
+
+        FitnessInfo fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
+        actualSolution.setFitnessInfo(fitnessInfo);
+
+        return actualSolution;
+    }
+
+    private LocalsearchEvaluator createLocalSearchEvaluator(SchedulingProblem problem, FitnessCalculator fitnessCalculator){
+
+        return new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
+    }
+
+    private List<GeneratedNeighbor> generateNeighbors(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList, SchedulePermutationSolution actualSolution){
+
+        List<GeneratedNeighbor> neighborsList = new ArrayList<>();
+
+        for(NeighborhoodOperatorGlobal neighborhoodOperator : neighborhoodOperatorList){
+            neighborsList.addAll(
+                    neighborhoodOperator.execute(actualSolution)
+            );
+        }
+
+        return neighborsList;
+    }
+
+    private boolean checkImprovement(SchedulePermutationSolution actualSolution, SchedulePermutationSolution bestNeighbor){
+        return actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighbor.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD;
     }
 }
