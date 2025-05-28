@@ -1,4 +1,4 @@
-package com.uniovi.sercheduler.localsearch.strategy;
+package com.uniovi.sercheduler.localsearch.strategy.neighborgenerator;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;

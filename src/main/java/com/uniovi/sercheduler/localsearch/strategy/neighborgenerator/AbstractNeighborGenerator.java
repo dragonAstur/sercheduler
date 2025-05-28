@@ -1,4 +1,4 @@
-package com.uniovi.sercheduler.localsearch.strategy;
+package com.uniovi.sercheduler.localsearch.strategy.neighborgenerator;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -9,7 +9,7 @@ public abstract class AbstractNeighborGenerator implements NeighborGenerator {
 
 
 
-    protected <T> Stream<T> lazyRandomEvaluation(List<Supplier<Stream<T>>> streamSuppliers) {
+    protected <T> Stream<T> shuffleStreams(List<Supplier<Stream<T>>> streamSuppliers) {
 
         List<Iterator<T>> iterators = streamSuppliers.stream()
                 .map(Supplier::get)

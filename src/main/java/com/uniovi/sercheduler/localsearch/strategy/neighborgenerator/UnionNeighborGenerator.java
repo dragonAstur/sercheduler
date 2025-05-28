@@ -1,4 +1,4 @@
-package com.uniovi.sercheduler.localsearch.strategy;
+package com.uniovi.sercheduler.localsearch.strategy.neighborgenerator;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
@@ -8,7 +8,6 @@ import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class UnionNeighborGenerator extends AbstractNeighborGenerator{
 
@@ -19,7 +18,7 @@ public class UnionNeighborGenerator extends AbstractNeighborGenerator{
         for(NeighborhoodOperatorLazy neighborhoodLazyOperator : neighborhoodLazyOperatorList)
             operators.add(() -> neighborhoodLazyOperator.execute(actualSolution));
 
-        return lazyRandomEvaluation(operators);
+        return shuffleStreams(operators);
     }
 
 
