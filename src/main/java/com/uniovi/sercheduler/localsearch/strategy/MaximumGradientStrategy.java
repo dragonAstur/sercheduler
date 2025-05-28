@@ -130,6 +130,8 @@ public class MaximumGradientStrategy extends AbstractStrategy {
                 //Generate new neighbors
                 neighborsList = generateNeighbors(neighborhoodOperatorList, actualSolution);
 
+                getObserver().addNumberOfGeneratedNeighbors( neighborsList.size() );
+
                 //Take the best one
                 bestNeighborInThisStart = selectBestNeighbor(actualSolution, neighborsList, evaluator);
 
@@ -208,7 +210,9 @@ public class MaximumGradientStrategy extends AbstractStrategy {
                 upgradeFound = false;
 
                 //Generate new neighbors
-                neighborsList = chosenOperator.execute(actualSolution); //TODO: check if this can be extracted into a method (maybe not)
+                neighborsList = chosenOperator.execute(actualSolution);
+
+                getObserver().addNumberOfGeneratedNeighbors( neighborsList.size() );
 
                 //Take the best one
                 bestNeighborInThisStart = selectBestNeighbor(actualSolution, neighborsList, evaluator);
@@ -239,7 +243,6 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
         getObserver().setNumberOfIterations(localSearchIterations);
-        getObserver().setTotalBestMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
         getObserver().executionEnded();
 
