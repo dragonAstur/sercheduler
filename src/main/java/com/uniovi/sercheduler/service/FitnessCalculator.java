@@ -108,7 +108,7 @@ public abstract class FitnessCalculator {
 
       case "rank", "rank-makespan", "rank-makespan-mono" ->
           new FitnessCalculatorRank(instanceData, evaluationsHistory);
-      case "multi", "multi-double-eval", "multi-spea2" ->
+      case "multi", "multi-double-eval", "multi-spea2", "multi-ibea" ->
           new FitnessCalculatorMulti(
               instanceData,
               List.of(
@@ -125,7 +125,7 @@ public abstract class FitnessCalculator {
               "none",
               evaluationsHistory);
 
-      case "multi-makespan", "multi-makespan-mono", "multi-makespan-spea2" ->
+      case "multi-makespan", "multi-makespan-mono", "multi-makespan-spea2", "multi-makespan-ibea" ->
           new FitnessCalculatorMulti(
               instanceData,
               List.of(
@@ -147,7 +147,7 @@ public abstract class FitnessCalculator {
                   new FitnessCalculatorHeftEnergy(instanceData, "active"),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active")),
               evaluationsHistory);
-      case "multi-energy", "multi-energy-mono", "multi-energy-spea2" ->
+      case "multi-energy", "multi-energy-mono", "multi-energy-spea2", "multi-energy-ibea" ->
           new FitnessCalculatorMulti(
               instanceData,
               Collections.emptyList(),

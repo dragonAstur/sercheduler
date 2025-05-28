@@ -4,6 +4,7 @@ import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.dao.experiment.ExperimentConfig;
 import com.uniovi.sercheduler.dto.analysis.GenerationInfo;
 import com.uniovi.sercheduler.dto.analysis.MultiResult;
+import com.uniovi.sercheduler.jmetal.algorithm.IBEABuilder;
 import com.uniovi.sercheduler.jmetal.algorithm.MultiEvolutionaryAlgorithm;
 import com.uniovi.sercheduler.jmetal.algorithm.NSGAIIBuilderMulti;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadedEvaluation;
@@ -494,10 +495,10 @@ public class ExperimentJmetalCommand {
 
             } else if (f.equals("multi-spea2")) {
               algorithm =
-                      new SPEA2Builder<>(problem, crossover, mutation)
-                              .setPopulationSize(populationSize)
-                              .setMaxIterations((executions / populationSize) / 2)
-                              .build();
+                  new SPEA2Builder<>(problem, crossover, mutation)
+                      .setPopulationSize(populationSize)
+                      .setMaxIterations((executions / populationSize) / 2)
+                      .build();
 
             } else if (f.contains("spea2")) {
               algorithm =
@@ -506,11 +507,26 @@ public class ExperimentJmetalCommand {
                       .setMaxIterations(executions / populationSize)
                       .build();
 
-            } else if (f.contains("pesa2")) {
+            } else if (f.equals("multi-ibea")) {
               algorithm =
-                  new PESA2Builder<>(problem, crossover, mutation)
+                  new IBEABuilder(problem)
+                      .setPopulationSize(populationSize)
+                      .setMaxEvaluations(executions / 2)
+                      .setPopulationSize(populationSize)
+                      .setArchiveSize(populationSize)
+                      .setCrossover(crossover)
+                      .setMutation(mutation)
+                      .build();
+
+            } else if (f.contains("ibea")) {
+              algorithm =
+                  new IBEABuilder(problem)
                       .setPopulationSize(populationSize)
                       .setMaxEvaluations(executions)
+                      .setPopulationSize(populationSize)
+                      .setArchiveSize(populationSize)
+                      .setCrossover(crossover)
+                      .setMutation(mutation)
                       .build();
             } else if (f.equals("multi")) {
               algorithm =
