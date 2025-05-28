@@ -492,6 +492,13 @@ public class ExperimentJmetalCommand {
                       .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
                       .build();
 
+            } else if (f.equals("multi-spea2")) {
+              algorithm =
+                      new SPEA2Builder<>(problem, crossover, mutation)
+                              .setPopulationSize(populationSize)
+                              .setMaxIterations((executions / populationSize) / 2)
+                              .build();
+
             } else if (f.contains("spea2")) {
               algorithm =
                   new SPEA2Builder<>(problem, crossover, mutation)
