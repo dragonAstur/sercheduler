@@ -106,28 +106,34 @@ public abstract class FitnessCalculator {
       case "fvlt-me-semi-active", "fvlt-me-mono-semi-active" ->
           new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "semi-active");
 
-      case "rank", "rank-makespan", "rank-makespan-mono" -> new FitnessCalculatorRank(instanceData, evaluationsHistory);
-      case "multi", "multi-double-eval" ->
+      case "rank", "rank-makespan", "rank-makespan-mono" ->
+          new FitnessCalculatorRank(instanceData, evaluationsHistory);
+      case "multi", "multi-double-eval", "multi-spea2" ->
           new FitnessCalculatorMulti(
               instanceData,
               List.of(
-                  new FitnessCalculatorSimple(instanceData, new ArrayList<>(evaluationsHistory.size())),
+                  new FitnessCalculatorSimple(
+                      instanceData, new ArrayList<>(evaluationsHistory.size())),
                   new FitnessCalculatorHeft(instanceData),
-                  new FitnessCalculatorRank(instanceData, new ArrayList<>(evaluationsHistory.size()))),
+                  new FitnessCalculatorRank(
+                      instanceData, new ArrayList<>(evaluationsHistory.size()))),
               List.of(
-                  new FitnessCalculatorSimple(instanceData, new ArrayList<>(evaluationsHistory.size())),
+                  new FitnessCalculatorSimple(
+                      instanceData, new ArrayList<>(evaluationsHistory.size())),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active"),
                   new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active")),
               "none",
               evaluationsHistory);
 
-      case "multi-makespan", "multi-makespan-mono" ->
+      case "multi-makespan", "multi-makespan-mono", "multi-makespan-spea2" ->
           new FitnessCalculatorMulti(
               instanceData,
               List.of(
-                  new FitnessCalculatorSimple(instanceData, new ArrayList<>(evaluationsHistory.size())),
+                  new FitnessCalculatorSimple(
+                      instanceData, new ArrayList<>(evaluationsHistory.size())),
                   new FitnessCalculatorHeft(instanceData),
-                  new FitnessCalculatorRank(instanceData, new ArrayList<>(evaluationsHistory.size()))),
+                  new FitnessCalculatorRank(
+                      instanceData, new ArrayList<>(evaluationsHistory.size()))),
               Collections.emptyList(),
               "makespan",
               evaluationsHistory);
@@ -136,16 +142,18 @@ public abstract class FitnessCalculator {
               instanceData,
               Collections.emptyList(),
               List.of(
-                  new FitnessCalculatorSimple(instanceData, new ArrayList<>(evaluationsHistory.size())),
+                  new FitnessCalculatorSimple(
+                      instanceData, new ArrayList<>(evaluationsHistory.size())),
                   new FitnessCalculatorHeftEnergy(instanceData, "active"),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active")),
               evaluationsHistory);
-      case "multi-energy", "multi-energy-mono" ->
+      case "multi-energy", "multi-energy-mono", "multi-energy-spea2" ->
           new FitnessCalculatorMulti(
               instanceData,
               Collections.emptyList(),
               List.of(
-                  new FitnessCalculatorSimple(instanceData, new ArrayList<>(evaluationsHistory.size())),
+                  new FitnessCalculatorSimple(
+                      instanceData, new ArrayList<>(evaluationsHistory.size())),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active"),
                   new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active")),
               "energy",
