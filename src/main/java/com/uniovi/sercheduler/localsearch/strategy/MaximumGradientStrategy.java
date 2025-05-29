@@ -5,8 +5,12 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
+import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import com.uniovi.sercheduler.localsearch.strategy.neighborgenerator.NeighborGenerator;
 import com.uniovi.sercheduler.localsearch.strategy.neighborgenerator.UnionNeighborGenerator;
+import com.uniovi.sercheduler.localsearch.strategy.startoperatorselector.AllStartOperatorSelector;
+import com.uniovi.sercheduler.localsearch.strategy.startoperatorselector.RandomStartOperatorSelector;
+import com.uniovi.sercheduler.localsearch.strategy.startoperatorselector.StartOperatorSelector;
 import com.uniovi.sercheduler.service.FitnessCalculator;
 import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 import com.uniovi.sercheduler.service.FitnessInfo;
@@ -63,9 +67,14 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         NeighborGenerator unionNeighborGenerator = new UnionNeighborGenerator();
 
+        List<NeighborhoodOperatorGlobal> chosenOperators;
+        StartOperatorSelector operatorSelector = new RandomStartOperatorSelector();
+
         do {
 
-            SchedulePermutationSolution actualSolution = runLocalSearchGlobal(problem, neighborhoodOperatorList, limitTime, startingTime, localSearchIterations, unionNeighborGenerator);
+            chosenOperators = operatorSelector.selectOperatorsGlobal(neighborhoodOperatorList);
+
+            SchedulePermutationSolution actualSolution = runLocalSearchGlobal(problem, chosenOperators, limitTime, startingTime, localSearchIterations, unionNeighborGenerator);
 
             //If it is the first time, initialize the total best neighbor variable
             if(totalBestNeighbor == null)
@@ -100,14 +109,14 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         NeighborGenerator unionNeighborGenerator = new UnionNeighborGenerator();
 
-        Random random = new Random();
-        NeighborhoodOperatorGlobal chosenOperator;
+        List<NeighborhoodOperatorGlobal> chosenOperators;
+        StartOperatorSelector operatorSelector = new RandomStartOperatorSelector();
 
         do {
 
-            chosenOperator = neighborhoodOperatorList.get( random.nextInt(0, neighborhoodOperatorList.size()) );
+            chosenOperators = operatorSelector.selectOperatorsGlobal(neighborhoodOperatorList);
 
-            SchedulePermutationSolution actualSolution = runLocalSearchGlobal(problem, chosenOperator, limitTime, startingTime, localSearchIterations, unionNeighborGenerator);
+            SchedulePermutationSolution actualSolution = runLocalSearchGlobal(problem, chosenOperators, limitTime, startingTime, localSearchIterations, unionNeighborGenerator);
 
             //If it is the first time, initialize the total best neighbor variable
             if(totalBestNeighbor == null)

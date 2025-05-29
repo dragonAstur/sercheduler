@@ -6,6 +6,9 @@ import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import com.uniovi.sercheduler.localsearch.strategy.neighborgenerator.NeighborGenerator;
 import com.uniovi.sercheduler.localsearch.strategy.neighborgenerator.UnionNeighborGenerator;
+import com.uniovi.sercheduler.localsearch.strategy.startoperatorselector.AllStartOperatorSelector;
+import com.uniovi.sercheduler.localsearch.strategy.startoperatorselector.RandomStartOperatorSelector;
+import com.uniovi.sercheduler.localsearch.strategy.startoperatorselector.StartOperatorSelector;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,10 +63,15 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
         NeighborGenerator unionNeighborGenerator = new UnionNeighborGenerator();
 
+        List<NeighborhoodOperatorLazy> chosenOperators;
+        StartOperatorSelector operatorSelector = new AllStartOperatorSelector();
+
 
         do {
 
-            SchedulePermutationSolution actualSolution = this.runLocalSearchLazy(problem, neighborhoodLazyOperatorList, limitTime, startingTime, localSearchIterations, unionNeighborGenerator);
+            chosenOperators = operatorSelector.selectOperatorsLazy(neighborhoodLazyOperatorList);
+
+            SchedulePermutationSolution actualSolution = this.runLocalSearchLazy(problem, chosenOperators, limitTime, startingTime, localSearchIterations, unionNeighborGenerator);
 
             //If it is the first time, initialize the total best neighbor variable
             if(totalBestNeighbor == null)
@@ -102,14 +110,14 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
         NeighborGenerator unionNeighborGenerator = new UnionNeighborGenerator();
 
-        Random random = new Random();
-        NeighborhoodOperatorLazy chosenOperator;
+        List<NeighborhoodOperatorLazy> chosenOperators;
+        StartOperatorSelector operatorSelector = new RandomStartOperatorSelector();
 
         do {
 
-            chosenOperator = neighborhoodLazyOperatorList.get( random.nextInt(0, neighborhoodLazyOperatorList.size()) );
+            chosenOperators = operatorSelector.selectOperatorsLazy(neighborhoodLazyOperatorList);
 
-            SchedulePermutationSolution actualSolution = runLocalSearchLazy(problem, chosenOperator, limitTime, startingTime, localSearchIterations, unionNeighborGenerator);
+            SchedulePermutationSolution actualSolution = runLocalSearchLazy(problem, chosenOperators, limitTime, startingTime, localSearchIterations, unionNeighborGenerator);
 
             //If it is the first time, initialize the total best neighbor variable
             if(totalBestNeighbor == null)
