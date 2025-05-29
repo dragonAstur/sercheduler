@@ -62,7 +62,8 @@ public abstract class AbstractStrategy {
             }
 
             getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
-        } while (upgradeFound && (System.currentTimeMillis() - startingTimeMillis) < limitTimeMillis);
+
+        } while (checkStopCondition(upgradeFound, limitTimeMillis, startingTimeMillis));
 
         return actualSolution;
     }
@@ -109,7 +110,8 @@ public abstract class AbstractStrategy {
             }
 
             getObserver().addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
-        } while (upgradeFound && (System.currentTimeMillis() - startingTimeMillis) < limitTimeMillis);
+
+        } while(checkStopCondition(upgradeFound, startingTimeMillis, limitTimeMillis));
 
         return actualSolution;
     }
@@ -212,6 +214,10 @@ public abstract class AbstractStrategy {
 
     private boolean checkImprovement(SchedulePermutationSolution actualSolution, SchedulePermutationSolution bestNeighbor){
         return actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighbor.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD;
+    }
+
+    private boolean checkStopCondition(boolean upgradeFound, long limitTimeMillis, long startingTimeMillis){
+        return upgradeFound && (System.currentTimeMillis() - startingTimeMillis) < limitTimeMillis;
     }
 
 }

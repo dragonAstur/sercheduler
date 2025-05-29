@@ -134,26 +134,4 @@ public class MaximumGradientStrategy extends AbstractStrategy {
     }
 
 
-
-    private FitnessCalculator createFitnessCalculator(SchedulingProblem problem){
-        return new FitnessCalculatorSimple(problem.getInstanceData());
-    }
-
-    private SchedulePermutationSolution createInitialSolution(SchedulingProblem problem, FitnessCalculator fitnessCalculator){
-        SchedulePermutationSolution actualSolution = problem.createSolution();
-
-        //Evaluate this new created solution (this step is skipped in the pseudocode)
-
-        FitnessInfo fitnessInfo = fitnessCalculator.calculateFitness(actualSolution);
-        actualSolution.setFitnessInfo(fitnessInfo);
-
-        return actualSolution;
-    }
-
-    private LocalsearchEvaluator createLocalSearchEvaluator(SchedulingProblem problem, FitnessCalculator fitnessCalculator){
-
-        return new LocalsearchEvaluator(fitnessCalculator.getComputationMatrix(), fitnessCalculator.getNetworkMatrix(), problem.getInstanceData());
-    }
-
-
 }
