@@ -7,7 +7,6 @@ import com.uniovi.sercheduler.dto.TaskFile;
 import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.service.support.ScheduleGap;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -87,26 +86,31 @@ public abstract class FitnessCalculator {
           "simple-makespan",
           "simple-makespan-mono",
           "simple-energy",
-          "simple-energy-mono" ->
+          "simple-energy-mono",
+          "simple-ibea",
+          "simple-spea2" ->
           new FitnessCalculatorSimple(instanceData, evaluationsHistory);
-      case "heft", "heft-makespan-mono", "heft-spea2", "heft-pesa2" ->
+      case "heft", "heft-makespan-mono", "heft-spea2", "heft-ibea" ->
           new FitnessCalculatorHeft(instanceData);
       case "heft-energy-active", "heft-energy-mono-active" ->
           new FitnessCalculatorHeftEnergy(instanceData, "active");
       case "heft-energy-semi-active", "heft-energy-mono-semi-active" ->
           new FitnessCalculatorHeftEnergy(instanceData, "semi-active");
 
-      case "min-energy-UM-active", "min-energy-UM-mono-active" ->
+      case "min-energy-UM-active",
+          "min-energy-UM-mono-active",
+          "min-energy-UM-active-spea2",
+          "min-energy-UM-active-ibea" ->
           new FitnessCalculatorMinEnergyUM(instanceData, "active");
       case "min-energy-UM-semi-active", "min-energy-UM-mono-semi-active" ->
           new FitnessCalculatorMinEnergyUM(instanceData, "semi-active");
 
-      case "fvlt-me-active", "fvlt-me-mono-active" ->
+      case "fvlt-me-active", "fvlt-me-mono-active", "fvlt-me-active-spea2", "fvlt-me-active-ibea" ->
           new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active");
       case "fvlt-me-semi-active", "fvlt-me-mono-semi-active" ->
           new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "semi-active");
 
-      case "rank", "rank-makespan", "rank-makespan-mono" ->
+      case "rank", "rank-makespan", "rank-makespan-mono", "rank-spea2", "rank-ibea" ->
           new FitnessCalculatorRank(instanceData, evaluationsHistory);
       case "multi",
           "multi-double-eval",
