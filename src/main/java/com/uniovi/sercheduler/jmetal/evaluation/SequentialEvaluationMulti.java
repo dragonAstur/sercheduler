@@ -85,6 +85,9 @@ public class SequentialEvaluationMulti
     return problem;
   }
 
+  public String getAlternativeArbiter() {
+    return alternativeArbiter;
+  }
 
   /**
    * Manages the shutdown of the evaluation, only useful for parallel. */

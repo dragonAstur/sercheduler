@@ -1,8 +1,8 @@
 package com.uniovi.sercheduler.jmetal.algorithm;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
-import org.uma.jmetal.component.algorithm.EvolutionaryAlgorithm;
-import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
+import java.util.Arrays;
+import java.util.Comparator;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.SequentialEvaluation;
 import org.uma.jmetal.component.catalogue.common.solutionscreation.SolutionsCreation;
@@ -23,9 +23,6 @@ import org.uma.jmetal.util.densityestimator.DensityEstimator;
 import org.uma.jmetal.util.densityestimator.impl.CrowdingDistanceDensityEstimator;
 import org.uma.jmetal.util.ranking.Ranking;
 import org.uma.jmetal.util.ranking.impl.FastNonDominatedSortRanking;
-
-import java.util.Arrays;
-import java.util.Comparator;
 
 public class NSGAIIBuilderMulti {
   private String name;

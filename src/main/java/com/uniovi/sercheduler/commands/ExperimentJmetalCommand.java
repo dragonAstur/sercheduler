@@ -510,24 +510,16 @@ public class ExperimentJmetalCommand {
 
             } else if (f.equals("multi-ibea")) {
               algorithm =
-                  new IBEABuilder(problem)
-                      .setPopulationSize(populationSize)
-                      .setMaxEvaluations(executions / 2)
-                      .setPopulationSize(populationSize)
-                      .setArchiveSize(populationSize)
-                      .setCrossover(crossover)
-                      .setMutation(mutation)
+                  new IBEABuilder(problem, populationSize, 100, crossover, mutation)
+                      .setMaxEvaluations(executions)
+                      .setEvaluation(getEvaluator("multi", problem, objectives))
                       .build();
 
             } else if (f.contains("ibea")) {
               algorithm =
-                  new IBEABuilder(problem)
-                      .setPopulationSize(populationSize)
+                  new IBEABuilder(problem, populationSize, 100, crossover, mutation)
                       .setMaxEvaluations(executions)
-                      .setPopulationSize(populationSize)
-                      .setArchiveSize(populationSize)
-                      .setCrossover(crossover)
-                      .setMutation(mutation)
+                      .setEvaluation(getEvaluator("simple", problem, objectives))
                       .build();
             } else if (f.equals("multi")) {
               algorithm =
