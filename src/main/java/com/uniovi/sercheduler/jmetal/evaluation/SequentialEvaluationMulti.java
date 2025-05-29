@@ -6,16 +6,21 @@ import java.util.stream.Stream;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.util.errorchecking.Check;
+import org.uma.jmetal.util.evaluator.SolutionListEvaluator;
 
-public class SequentialEvaluationMulti implements Evaluation<SchedulePermutationSolution> {
+public class SequentialEvaluationMulti
+    implements Evaluation<SchedulePermutationSolution>,
+        SolutionListEvaluator<SchedulePermutationSolution> {
 
   private final Problem<SchedulePermutationSolution> problem;
   private final int numberOfThreads;
-  private int computedEvaluations;
   private final String alternativeArbiter;
+  private int computedEvaluations;
 
   public SequentialEvaluationMulti(
-      int numberOfThreads, Problem<SchedulePermutationSolution> problem, String alternativeArbiter) {
+      int numberOfThreads,
+      Problem<SchedulePermutationSolution> problem,
+      String alternativeArbiter) {
     Check.that(
         numberOfThreads >= 0, "The number of threads is a negative value: " + numberOfThreads);
     Check.notNull(problem);
@@ -53,6 +58,19 @@ public class SequentialEvaluationMulti implements Evaluation<SchedulePermutation
     return solutionList;
   }
 
+  /**
+   * Evaluates all the solutions in a sequential manner.
+   *
+   * @param list The solutions to evaluate.
+   * @param problem The problem to fix.
+   * @return The evaluated solutions.
+   */
+  @Override
+  public List<SchedulePermutationSolution> evaluate(
+      List<SchedulePermutationSolution> list, Problem<SchedulePermutationSolution> problem) {
+    return evaluate(list);
+  }
+
   @Override
   public int computedEvaluations() {
     return computedEvaluations;
@@ -65,5 +83,13 @@ public class SequentialEvaluationMulti implements Evaluation<SchedulePermutation
   @Override
   public Problem<SchedulePermutationSolution> problem() {
     return problem;
+  }
+
+
+  /**
+   * Manages the shutdown of the evaluation, only useful for parallel. */
+  @Override
+  public void shutdown() {
+    // Does nothing because the evaluator is sequential.
   }
 }

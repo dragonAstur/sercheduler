@@ -3,7 +3,6 @@ package com.uniovi.sercheduler.commands;
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.dao.experiment.ExperimentConfig;
 import com.uniovi.sercheduler.dto.analysis.GenerationInfo;
-import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import com.uniovi.sercheduler.jmetal.algorithm.IBEABuilder;
 import com.uniovi.sercheduler.jmetal.algorithm.MultiEvolutionaryAlgorithm;
 import com.uniovi.sercheduler.jmetal.algorithm.NSGAIIBuilderMulti;
@@ -37,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
 import org.uma.jmetal.algorithm.Algorithm;
-import org.uma.jmetal.algorithm.multiobjective.pesa2.PESA2Builder;
 import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2Builder;
 import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
 import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
@@ -498,6 +496,9 @@ public class ExperimentJmetalCommand {
                   new SPEA2Builder<>(problem, crossover, mutation)
                       .setPopulationSize(populationSize)
                       .setMaxIterations((executions / populationSize) / 2)
+                      .setSolutionListEvaluator(
+                          new SequentialEvaluationMulti(
+                              0, problem, objectives.get(1).objectiveName))
                       .build();
 
             } else if (f.contains("spea2")) {

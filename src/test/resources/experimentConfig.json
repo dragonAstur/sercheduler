@@ -1,7 +1,6 @@
 {
   "fitness": [
-    "multi",
-    "simple"
+    "multi"
   ],
   "workflows": [
     "montage-chameleon-2mass-005d-001",
@@ -11,7 +10,7 @@
   "maxHosts": 16,
   "hostIncrement": 2,
   "referenceSpeed": "121.6Gf",
-  "independentRuns": 3,
+  "independentRuns": 1,
   "objectives": [
     "energy", "makespan"
   ],
