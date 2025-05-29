@@ -613,7 +613,13 @@ public class ExperimentJmetalCommand {
                     new Spread()))
             .setIndependentRuns(experimentConfig.independentRuns())
             .build();
+
+    long start = System.currentTimeMillis();
+
     new ExecuteAlgorithms<>(experiment).run();
+
+    long end = System.currentTimeMillis();
+
 
     calculateConvergenceCSV(
         executions, algorithmList, populationSize, experimentConfig, experiment);
@@ -636,7 +642,7 @@ public class ExperimentJmetalCommand {
       throw new RuntimeException(e);
     }
 
-    return "All experiments done";
+    return "All experiments done Execution time: " + (end - start) + " ms";
   }
 
   private Evaluation<SchedulePermutationSolution> getEvaluator(

@@ -11,7 +11,8 @@
     "multi-pop-150-prob-1.0"
   ],
   "workflows": [
-    "cycles-chameleon-5l-1c-12p-001"
+    "cycles-chameleon-5l-1c-12p-001",
+    "epigenomics-chameleon-ilmn-6seq-100k-001"
   ],
   "minHosts": 16,
   "maxHosts": 16,
