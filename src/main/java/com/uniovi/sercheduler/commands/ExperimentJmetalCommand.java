@@ -394,6 +394,28 @@ public class ExperimentJmetalCommand {
     }
   }
 
+  private static AlgoFlag parseFlag(String f) {
+    if (f.contains("mono")) {
+      return AlgoFlag.MONO;
+    } else if (f.equals("multi-spea2")) {
+      return AlgoFlag.MULTI_SPEA2;
+    } else if (f.contains("spea2")) {
+      return AlgoFlag.SPEA2;
+    } else if (f.equals("multi-ibea")) {
+      return AlgoFlag.MULTI_IBEA;
+    } else if (f.contains("ibea")) {
+      return AlgoFlag.IBEA;
+    } else if (f.equals("multi")) {
+      return AlgoFlag.MULTI;
+    } else if (f.equals("multi-double-eval")) {
+      return AlgoFlag.MULTI_DOUBLE_EVAL;
+    } else if (f.contains("multi-pop-")) {
+      return AlgoFlag.MULTI;
+    } else {
+      return AlgoFlag.DEFAULT;
+    }
+  }
+
   /**
    * Runs an experiment with all available fitness functions.
    *
@@ -476,71 +498,92 @@ public class ExperimentJmetalCommand {
           for (int run = 0; run < experimentConfig.independentRuns(); run++) {
             Algorithm<List<SchedulePermutationSolution>> algorithm;
 
-            if (f.contains("mono")) {
-              algorithm =
-                  new GeneticAlgorithmBuilder<>(
-                          "GGA",
-                          problem,
-                          populationSize,
-                          offspringPopulationSize,
-                          crossover,
-                          mutation)
-                      .setTermination(termination)
-                      .setEvaluation(getEvaluator("simple", problem, objectives))
-                      .setSelection(new ScheduleSelection(random))
-                      .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
-                      .build();
+            AlgoFlag flag = parseFlag(f);
+            switch (flag) {
+              case MONO ->
+                  algorithm =
+                      new GeneticAlgorithmBuilder<>(
+                              "GGA",
+                              problem,
+                              populationSize,
+                              offspringPopulationSize,
+                              crossover,
+                              mutation)
+                          .setTermination(termination)
+                          .setEvaluation(getEvaluator("simple", problem, objectives))
+                          .setSelection(new ScheduleSelection(random))
+                          .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
+                          .build();
 
-            } else if (f.equals("multi-spea2")) {
-              algorithm =
-                  new SPEA2Builder<>(problem, crossover, mutation)
-                      .setPopulationSize(populationSize)
-                      .setMaxIterations((executions / populationSize) / 2)
-                      .setSolutionListEvaluator(
-                          new SequentialEvaluationMulti(
-                              0, problem, objectives.get(1).objectiveName))
-                      .build();
+              case MULTI_SPEA2 ->
+                  algorithm =
+                      new SPEA2Builder<>(problem, crossover, mutation)
+                          .setPopulationSize(populationSize)
+                          .setMaxIterations((executions / populationSize) / 2)
+                          .setSolutionListEvaluator(
+                              new SequentialEvaluationMulti(
+                                  0, problem, objectives.get(1).objectiveName))
+                          .build();
 
-            } else if (f.contains("spea2")) {
-              algorithm =
-                  new SPEA2Builder<>(problem, crossover, mutation)
-                      .setPopulationSize(populationSize)
-                      .setMaxIterations(executions / populationSize)
-                      .build();
+              case SPEA2 ->
+                  algorithm =
+                      new SPEA2Builder<>(problem, crossover, mutation)
+                          .setPopulationSize(populationSize)
+                          .setMaxIterations(executions / populationSize)
+                          .build();
 
-            } else if (f.equals("multi-ibea")) {
-              algorithm =
-                  new IBEABuilder(problem, populationSize, 100, crossover, mutation)
-                      .setMaxEvaluations(executions)
-                      .setEvaluation(getEvaluator("multi", problem, objectives))
-                      .build();
+              case MULTI_IBEA ->
+                  algorithm =
+                      new IBEABuilder(problem, populationSize, 100, crossover, mutation)
+                          .setMaxEvaluations(executions)
+                          .setEvaluation(getEvaluator("multi", problem, objectives))
+                          .build();
 
-            } else if (f.contains("ibea")) {
-              algorithm =
-                  new IBEABuilder(problem, populationSize, 100, crossover, mutation)
-                      .setMaxEvaluations(executions)
-                      .setEvaluation(getEvaluator("simple", problem, objectives))
-                      .build();
-            } else if (f.equals("multi")) {
-              algorithm =
-                  new NSGAIIBuilderMulti(problem, 50, 50, crossover, mutation)
-                      .setTermination(termination)
-                      .setEvaluation(getEvaluator("multi", problem, objectives))
-                      .build();
-            } else if (f.equals("multi-double-eval")) {
-              algorithm =
-                  new NSGAIIBuilderMulti(problem, 50, 50, crossover, mutation)
-                      .setTermination(new TerminationByEvaluations(executions * 2))
-                      .setEvaluation(getEvaluator("multi", problem, objectives))
-                      .build();
-            } else {
+              case IBEA ->
+                  algorithm =
+                      new IBEABuilder(problem, populationSize, 100, crossover, mutation)
+                          .setMaxEvaluations(executions)
+                          .setEvaluation(getEvaluator("simple", problem, objectives))
+                          .build();
 
-              algorithm =
-                  new NSGAIIBuilder<>(
-                          problem, populationSize, offspringPopulationSize, crossover, mutation)
-                      .setTermination(termination)
-                      .setEvaluation(getEvaluator("simple", problem, objectives))
-                      .build();
+              case MULTI -> {
+                int customPopulationSize = 50;
+                var customCrossover = new ScheduleCrossover(1, operators);
+
+                Pattern p = Pattern.compile("^multi-pop-(\\d+)-prob-([0-9]*\\.?[0-9]+)$");
+                Matcher m = p.matcher(f);
+                if (m.matches()) {
+                  customPopulationSize = Integer.parseInt(m.group(1)) / 2;
+                  double crossoverProb = Double.parseDouble(m.group(2));
+                  customCrossover = new ScheduleCrossover(crossoverProb, operators);
+                }
+
+                algorithm =
+                    new NSGAIIBuilderMulti(
+                            problem,
+                            customPopulationSize,
+                            customPopulationSize,
+                            customCrossover,
+                            mutation)
+                        .setTermination(termination)
+                        .setEvaluation(getEvaluator("multi", problem, objectives))
+                        .build();
+              }
+
+              case MULTI_DOUBLE_EVAL ->
+                  algorithm =
+                      new NSGAIIBuilderMulti(problem, 50, 50, crossover, mutation)
+                          .setTermination(new TerminationByEvaluations(executions * 2))
+                          .setEvaluation(getEvaluator("multi", problem, objectives))
+                          .build();
+
+              default ->
+                  algorithm =
+                      new NSGAIIBuilder<>(
+                              problem, populationSize, offspringPopulationSize, crossover, mutation)
+                          .setTermination(termination)
+                          .setEvaluation(getEvaluator("simple", problem, objectives))
+                          .build();
             }
 
             algorithmList.add(new ExperimentAlgorithm<>(algorithm, f, experimentProblem, run));
@@ -603,6 +646,17 @@ public class ExperimentJmetalCommand {
       case "multi" -> new SequentialEvaluationMulti(0, problem, objectives.get(1).objectiveName);
       default -> new MultiThreadedEvaluation(0, problem);
     };
+  }
+
+  enum AlgoFlag {
+    MONO,
+    MULTI_SPEA2,
+    SPEA2,
+    MULTI_IBEA,
+    IBEA,
+    MULTI,
+    MULTI_DOUBLE_EVAL,
+    DEFAULT;
   }
 
   private record ExecutionStat(

@@ -108,7 +108,19 @@ public abstract class FitnessCalculator {
 
       case "rank", "rank-makespan", "rank-makespan-mono" ->
           new FitnessCalculatorRank(instanceData, evaluationsHistory);
-      case "multi", "multi-double-eval", "multi-spea2", "multi-ibea" ->
+      case "multi",
+          "multi-double-eval",
+          "multi-spea2",
+          "multi-ibea",
+          "multi-pop-50-prob-0.7",
+          "multi-pop-50-prob-0.9",
+          "multi-pop-50-prob-1.0",
+          "multi-pop-100-prob-0.7",
+          "multi-pop-100-prob-0.9",
+          "multi-pop-100-prob-1.0",
+          "multi-pop-150-prob-0.7",
+          "multi-pop-150-prob-0.9",
+          "multi-pop-150-prob-1.0" ->
           new FitnessCalculatorMulti(
               instanceData,
               List.of(
