@@ -7,8 +7,8 @@ import com.uniovi.sercheduler.localsearch.export.XLSXExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
 import com.uniovi.sercheduler.localsearch.operator.*;
-import com.uniovi.sercheduler.localsearch.strategy.MaximumGradientStrategy;
-import com.uniovi.sercheduler.localsearch.strategy.SimpleClimbingStrategy;
+import com.uniovi.sercheduler.localsearch.algorithms.MaximumGradientStrategy;
+import com.uniovi.sercheduler.localsearch.algorithms.SimpleClimbingStrategy;
 
 import java.io.File;
 import java.util.ArrayList;

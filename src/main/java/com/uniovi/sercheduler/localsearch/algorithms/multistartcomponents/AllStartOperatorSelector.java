@@ -1,4 +1,4 @@
-package com.uniovi.sercheduler.localsearch.strategy.startoperatorselector;
+package com.uniovi.sercheduler.localsearch.algorithms.multistartcomponents;
 
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
