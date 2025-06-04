@@ -187,12 +187,12 @@ public class LocalsearchEvaluator {
 
         double parentsCommunicationsDuration = 0D;
 
-        for(int i = 0; i < parentsPositions.length; i++){
+        for (int parentsPosition : parentsPositions) {
 
-            var slowestSpeed = findHostSpeed(plan.get(position).host(), plan.get(parentsPositions[i]).host());
+            var slowestSpeed = findHostSpeed(plan.get(position).host(), plan.get(parentsPosition).host());
 
             parentsCommunicationsDuration +=
-                    networkMatrix.get(plan.get(position).task().getName()).get(plan.get(parentsPositions[i]).task().getName()) / slowestSpeed.doubleValue();
+                    networkMatrix.get(plan.get(position).task().getName()).get(plan.get(parentsPosition).task().getName()) / slowestSpeed.doubleValue();
         }
 
         return parentsCommunicationsDuration;
