@@ -30,6 +30,6 @@ public record StartMetrics (
     }
 
     public double startMinReachedMakespan(){
-        return iterations.stream().mapToDouble(IterationMetrics::reachedMakespan).min().orElse(0.0);
+        return iterations.get(numberOfIterations()-1).reachedMakespan();
     }
 }

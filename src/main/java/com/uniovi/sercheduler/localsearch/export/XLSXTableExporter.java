@@ -72,12 +72,12 @@ public class XLSXTableExporter {
             row.createCell(1).setCellValue(operatorLabel);
 
             for(int i = 1; i <= 30; i++)
-                row.createCell(i+1).setCellValue(observer.getExecutions().get(i-1).bestReachedMakespan());
+                row.createCell(i+1).setCellValue(observer.getRuns().get(i-1).minStartsReachedMakespan());
 
             row.createCell(32).setCellValue("");
-            row.createCell(33).setCellValue(observer.getBestReachedMakespan());
-            row.createCell(34).setCellValue(observer.avgReachedCost());
-            row.createCell(35).setCellValue(observer.getBiggerBestReachedMakespan());
+            row.createCell(33).setCellValue(observer.getBestMinReachedMakespan());
+            row.createCell(34).setCellValue(observer.getAvgMinReachedMakespan());
+            row.createCell(35).setCellValue(observer.getWorstMinReachedMakespan());
             row.createCell(36).setCellValue(observer.standardDeviation());
 
             // Write the workbook to a file

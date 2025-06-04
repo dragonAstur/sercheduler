@@ -5,7 +5,169 @@ import java.util.List;
 
 public class NeighborhoodObserver implements Observer {
 
-    private final List<ExecutionMetrics> executions;
+    private final List<RunMetrics> runs;
+
+    private final String strategyName;
+
+
+    private List<StartMetrics> starts;
+
+
+    private List<IterationMetrics> iterations;
+
+
+    private double reachedMakespan;
+    private int numberOfGeneratedNeighbor;
+    private double betterNeighborsRatio;
+    private double betterNeighborsImprovingRatio;
+    private double allNeighborsImprovingRatio;
+    private double reachedMakespanImprovingRatioWithRespectLastIteration;
+
+    public NeighborhoodObserver(String strategyName, String instanceName){
+        this.strategyName = strategyName;
+        this.runs = new ArrayList<>();
+
+        starts = new ArrayList<>();
+
+        iterations = new ArrayList<>();
+
+        reachedMakespan = -1;
+        numberOfGeneratedNeighbor = -1;
+        betterNeighborsRatio = -1;
+        betterNeighborsImprovingRatio = -1;
+        allNeighborsImprovingRatio = -1; //This could be possible, be careful
+        reachedMakespanImprovingRatioWithRespectLastIteration = -1;
+    }
+
+    public List<RunMetrics> getRuns() {
+        return new ArrayList<>(runs);
+    }
+
+    public int numberOfRuns(){
+        return runs.size();
+    }
+
+    public void endRun(long executionTime){
+        runs.add(
+                new RunMetrics(strategyName, starts, executionTime)
+        );
+
+        starts = new ArrayList<>();
+    }
+
+    public void endStart(){
+        starts.add(
+                new StartMetrics(iterations)
+        );
+
+        iterations = new ArrayList<>();
+    }
+
+    public void endIteration(){
+        runs.get(numberOfRuns() - 1).starts().get(numberOfRuns()-1).iterations().add(
+                new IterationMetrics(
+                        reachedMakespan,
+                        numberOfGeneratedNeighbor,
+                        betterNeighborsRatio,
+                        betterNeighborsImprovingRatio,
+                        allNeighborsImprovingRatio,
+                        reachedMakespanImprovingRatioWithRespectLastIteration
+                )
+        );
+
+        reachedMakespan = -1;
+        numberOfGeneratedNeighbor = -1;
+        betterNeighborsRatio = -1;
+        betterNeighborsImprovingRatio = -1;
+        allNeighborsImprovingRatio = -1; //This could be possible, be careful
+        reachedMakespanImprovingRatioWithRespectLastIteration = -1;
+    }
+
+    public String getStrategyName(){
+        return strategyName;
+    }
+
+    public double getAvgExecutionTime(){
+        return runs.stream().mapToDouble(RunMetrics::executionTime).average().orElse(-1);
+    }
+
+    public double avgIterationsMonoStart(){
+        return runs.stream().map(r -> r.starts().get(0)).mapToDouble(StartMetrics::numberOfIterations).average().orElse(-1);
+    }
+
+    //TODO
+    public double avgIterationsMultiStart(){
+        int toalIterations = 0;
+        int totalStarts = 0;
+        for(RunMetrics run : runs) {
+            toalIterations += run.starts().stream().mapToInt(StartMetrics::numberOfIterations).sum();
+            totalStarts += run.numberOfStarts();
+        }
+        return toalIterations * 1.0 / totalStarts;
+    }
+
+    public double avgGeneratedNeighborsMonoStart(){
+        return runs.stream().map(RunMetrics::monoStart).mapToDouble(StartMetrics::numberOfGeneratedNeighbors).average().orElse(-1);
+    }
+
+    //TODO
+    public double avgGeneratedNeighborsMultiStart(){
+        int totalGeneratedNeighbors = 0;
+        int totalIterations = 0;
+        for(RunMetrics run : runs) {
+            totalGeneratedNeighbors += run.starts().stream().mapToInt(StartMetrics::numberOfGeneratedNeighbors).sum();
+            totalIterations += run.starts().stream().mapToInt(StartMetrics::numberOfIterations).sum();
+        }
+        return totalGeneratedNeighbors * 1.0 / totalIterations;
+    }
+
+    public double getBestMinReachedMakespan(){
+        return runs.stream().mapToDouble(RunMetrics::minStartsReachedMakespan).min().orElse(-1);
+    }
+
+    public double getWorstMinReachedMakespan(){
+        return runs.stream().mapToDouble(RunMetrics::minStartsReachedMakespan).max().orElse(-1);
+    }
+
+    public double getAvgMinReachedMakespan(){
+        return runs.stream().mapToDouble(RunMetrics::minStartsReachedMakespan).average().orElse(-1);
+    }
+
+    public double standardDeviation(){
+
+        final double avgReachedMakespan = getAvgMinReachedMakespan();
+
+        return Math.sqrt(
+                runs.stream()
+                        .mapToDouble(RunMetrics::minStartsReachedMakespan)
+                        .map(makespan -> Math.pow(makespan - avgReachedMakespan, 2)).average().orElse(-1)
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*private final List<ExecutionMetrics> executions;
 
     private final String strategyName;
     private final String instanceName;
@@ -56,14 +218,6 @@ public class NeighborhoodObserver implements Observer {
         betterNeighborsRatioList = new ArrayList<>();
         allNeighborsImprovingRatioList = new ArrayList<>();
         betterNeighborsImprovingRatioList = new ArrayList<>();
-    }
-
-    public void setTotalBestMakespan(double totalBestMakespan) {
-        this.totalBestMakespan = totalBestMakespan;
-    }
-
-    public void setTotalWorstMakespan(double totalWorstMakespan) {
-        this.totalWorstMakespan = totalWorstMakespan;
     }
 
     public void setExecutionTime(long executionTime) {
@@ -186,5 +340,5 @@ public class NeighborhoodObserver implements Observer {
                 .mapToDouble(ExecutionMetrics::bestReachedMakespan)
                 .map(makespan -> Math.pow(makespan - avgReachedMakespan, 2)).sum() / executions.size()
             );
-    }
+    }*/
 }

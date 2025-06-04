@@ -6,5 +6,5 @@ public record IterationMetrics(
     double betterNeighborsRatio,
     double betterNeighborsImprovingRatio,
     double allNeighborsImprovingRatio,
-    double reachedMakespanImprovingRatioWithRespectLastIteration
+    double improvementRatioWithRespectLastIteration
 ) { }

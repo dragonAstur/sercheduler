@@ -67,8 +67,8 @@ public class LocalSearchRunnable {
         XLSXExporter.createWorkbook("local_search_results_" + globalOperator.getName());
         XLSXExporter.appendWorkbook(observer, "local_search_results_" + globalOperator.getName());
 
-        CSVExporter.createCSV("local_search_results_" + globalOperator.getName());
-        CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());
+        /*CSVExporter.createCSV("local_search_results_" + globalOperator.getName());
+        CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());*/
 
 
 
@@ -89,7 +89,7 @@ public class LocalSearchRunnable {
 
         XLSXExporter.appendWorkbook(observer, "local_search_results_" + globalOperator.getName());
 
-        CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());
+        //CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());
     }
 
     private static void operatorsExperiment(String instanceName, SchedulingProblem problem, long timeLimit){
@@ -124,8 +124,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1");
 
@@ -143,8 +143,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2");
 
@@ -162,8 +162,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3");
 
@@ -181,8 +181,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N4");
 
@@ -203,8 +203,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2");
 
@@ -225,8 +225,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3");
 
@@ -247,8 +247,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N4");
 
@@ -269,8 +269,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3");
 
@@ -290,8 +290,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N4");
 
@@ -312,8 +312,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3 U N4");
 
@@ -335,8 +335,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3");
 
@@ -358,8 +358,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N4");
 
@@ -381,8 +381,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3 U N4");
 
@@ -403,8 +403,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3 U N4");
 
@@ -427,8 +427,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
 
@@ -451,8 +451,8 @@ public class LocalSearchRunnable {
             maximumGradientStrategy.executeVNS(problem, globalOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "VNS (random choice)");
 
@@ -470,8 +470,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1");
 
@@ -489,8 +489,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2");
 
@@ -508,8 +508,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3");
 
@@ -527,8 +527,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N4");
 
@@ -549,8 +549,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2");
 
@@ -571,8 +571,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3");
 
@@ -593,8 +593,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N4");
 
@@ -615,8 +615,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3");
 
@@ -637,8 +637,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N4");
 
@@ -659,8 +659,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3 U N4");
 
@@ -682,8 +682,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3");
 
@@ -705,8 +705,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N4");
 
@@ -728,8 +728,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3 U N4");
 
@@ -751,8 +751,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3 U N4");
 
@@ -775,8 +775,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
 
@@ -798,8 +798,8 @@ public class LocalSearchRunnable {
             simpleClimbingStrategy.executeVNS(problem, lazyOperatorList, timeLimit);
         }
 
-        avgMakespanList.add(observer.avgReachedCost());
-        bestKnownCostList.add(observer.getBestReachedMakespan());
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "VNS (random choice)");
 

@@ -3,41 +3,35 @@ package com.uniovi.sercheduler.localsearch.observer;
 import java.util.List;
 
 public record RunMetrics (
-        List<StartMetrics> starts
+        String strategyName,
+        List<StartMetrics> starts,
+        long executionTime
 ) {
     public int numberOfStarts(){
         return starts.size();
     }
 
-    public double avgGeneratedNeighborsMonoStart(){
-        return starts.getFirst().avgNumberOfGeneratedNeighbors();
+    public double avgGeneratedNeighbors(){
+        return starts.stream().mapToDouble(StartMetrics::avgNumberOfGeneratedNeighbors).average().orElse(-1);
     }
 
-    public double avgGeneratedNeighborsMultiStart(){
-        return starts.stream().mapToDouble(StartMetrics::numberOfGeneratedNeighbors).average().orElse(0.0);
+    public double avgIterations(){
+        return starts.stream().mapToInt(StartMetrics::numberOfIterations).average().orElse(-1);
     }
 
-    public double avgBetterNeighborsRatio(){
-        return starts.getFirst().avgBetterNeighborsRatio();
+    public double minStartsReachedMakespan(){
+        return starts.stream().mapToDouble(StartMetrics::startMinReachedMakespan).min().orElse(-1);
     }
 
-    public double avgBetterNeighborsImprovingRatio(){
-        return starts.getFirst().avgBetterNeighborsImprovingRatio();
+    public double maxStartsReachedMakespan(){
+        return starts.stream().mapToDouble(StartMetrics::startMinReachedMakespan).max().orElse(-1);
     }
 
-    public double avgAllNeighborsImprovingRatio(){
-        return starts.getFirst().avgAllNeighborsImprovingRatio();
+    public double avgStartsReachedMakespan(){
+        return starts.stream().mapToDouble(StartMetrics::startMinReachedMakespan).average().orElse(-1);
     }
 
-    public double minStartReachedMakespan(){
-        return starts.stream().mapToDouble(StartMetrics::startMinReachedMakespan).min().orElse(0.0);
-    }
-
-    public double maxStartReachedMakespan(){
-        return starts.stream().mapToDouble(StartMetrics::startMinReachedMakespan).max().orElse(0.0);
-    }
-
-    public double avgStartReachedMakespan(){
-        return starts.stream().mapToDouble(StartMetrics::startMinReachedMakespan).average().orElse(0.0);
+    public StartMetrics monoStart(){
+        return starts().get(0);
     }
 }

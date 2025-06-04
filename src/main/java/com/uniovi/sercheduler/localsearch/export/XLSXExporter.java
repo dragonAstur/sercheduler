@@ -60,27 +60,27 @@ public class XLSXExporter {
         int rowCounter = sheet.getLastRowNum() + 1;
         Row row;
 
-        for(int run = 0; run < observer.getExecutions().size(); run++){
+        for(int i = 0; i < observer.numberOfRuns(); i++){
 
-            for(int iteration = 0; iteration < observer.getExecutions().get(run).numberOfIterations(); iteration++){
+            for(int iteration = 0; iteration < observer.getRuns().get(i).monoStart().numberOfIterations(); iteration++){
 
                 row = sheet.createRow(rowCounter++);
 
                 row.createCell(0).setCellValue("??");
-                row.createCell(1).setCellValue(run + 1);
+                row.createCell(1).setCellValue(i + 1);
                 row.createCell(2).setCellValue(iteration + 1);
-                row.createCell(3).setCellValue(observer.getExecutions().get(run).reachedMakespanList().get(iteration));
-                row.createCell(4).setCellValue(observer.getExecutions().get(run).improvementRatioWithRespectToLastIteration().get(iteration));
-                row.createCell(5).setCellValue(observer.getExecutions().get(run).numberOfGeneratedNeighborsList().get(iteration));
+                row.createCell(3).setCellValue(observer.getRuns().get(i).monoStart().iterations().get(iteration).reachedMakespan());
+                row.createCell(4).setCellValue(observer.getRuns().get(i).monoStart().iterations().get(iteration).improvementRatioWithRespectLastIteration());
+                row.createCell(5).setCellValue(observer.getRuns().get(i).monoStart().iterations().get(iteration).numberOfGeneratedNeighbors());
 
-                if (observer.getExecutions().get(run).betterNeighborsRatioList().isEmpty()) {
+                if (observer.getRuns().get(i).monoStart().avgBetterNeighborsRatio() == -1) {
                     row.createCell(6).setCellValue("-");
                     row.createCell(7).setCellValue("-");
                     row.createCell(8).setCellValue("-");
                 } else {
-                    row.createCell(6).setCellValue(observer.getExecutions().get(run).betterNeighborsRatioList().get(iteration));
-                    row.createCell(7).setCellValue(observer.getExecutions().get(run).allNeighborsImprovingRatioList().get(iteration));
-                    row.createCell(8).setCellValue(observer.getExecutions().get(run).betterNeighborsImprovingRatioList().get(iteration));
+                    row.createCell(6).setCellValue(observer.getRuns().get(i).monoStart().avgBetterNeighborsRatio());
+                    row.createCell(7).setCellValue(observer.getRuns().get(i).monoStart().avgBetterNeighborsImprovingRatio());
+                    row.createCell(8).setCellValue(observer.getRuns().get(i).monoStart().avgBetterNeighborsImprovingRatio());
                 }
             }
         }
@@ -93,12 +93,12 @@ public class XLSXExporter {
         Row row = sheet.createRow( sheet.getLastRowNum() + 1 );
 
         row.createCell(0).setCellValue(observer.getStrategyName());
-        row.createCell(1).setCellValue(observer.avgReachedCost());
-        row.createCell(2).setCellValue(observer.avgExecutionTime());
-        row.createCell(3).setCellValue(observer.avgIterations());
-        row.createCell(4).setCellValue(observer.avgGeneratedNeighbors());
-        row.createCell(5).setCellValue(observer.getBestReachedMakespan());
-        row.createCell(6).setCellValue(observer.getBiggerBestReachedMakespan());
+        row.createCell(1).setCellValue(observer.getAvgMinReachedMakespan());
+        row.createCell(2).setCellValue(observer.getAvgExecutionTime());
+        row.createCell(3).setCellValue(observer.avgIterationsMultiStart());
+        row.createCell(4).setCellValue(observer.avgGeneratedNeighborsMonoStart());
+        row.createCell(5).setCellValue(observer.getBestMinReachedMakespan());
+        row.createCell(6).setCellValue(observer.getWorstMinReachedMakespan());
         row.createCell(7).setCellValue(observer.standardDeviation());
     }
 
@@ -108,24 +108,24 @@ public class XLSXExporter {
 
         int rowCounter = sheet.getLastRowNum() + 1;
 
-        for(int i = 0; i < observer.getExecutions().size(); i++) {
+        for(int i = 0; i < observer.getRuns().size(); i++) {
 
             Row row = sheet.createRow(rowCounter + i);
-            row.createCell(0).setCellValue(observer.getExecutions().get(i).strategyName());
+            row.createCell(0).setCellValue(observer.getRuns().get(i).strategyName());
             row.createCell(1).setCellValue(i + 1);
-            row.createCell(2).setCellValue(observer.getExecutions().get(i).bestReachedMakespan());
-            row.createCell(3).setCellValue(observer.getExecutions().get(i).executionTime());
-            row.createCell(4).setCellValue(observer.getExecutions().get(i).numberOfIterations());
-            row.createCell(5).setCellValue(observer.getExecutions().get(i).avgGeneratedNeighbors());
+            row.createCell(2).setCellValue(observer.getRuns().get(i).minStartsReachedMakespan());
+            row.createCell(3).setCellValue(observer.getRuns().get(i).executionTime());
+            row.createCell(4).setCellValue(observer.getRuns().get(i).monoStart().numberOfIterations());
+            row.createCell(5).setCellValue(observer.getRuns().get(i).avgGeneratedNeighbors());
 
-            if (observer.getExecutions().get(i).betterNeighborsRatioList().isEmpty()) {
+            if (observer.getRuns().get(i).monoStart().avgBetterNeighborsRatio() == -1) {
                 row.createCell(6).setCellValue("-");
                 row.createCell(7).setCellValue("-");
                 row.createCell(8).setCellValue("-");
             } else {
-                row.createCell(6).setCellValue(observer.getExecutions().get(i).avgBetterNeighborsRatio());
-                row.createCell(7).setCellValue(observer.getExecutions().get(i).avgAllNeighborsImprovingRatio());
-                row.createCell(8).setCellValue(observer.getExecutions().get(i).avgBetterNeighborsImprovingRatio());
+                row.createCell(6).setCellValue(observer.getRuns().get(i).monoStart().avgBetterNeighborsRatio());
+                row.createCell(7).setCellValue(observer.getRuns().get(i).monoStart().avgAllNeighborsImprovingRatio());
+                row.createCell(8).setCellValue(observer.getRuns().get(i).monoStart().avgBetterNeighborsImprovingRatio());
             }
         }
 
