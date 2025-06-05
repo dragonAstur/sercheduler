@@ -45,7 +45,7 @@ public class LocalSearchRunnable {
                         objectives,
                         Objective.MAKESPAN.objectiveName);
 
-        operatorsExperiment(instanceName + "_v2", problem, 1000L);
+        operatorsExperiment(instanceName + "_v2", problem, 10000L);
     }
 
     private static void StrategiesExperiment(String instanceName, SchedulingProblem problem) {
@@ -107,7 +107,7 @@ public class LocalSearchRunnable {
 
         final String fileName = "operators_experiment_results";
 
-        /*XLSXTableExporter.createWorkbook(fileName);*/
+        XLSXTableExporter.createWorkbook(fileName);
         XLSXTableExporter.createInstanceSheet(fileName, instanceName);
 
 

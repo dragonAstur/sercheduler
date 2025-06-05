@@ -23,6 +23,9 @@ public class NeighborhoodObserver implements Observer {
     private double allNeighborsImprovingRatio;
     private double reachedMakespanImprovingRatioWithRespectLastIteration;
 
+    private long timeForFindingBestSolution;
+    private int generatedNeighborsForFindingBestSolution;
+
     public NeighborhoodObserver(String strategyName, String instanceName){
         this.strategyName = strategyName;
         this.runs = new ArrayList<>();
@@ -56,6 +59,8 @@ public class NeighborhoodObserver implements Observer {
                 new RunMetrics(strategyName, starts, executionTime)
         );
 
+        checkBestSolution();
+
         starts = new ArrayList<>();
     }
 
@@ -68,7 +73,7 @@ public class NeighborhoodObserver implements Observer {
     }
 
     public void endIteration(){
-        runs.get(numberOfRuns() - 1).starts().get(numberOfRuns()-1).iterations().add(
+        iterations.add(
                 new IterationMetrics(
                         reachedMakespan,
                         numberOfGeneratedNeighbors,
@@ -99,30 +104,21 @@ public class NeighborhoodObserver implements Observer {
         return runs.stream().map(RunMetrics::monoStart).mapToDouble(StartMetrics::numberOfIterations).average().orElse(-1);
     }
 
-    //TODO
-    public double avgIterationsMultiStart(){
-        int toalIterations = 0;
-        int totalStarts = 0;
-        for(RunMetrics run : runs) {
-            toalIterations += run.starts().stream().mapToInt(StartMetrics::numberOfIterations).sum();
-            totalStarts += run.numberOfStarts();
-        }
-        return toalIterations * 1.0 / totalStarts;
+    public double avgStartsPerRun(){
+
+        return runs.stream().mapToInt(RunMetrics::numberOfStarts).average().orElse(-1);
     }
 
     public double avgGeneratedNeighborsMonoStart(){
         return runs.stream().map(RunMetrics::monoStart).mapToDouble(StartMetrics::numberOfGeneratedNeighbors).average().orElse(-1);
     }
 
-    //TODO
     public double avgGeneratedNeighborsMultiStart(){
         int totalGeneratedNeighbors = 0;
-        int totalIterations = 0;
-        for(RunMetrics run : runs) {
+        for(RunMetrics run : runs)
             totalGeneratedNeighbors += run.starts().stream().mapToInt(StartMetrics::numberOfGeneratedNeighbors).sum();
-            totalIterations += run.starts().stream().mapToInt(StartMetrics::numberOfIterations).sum();
-        }
-        return totalGeneratedNeighbors * 1.0 / totalIterations;
+
+        return totalGeneratedNeighbors * 1.0 / numberOfRuns();
     }
 
     public double getBestMinReachedMakespan(){
@@ -168,96 +164,36 @@ public class NeighborhoodObserver implements Observer {
         this.numberOfGeneratedNeighbors = numberOfGeneratedNeighbors;
     }
 
+    private void checkBestSolution() {
 
+        if(runs.get(numberOfRuns()-1).minStartsReachedMakespan() == getBestMinReachedMakespan()){
+            computeTimeForFindingBestSolution();
+            computeGeneratedNeighborsForFindingBestSolution();
+        }
 
-
-
-
-
-
-
-
-    /*private final List<ExecutionMetrics> executions;
-
-    private final String strategyName;
-    private final String instanceName;
-    private double totalBestMakespan;
-    private double totalWorstMakespan;
-    private long executionTime;
-    private int numberOfIterations;
-    private List<Integer> numberOfGeneratedNeighborsList;
-    private List<Double> reachedMakespanList;
-    private List<Double> betterNeighborsRatioList;
-    private List<Double> allNeighborsImprovingRatioList;
-    private List<Double> betterNeighborsImprovingRatioList;
-
-    public NeighborhoodObserver(String strategyName, String instanceName){
-        this.strategyName = strategyName;
-        this.instanceName = instanceName;
-        this.executions = new ArrayList<>();
     }
 
-    public List<ExecutionMetrics> getExecutions() {
-        return executions;
+    public void computeTimeForFindingBestSolution(){
+        this.timeForFindingBestSolution = runs.stream().mapToLong(RunMetrics::executionTime).sum();
     }
 
-    public void executionEnded(){
-        executions.add(
-                new ExecutionMetrics(
-                        strategyName,
-                        totalBestMakespan,
-                        totalWorstMakespan,
-                        executionTime,
-                        numberOfIterations,
-                        new ArrayList<>(numberOfGeneratedNeighborsList),
-                        new ArrayList<>(reachedMakespanList),
-                        new ArrayList<>(betterNeighborsRatioList),
-                        new ArrayList<>(allNeighborsImprovingRatioList),
-                        new ArrayList<>(betterNeighborsImprovingRatioList)
-                )
-        );
+    public void computeGeneratedNeighborsForFindingBestSolution(){
+        this.generatedNeighborsForFindingBestSolution = runs.stream().mapToInt(RunMetrics::numberOfGeneratedNeighbors).sum();
     }
 
-    public void executionStarted(){
-        totalBestMakespan = -1;
-        totalWorstMakespan = -1;
-        executionTime = -1L;
-        numberOfIterations = -1;
-        numberOfGeneratedNeighborsList = new ArrayList<>();
-        reachedMakespanList = new ArrayList<>();
-        betterNeighborsRatioList = new ArrayList<>();
-        allNeighborsImprovingRatioList = new ArrayList<>();
-        betterNeighborsImprovingRatioList = new ArrayList<>();
+    public long getTimeForFindingBestSolution(){
+        return timeForFindingBestSolution;
     }
 
-    public void setExecutionTime(long executionTime) {
-        this.executionTime = executionTime;
+    public int getGeneratedNeighborsForFindingBestSolution(){
+        return generatedNeighborsForFindingBestSolution;
     }
 
-    public void setNumberOfIterations(int numberOfIterations) {
-        this.numberOfIterations = numberOfIterations;
-    }
 
-    public void addNumberOfGeneratedNeighbors(Integer value){
-        numberOfGeneratedNeighborsList.add(value);
-    }
 
-    public void addReachedMakespan(Double value){
-        reachedMakespanList.add(value);
-    }
 
-    public void addBetterNeighborsRatio(Double value){
-        betterNeighborsRatioList.add(value);
-    }
 
-    public void addAllNeighborsImprovingRatio(Double value){
-        allNeighborsImprovingRatioList.add(value);
-    }
-
-    public void addBetterNeighborsImprovingRatio(Double value){
-        betterNeighborsImprovingRatioList.add(value);
-    }
-
+    /*
     @Override
     public String toString() {
 

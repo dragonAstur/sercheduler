@@ -15,21 +15,21 @@ public record RunMetrics (
         return starts.stream().mapToDouble(StartMetrics::avgNumberOfGeneratedNeighbors).average().orElse(-1);
     }
 
-    public double avgIterations(){
-        return starts.stream().mapToInt(StartMetrics::numberOfIterations).average().orElse(-1);
+    public int numberOfGeneratedNeighbors(){
+        return starts.stream().mapToInt(StartMetrics::numberOfGeneratedNeighbors).sum();
     }
 
     public double minStartsReachedMakespan(){
         return starts.stream().mapToDouble(StartMetrics::startMinReachedMakespan).min().orElse(-1);
     }
 
-    public double maxStartsReachedMakespan(){
+    /*public double maxStartsReachedMakespan(){
         return starts.stream().mapToDouble(StartMetrics::startMinReachedMakespan).max().orElse(-1);
     }
 
     public double avgStartsReachedMakespan(){
         return starts.stream().mapToDouble(StartMetrics::startMinReachedMakespan).average().orElse(-1);
-    }
+    }*/
 
     public StartMetrics monoStart(){
         return starts().get(0);

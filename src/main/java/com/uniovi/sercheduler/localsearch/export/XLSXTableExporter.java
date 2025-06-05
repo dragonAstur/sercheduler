@@ -38,7 +38,7 @@ public class XLSXTableExporter {
             Sheet sheet = workbook.createSheet(instanceName);
             Row headerRow = sheet.createRow(0);
 
-            headerRow.createCell(1).setCellValue("Execution");
+            headerRow.createCell(1).setCellValue("Run");
 
             for(int i = 1; i <= 30; i++)
                 headerRow.createCell(i+1).setCellValue(i);
@@ -48,6 +48,12 @@ public class XLSXTableExporter {
             headerRow.createCell(34).setCellValue("avg");
             headerRow.createCell(35).setCellValue("max");
             headerRow.createCell(36).setCellValue("standard deviation");
+
+            headerRow.createCell(38).setCellValue("avg starts per run");
+            headerRow.createCell(39).setCellValue("avg evaluated neighbors per run");
+
+            headerRow.createCell(41).setCellValue("Time for finding best solution");
+            headerRow.createCell(42).setCellValue("Generated neighbors for finding best solution");
 
             // Write the workbook to a file
             try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
@@ -79,6 +85,13 @@ public class XLSXTableExporter {
             row.createCell(34).setCellValue(observer.getAvgMinReachedMakespan());
             row.createCell(35).setCellValue(observer.getWorstMinReachedMakespan());
             row.createCell(36).setCellValue(observer.standardDeviation());
+
+
+            row.createCell(38).setCellValue(observer.avgStartsPerRun());
+            row.createCell(39).setCellValue(observer.avgGeneratedNeighborsMultiStart());
+
+            row.createCell(41).setCellValue(observer.getTimeForFindingBestSolution());
+            row.createCell(42).setCellValue(observer.getGeneratedNeighborsForFindingBestSolution());
 
             // Write the workbook to a file
             try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
