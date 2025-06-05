@@ -17,7 +17,7 @@ public class NeighborhoodObserver implements Observer {
 
 
     private double reachedMakespan;
-    private int numberOfGeneratedNeighbor;
+    private int numberOfGeneratedNeighbors;
     private double betterNeighborsRatio;
     private double betterNeighborsImprovingRatio;
     private double allNeighborsImprovingRatio;
@@ -32,7 +32,7 @@ public class NeighborhoodObserver implements Observer {
         iterations = new ArrayList<>();
 
         reachedMakespan = -1;
-        numberOfGeneratedNeighbor = -1;
+        numberOfGeneratedNeighbors = -1;
         betterNeighborsRatio = -1;
         betterNeighborsImprovingRatio = -1;
         allNeighborsImprovingRatio = -1; //This could be possible, be careful
@@ -47,7 +47,11 @@ public class NeighborhoodObserver implements Observer {
         return runs.size();
     }
 
-    public void endRun(long executionTime){
+    public void endRun(long executionTime) {
+
+        if (starts.isEmpty())
+            endStart();
+
         runs.add(
                 new RunMetrics(strategyName, starts, executionTime)
         );
@@ -67,7 +71,7 @@ public class NeighborhoodObserver implements Observer {
         runs.get(numberOfRuns() - 1).starts().get(numberOfRuns()-1).iterations().add(
                 new IterationMetrics(
                         reachedMakespan,
-                        numberOfGeneratedNeighbor,
+                        numberOfGeneratedNeighbors,
                         betterNeighborsRatio,
                         betterNeighborsImprovingRatio,
                         allNeighborsImprovingRatio,
@@ -76,7 +80,7 @@ public class NeighborhoodObserver implements Observer {
         );
 
         reachedMakespan = -1;
-        numberOfGeneratedNeighbor = -1;
+        numberOfGeneratedNeighbors = -1;
         betterNeighborsRatio = -1;
         betterNeighborsImprovingRatio = -1;
         allNeighborsImprovingRatio = -1; //This could be possible, be careful
@@ -92,7 +96,7 @@ public class NeighborhoodObserver implements Observer {
     }
 
     public double avgIterationsMonoStart(){
-        return runs.stream().map(r -> r.starts().get(0)).mapToDouble(StartMetrics::numberOfIterations).average().orElse(-1);
+        return runs.stream().map(RunMetrics::monoStart).mapToDouble(StartMetrics::numberOfIterations).average().orElse(-1);
     }
 
     //TODO
@@ -144,19 +148,25 @@ public class NeighborhoodObserver implements Observer {
         );
     }
 
+    public void setReachedMakespan(double reachedMakespan){
+        this.reachedMakespan = reachedMakespan;
+    }
 
+    public void setBetterNeighborsRatio(double betterNeighborsRatio) {
+        this.betterNeighborsRatio = betterNeighborsRatio;
+    }
 
+    public void setAllNeighborsImprovingRatio(double allNeighborsImprovingRatio) {
+        this.allNeighborsImprovingRatio = allNeighborsImprovingRatio;
+    }
 
+    public void setBetterNeighborsImprovingRatio(double betterNeighborsImprovingRatio) {
+        this.betterNeighborsImprovingRatio = betterNeighborsImprovingRatio;
+    }
 
-
-
-
-
-
-
-
-
-
+    public void setNumberOfGeneratedNeighbors(int numberOfGeneratedNeighbors){
+        this.numberOfGeneratedNeighbors = numberOfGeneratedNeighbors;
+    }
 
 
 
@@ -297,48 +307,5 @@ public class NeighborhoodObserver implements Observer {
         result.append("\n----------------------------------------------------------------------\n");
 
         return result.toString();
-    }
-
-    public double avgReachedCost(){
-        return executions.stream().mapToDouble(ExecutionMetrics::bestReachedMakespan).sum() / executions.size();
-    }
-
-    public double avgExecutionTime(){
-        return executions.stream().mapToDouble(ExecutionMetrics::executionTime).sum() / executions.size();
-    }
-
-    public double avgIterations(){
-        return executions.stream().mapToDouble(ExecutionMetrics::numberOfIterations).sum() / executions.size();
-    }
-
-    public double avgGeneratedNeighbors(){
-        return executions.stream().mapToDouble(ExecutionMetrics::avgGeneratedNeighbors).sum() / executions.size();
-    }
-
-    public String getStrategyName(){
-        return strategyName;
-    }
-
-    public double getBiggerBestReachedMakespan(){
-        return executions.stream().mapToDouble(ExecutionMetrics::bestReachedMakespan).max().orElse(-1);
-    }
-
-    public double getWorstReachedMakespan(){
-        return executions.stream().mapToDouble(ExecutionMetrics::worstReachedMakespan).min().orElse(-1);
-    }
-
-    public double getBestReachedMakespan(){
-        return executions.stream().mapToDouble(ExecutionMetrics::bestReachedMakespan).min().orElse(-1);
-    }
-
-    public double standardDeviation(){
-
-        final double avgReachedMakespan = avgReachedCost();
-
-        return Math.sqrt(
-                executions.stream()
-                .mapToDouble(ExecutionMetrics::bestReachedMakespan)
-                .map(makespan -> Math.pow(makespan - avgReachedMakespan, 2)).sum() / executions.size()
-            );
     }*/
 }

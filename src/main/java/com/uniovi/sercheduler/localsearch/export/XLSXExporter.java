@@ -95,7 +95,7 @@ public class XLSXExporter {
         row.createCell(0).setCellValue(observer.getStrategyName());
         row.createCell(1).setCellValue(observer.getAvgMinReachedMakespan());
         row.createCell(2).setCellValue(observer.getAvgExecutionTime());
-        row.createCell(3).setCellValue(observer.avgIterationsMultiStart());
+        row.createCell(3).setCellValue(observer.avgIterationsMonoStart());
         row.createCell(4).setCellValue(observer.avgGeneratedNeighborsMonoStart());
         row.createCell(5).setCellValue(observer.getBestMinReachedMakespan());
         row.createCell(6).setCellValue(observer.getWorstMinReachedMakespan());

@@ -32,18 +32,12 @@ public class SimpleClimbingStrategy extends AbstractStrategy {
 
         LocalSearchAlgorithm localSearchAlgorithm = new LocalSearchAlgorithm.Builder(problem).build();
 
-        getObserver().executionStarted();
-        AtomicInteger localSearchIterations = new AtomicInteger();
         long startingTime = localSearchAlgorithm.startTimeCounter();
 
         SchedulePermutationSolution achievedSolution =
-                localSearchAlgorithm.runLocalSearchLazy(neighborhoodLazyOperatorList, localSearchIterations, getObserver());
+                localSearchAlgorithm.runLocalSearchLazy(neighborhoodLazyOperatorList, getObserver());
 
-        getObserver().setExecutionTime(System.currentTimeMillis() - startingTime);
-        getObserver().setNumberOfIterations(localSearchIterations.get());
-        getObserver().setTotalBestMakespan(achievedSolution.getFitnessInfo().fitness().get("makespan"));
-
-        getObserver().executionEnded();
+        getObserver().endRun(System.currentTimeMillis() - startingTime);
 
         return achievedSolution;
 

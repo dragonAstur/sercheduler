@@ -59,13 +59,13 @@ public class NeighborSelectorImpl implements NeighborSelector {
 
         }
 
-        observer.addBetterNeighborsRatio(numberOfBetterNeighbors * 1.00 / neighborsList.size() );
-        observer.addAllNeighborsImprovingRatio(allNeighborsImprovingRatioSum / neighborsList.size() );
+        observer.setBetterNeighborsRatio(numberOfBetterNeighbors * 1.00 / neighborsList.size() );
+        observer.setAllNeighborsImprovingRatio(allNeighborsImprovingRatioSum / neighborsList.size() );
 
         if(numberOfBetterNeighbors > 0)
-            observer.addBetterNeighborsImprovingRatio( betterNeighborsImprovingRatioSum / numberOfBetterNeighbors );
+            observer.setBetterNeighborsImprovingRatio( betterNeighborsImprovingRatioSum / numberOfBetterNeighbors );
         else
-            observer.addBetterNeighborsImprovingRatio( 0.0 );
+            observer.setBetterNeighborsImprovingRatio( 0.0 );
 
         return bestSolution;
     }

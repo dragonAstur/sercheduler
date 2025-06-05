@@ -18,18 +18,18 @@ public record StartMetrics (
     }
 
     public double avgBetterNeighborsRatio(){
-        return iterations.stream().mapToDouble(IterationMetrics::betterNeighborsRatio).average().orElse(0.0);
+        return iterations.stream().mapToDouble(IterationMetrics::betterNeighborsRatio).average().orElse(-1);
     }
 
     public double avgBetterNeighborsImprovingRatio(){
-        return iterations.stream().mapToDouble(IterationMetrics::betterNeighborsImprovingRatio).average().orElse(0.0);
+        return iterations.stream().mapToDouble(IterationMetrics::betterNeighborsImprovingRatio).average().orElse(-1);
     }
 
     public double avgAllNeighborsImprovingRatio(){
-        return iterations.stream().mapToDouble(IterationMetrics::allNeighborsImprovingRatio).average().orElse(0.0);
+        return iterations.stream().mapToDouble(IterationMetrics::allNeighborsImprovingRatio).average().orElse(-1);
     }
 
     public double startMinReachedMakespan(){
-        return iterations.get(numberOfIterations()-1).reachedMakespan();
+        return iterations.stream().mapToDouble(IterationMetrics::reachedMakespan).min().orElse(-1);
     }
 }

@@ -96,7 +96,6 @@ public class LocalSearchAlgorithm {
 
     public SchedulePermutationSolution runLocalSearchGlobal(
             List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
-            AtomicInteger localSearchIterations,
             NeighborhoodObserver observer
     ) {
         FitnessCalculator fitnessCalculator = fitnessCalculatorGenerator.createFitnessCalculator();
@@ -107,7 +106,6 @@ public class LocalSearchAlgorithm {
         SchedulePermutationSolution bestNeighbor;
 
         do {
-            localSearchIterations.incrementAndGet();
 
             terminationCriterion.setUpgradeFound(false);
 
@@ -115,30 +113,23 @@ public class LocalSearchAlgorithm {
 
             bestNeighbor = neighborSelector.selectBestNeighborGlobal(actualSolution, neighbors, evaluator, observer);
 
+            observer.setNumberOfGeneratedNeighbors(neighbors.size());
+
             if (acceptanceCriterion.checkAcceptance(actualSolution, bestNeighbor)) {
                 actualSolution = bestNeighbor;
                 terminationCriterion.setUpgradeFound(true);
             }
 
-            observer.addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+            observer.setReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+            observer.endIteration();
 
         } while(terminationCriterion.checkTerminationCondition());
 
         return actualSolution;
     }
 
-    /*public SchedulePermutationSolution runLocalSearchGlobal(
-            NeighborhoodOperatorGlobal neighborhoodOperator,
-            AtomicInteger localSearchIterations,
-            NeighborhoodObserver observer
-    ) {
-
-        return runLocalSearchGlobal(List.of(neighborhoodOperator), localSearchIterations, observer);
-    }*/
-
     public SchedulePermutationSolution runLocalSearchLazy(
             List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList,
-            AtomicInteger localSearchIterations,
             NeighborhoodObserver observer
     ) {
         FitnessCalculator fitnessCalculator = fitnessCalculatorGenerator.createFitnessCalculator();
@@ -149,7 +140,6 @@ public class LocalSearchAlgorithm {
         Optional<GeneratedNeighbor> maybeBetterNeighbor;
 
         do {
-            localSearchIterations.incrementAndGet();
 
             terminationCriterion.setUpgradeFound(false);
 
@@ -159,25 +149,20 @@ public class LocalSearchAlgorithm {
 
             maybeBetterNeighbor = neighborSelector.selectBestNeighborLazy(actualSolution, neighbors, evaluator, counter, acceptanceCriterion);
 
+            observer.setNumberOfGeneratedNeighbors(counter.get());
+
             if (maybeBetterNeighbor.isPresent()) {
                 actualSolution = maybeBetterNeighbor.get().generatedSolution();
                 terminationCriterion.setUpgradeFound(true);
             }
 
-            observer.addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+            observer.setReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+            observer.endIteration();
 
         } while (terminationCriterion.checkTerminationCondition());
 
         return actualSolution;
     }
-
-    /*public SchedulePermutationSolution runLocalSearchLazy(
-            NeighborhoodOperatorLazy neighborhoodLazyOperator,
-            AtomicInteger localSearchIterations,
-            NeighborhoodObserver observer
-    ) {
-        return this.runLocalSearchLazy(List.of(neighborhoodLazyOperator), localSearchIterations, observer);
-    }*/
 
     public long startTimeCounter(){
         return terminationCriterion.startTimeCounter();

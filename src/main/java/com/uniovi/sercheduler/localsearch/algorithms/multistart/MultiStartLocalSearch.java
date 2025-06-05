@@ -25,12 +25,9 @@ public class MultiStartLocalSearch {
                                                NeighborhoodObserver observer)
     {
 
-        observer.executionStarted();
-        AtomicInteger localSearchIterations = new AtomicInteger();
         long startingTime = localSearchAlgorithm.startTimeCounter();
 
         SchedulePermutationSolution totalBestNeighbor = null;
-        double totalWorstMakespan = -1;
 
         List<NeighborhoodOperatorGlobal> chosenOperators;
 
@@ -39,7 +36,7 @@ public class MultiStartLocalSearch {
             chosenOperators = startOperatorSelector.selectOperatorsGlobal(neighborhoodOperatorList);    //TODO: here it changes from Global to Lazy
 
             SchedulePermutationSolution actualSolution =
-                    localSearchAlgorithm.runLocalSearchGlobal(chosenOperators, localSearchIterations, observer);    //TODO: here it changes from Global to Lazy
+                    localSearchAlgorithm.runLocalSearchGlobal(chosenOperators, observer);    //TODO: here it changes from Global to Lazy
 
             //If it is the first time, initialize the total best neighbor variable
             if(totalBestNeighbor == null)
@@ -47,20 +44,12 @@ public class MultiStartLocalSearch {
 
             if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                 totalBestNeighbor = actualSolution;
-            else if(actualSolution.getFitnessInfo().fitness().get("makespan") > totalWorstMakespan)
-                totalWorstMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
 
-            observer.addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+            observer.endStart();
 
         } while(System.currentTimeMillis() - startingTime < limitTime);
 
-        observer.setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
-        observer.setTotalWorstMakespan(totalWorstMakespan);
-
-        observer.setExecutionTime(System.currentTimeMillis() - startingTime);
-        observer.setNumberOfIterations(localSearchIterations.get());
-
-        observer.executionEnded();
+        observer.endRun(System.currentTimeMillis() - startingTime);
 
         return totalBestNeighbor;
     }
@@ -71,12 +60,9 @@ public class MultiStartLocalSearch {
                                                NeighborhoodObserver observer)
     {
 
-        observer.executionStarted();
-        AtomicInteger localSearchIterations = new AtomicInteger();
         long startingTime = System.currentTimeMillis();
 
         SchedulePermutationSolution totalBestNeighbor = null;
-        double totalWorstMakespan = -1;
 
         List<NeighborhoodOperatorLazy> chosenOperators;
 
@@ -85,7 +71,7 @@ public class MultiStartLocalSearch {
             chosenOperators = startOperatorSelector.selectOperatorsLazy(neighborhoodOperatorList);    //TODO: here it changes from Global to Lazy
 
             SchedulePermutationSolution actualSolution =
-                    localSearchAlgorithm.runLocalSearchLazy(chosenOperators, localSearchIterations, observer);    //TODO: here it changes from Global to Lazy
+                    localSearchAlgorithm.runLocalSearchLazy(chosenOperators, observer);    //TODO: here it changes from Global to Lazy
 
             //If it is the first time, initialize the total best neighbor variable
             if(totalBestNeighbor == null)
@@ -93,20 +79,13 @@ public class MultiStartLocalSearch {
 
             if(actualSolution.getFitnessInfo().fitness().get("makespan") < totalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                 totalBestNeighbor = actualSolution;
-            else if(actualSolution.getFitnessInfo().fitness().get("makespan") > totalWorstMakespan)
-                totalWorstMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
 
-            observer.addReachedMakespan(actualSolution.getFitnessInfo().fitness().get("makespan"));
+            observer.endStart();
 
         } while(System.currentTimeMillis() - startingTime < limitTime);
 
-        observer.setTotalBestMakespan(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"));
-        observer.setTotalWorstMakespan(totalWorstMakespan);
 
-        observer.setExecutionTime(System.currentTimeMillis() - startingTime);
-        observer.setNumberOfIterations(localSearchIterations.get());
-
-        observer.executionEnded();
+        observer.endRun(System.currentTimeMillis() - startingTime);
 
         return totalBestNeighbor;
     }
