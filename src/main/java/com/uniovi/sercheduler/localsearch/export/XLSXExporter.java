@@ -1,6 +1,6 @@
 package com.uniovi.sercheduler.localsearch.export;
 
-import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
+import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -33,7 +33,7 @@ public class XLSXExporter {
 
     }
 
-    public static void appendWorkbook(NeighborhoodObserver observer, String fileName){
+    public static void appendWorkbook(LocalSearchObserver observer, String fileName){
 
         try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
 
@@ -54,7 +54,7 @@ public class XLSXExporter {
 
     }
 
-    private static void appendDetailSheet(Workbook workbook, NeighborhoodObserver observer) {
+    private static void appendDetailSheet(Workbook workbook, LocalSearchObserver observer) {
         Sheet sheet = workbook.getSheet("Detail");
 
         int rowCounter = sheet.getLastRowNum() + 1;
@@ -86,7 +86,7 @@ public class XLSXExporter {
         }
     }
 
-    private static void appendResumeSheet(Workbook workbook, NeighborhoodObserver observer) {
+    private static void appendResumeSheet(Workbook workbook, LocalSearchObserver observer) {
 
         Sheet sheet = workbook.getSheet("Resume");
 
@@ -102,7 +102,7 @@ public class XLSXExporter {
         row.createCell(7).setCellValue(observer.standardDeviation());
     }
 
-    private static void appendDataSheet(Workbook workbook, NeighborhoodObserver observer) {
+    private static void appendDataSheet(Workbook workbook, LocalSearchObserver observer) {
 
         Sheet sheet = workbook.getSheet("Data");
 

@@ -3,12 +3,11 @@ package com.uniovi.sercheduler.localsearch.algorithms.multistart;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalSearchAlgorithm;
 import com.uniovi.sercheduler.localsearch.algorithms.multistartcomponents.StartOperatorSelector;
-import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
+import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MultiStartLocalSearch {
 
@@ -22,7 +21,7 @@ public class MultiStartLocalSearch {
     public SchedulePermutationSolution executeGlobal(LocalSearchAlgorithm localSearchAlgorithm,
                                                List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
                                                Long limitTime,
-                                               NeighborhoodObserver observer)
+                                               LocalSearchObserver observer)
     {
 
         long startingTime = localSearchAlgorithm.startTimeCounter();
@@ -57,7 +56,7 @@ public class MultiStartLocalSearch {
     public SchedulePermutationSolution executeLazy(LocalSearchAlgorithm localSearchAlgorithm,
                                                List<NeighborhoodOperatorLazy> neighborhoodOperatorList,
                                                Long limitTime,
-                                               NeighborhoodObserver observer)
+                                               LocalSearchObserver observer)
     {
 
         long startingTime = System.currentTimeMillis();

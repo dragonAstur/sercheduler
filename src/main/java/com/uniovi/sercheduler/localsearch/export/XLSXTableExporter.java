@@ -1,6 +1,6 @@
 package com.uniovi.sercheduler.localsearch.export;
 
-import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
+import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -66,7 +66,7 @@ public class XLSXTableExporter {
 
     }
 
-    public static void appendInstanceSheet(String fileName, String instanceName, NeighborhoodObserver observer, String operatorLabel){
+    public static void appendInstanceSheet(String fileName, String instanceName, LocalSearchObserver observer, String operatorLabel){
 
         try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
 

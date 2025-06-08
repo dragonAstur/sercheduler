@@ -6,21 +6,17 @@ import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalS
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.UpgradeAndTimeLimitTermination;
 import com.uniovi.sercheduler.localsearch.algorithms.multistart.MultiStartLocalSearch;
 import com.uniovi.sercheduler.localsearch.algorithms.multistartcomponents.AllStartOperatorSelector;
-import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
+import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
-import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.NeighborGenerator;
-import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.NeighborGeneratorImpl;
 import com.uniovi.sercheduler.localsearch.algorithms.multistartcomponents.RandomStartOperatorSelector;
-import com.uniovi.sercheduler.localsearch.algorithms.multistartcomponents.StartOperatorSelector;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MaximumGradientStrategy extends AbstractStrategy {
 
     private final double UPGRADE_THRESHOLD = 0.01;
 
-    public MaximumGradientStrategy(NeighborhoodObserver observer) {
+    public MaximumGradientStrategy(LocalSearchObserver observer) {
         super(observer);
     }
 

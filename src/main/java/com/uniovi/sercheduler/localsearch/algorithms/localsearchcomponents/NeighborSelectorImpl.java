@@ -2,7 +2,7 @@ package com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
-import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
+import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class NeighborSelectorImpl implements NeighborSelector {
                 .findFirst();   //this breaks laziness
     }
 
-    public SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution, List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator, NeighborhoodObserver observer){
+    public SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution, List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator, LocalSearchObserver observer){
 
         SchedulePermutationSolution bestSolution = originalSolution;
         double originalMakespan = originalSolution.getFitnessInfo().fitness().get("makespan");

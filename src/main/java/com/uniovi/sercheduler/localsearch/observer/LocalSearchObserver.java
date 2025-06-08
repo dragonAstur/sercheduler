@@ -3,7 +3,7 @@ package com.uniovi.sercheduler.localsearch.observer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NeighborhoodObserver implements Observer {
+public class LocalSearchObserver implements Observer {
 
     private final List<RunMetrics> runs;
 
@@ -26,7 +26,7 @@ public class NeighborhoodObserver implements Observer {
     private long timeForFindingBestSolution;
     private int generatedNeighborsForFindingBestSolution;
 
-    public NeighborhoodObserver(String strategyName, String instanceName){
+    public LocalSearchObserver(String strategyName, String instanceName){
         this.strategyName = strategyName;
         this.runs = new ArrayList<>();
 

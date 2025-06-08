@@ -1,10 +1,5 @@
 package com.uniovi.sercheduler.localsearch.export;
 
-import com.uniovi.sercheduler.localsearch.observer.NeighborhoodObserver;
-
-import java.io.FileWriter;
-import java.io.IOException;
-
 public class CSVExporter {
 /*
     public static void createCSV(String fileName){
