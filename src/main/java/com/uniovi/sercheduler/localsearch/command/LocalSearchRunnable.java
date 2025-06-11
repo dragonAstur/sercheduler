@@ -19,19 +19,15 @@ public class LocalSearchRunnable {
     public static final String HOSTS_FILE = "src/test/resources/extreme/hosts-16.json";
     public static final long TIME_LIMIT = 10000L;
 
-
-
     public static void main(String[] args) {
 
         List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
 
-        String[] workflowPath = WORFLOW_FILE.split("/");
-        String workflowName = workflowPath[workflowPath.length-1].split("\\.")[0];
+        String workflowFileName = getFileName(WORFLOW_FILE);
 
-        String[] hostsPath = HOSTS_FILE.split("/");
-        String hostsName = hostsPath[hostsPath.length-1].split("\\.")[0];
+        String hostsFileName = getFileName(HOSTS_FILE);
 
-        String instanceName = workflowName + "_" + hostsName + "_" + TIME_LIMIT;
+        String instanceName = workflowFileName + "_" + hostsFileName + "_" + TIME_LIMIT;
 
         long seed = System.nanoTime();
 
@@ -45,10 +41,15 @@ public class LocalSearchRunnable {
                         objectives,
                         Objective.MAKESPAN.objectiveName);
 
-        operatorsExperiment(instanceName, problem, TIME_LIMIT);
+        operatorsExperiment(instanceName, problem, TIME_LIMIT, false);
     }
 
-    private static void operatorsExperiment(String instanceName, SchedulingProblem problem, long timeLimit){
+    protected static String getFileName(String filePath) {
+        String[] filePathSplit = filePath.split("/");
+        return filePathSplit[filePathSplit.length - 1].split("\\.")[0];
+    }
+
+    protected static void operatorsExperiment(String instanceName, SchedulingProblem problem, long timeLimit, boolean createFile){
 
         NeighborhoodOperatorGlobal globalOperator;
         NeighborhoodOperatorLazy lazyOperator;
@@ -63,7 +64,8 @@ public class LocalSearchRunnable {
 
         final String fileName = "operators_experiment_results";
 
-        //XLSXTableExporter.createWorkbook(fileName);
+        if(createFile)
+            XLSXTableExporter.createWorkbook(fileName);
         XLSXTableExporter.createInstanceSheet(fileName, instanceName);
 
 
@@ -772,9 +774,6 @@ public class LocalSearchRunnable {
         );
 
     }
-
-
-
 
 
 
