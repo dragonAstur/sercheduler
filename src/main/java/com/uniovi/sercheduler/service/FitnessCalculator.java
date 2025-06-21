@@ -463,4 +463,12 @@ public abstract class FitnessCalculator {
    * @return The name of the fitness.
    */
   public abstract String fitnessName();
+
+  public Map<String, Map<String, Double>> getComputationMatrix() {
+    return computationMatrix;
+  }
+
+  public Map<String, Map<String, Long>> getNetworkMatrix() {
+    return networkMatrix;
+  }
 }
