@@ -42,7 +42,8 @@ public class LocalSearchCommand {
                         "simple",
                         seed,
                         objectives,
-                        Objective.MAKESPAN.objectiveName);
+                        Objective.MAKESPAN.objectiveName,
+                        1);
 
         LocalSearchRunnable.operatorsExperiment(instanceName, problem, timeLimit, createFile);
     }

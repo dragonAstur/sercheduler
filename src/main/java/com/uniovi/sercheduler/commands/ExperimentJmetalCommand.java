@@ -3,9 +3,7 @@ package com.uniovi.sercheduler.commands;
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.dao.experiment.ExperimentConfig;
 import com.uniovi.sercheduler.dto.analysis.GenerationInfo;
-import com.uniovi.sercheduler.jmetal.algorithm.IBEABuilder;
-import com.uniovi.sercheduler.jmetal.algorithm.MultiEvolutionaryAlgorithm;
-import com.uniovi.sercheduler.jmetal.algorithm.NSGAIIBuilderMulti;
+import com.uniovi.sercheduler.jmetal.algorithm.*;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadedEvaluation;
 import com.uniovi.sercheduler.jmetal.evaluation.SequentialEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
@@ -411,6 +409,10 @@ public class ExperimentJmetalCommand {
       return AlgoFlag.MULTI_DOUBLE_EVAL;
     } else if (f.contains("multi-pop-")) {
       return AlgoFlag.MULTI;
+    } else if (f.equals("moheft")) {
+      return AlgoFlag.MOHEFT;
+    } else if (f.equals("moaco")) {
+      return AlgoFlag.MOACO;
     } else {
       return AlgoFlag.DEFAULT;
     }
@@ -576,6 +578,8 @@ public class ExperimentJmetalCommand {
                           .setTermination(new TerminationByEvaluations(executions * 2))
                           .setEvaluation(getEvaluator("multi", problem, objectives))
                           .build();
+              case MOHEFT -> algorithm = new MOHEFT(problem, 10);
+              case MOACO ->  algorithm = new MOACO(problem, random);
 
               default ->
                   algorithm =
@@ -620,7 +624,6 @@ public class ExperimentJmetalCommand {
 
     long end = System.currentTimeMillis();
 
-
     calculateConvergenceCSV(
         executions, algorithmList, populationSize, experimentConfig, experiment);
 
@@ -662,6 +665,8 @@ public class ExperimentJmetalCommand {
     IBEA,
     MULTI,
     MULTI_DOUBLE_EVAL,
+    MOHEFT,
+    MOACO,
     DEFAULT;
   }
 

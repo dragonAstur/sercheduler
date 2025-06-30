@@ -8,7 +8,7 @@ import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
-import com.uniovi.sercheduler.service.FitnessCalculator;
+import com.uniovi.sercheduler.service.calculator.FitnessCalculator;
 
 import java.util.List;
 import java.util.Optional;

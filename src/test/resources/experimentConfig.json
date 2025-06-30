@@ -1,18 +1,18 @@
 {
   "fitness": [
-    "multi-ibea"
+    "moheft", "multi", "moaco", "simple"
   ],
   "workflows": [
     "montage-chameleon-2mass-005d-001",
     "montage-chameleon-2mass-01d-001"
   ],
-  "minHosts": 16,
+  "minHosts": 8,
   "maxHosts": 16,
   "hostIncrement": 2,
   "referenceSpeed": "121.6Gf",
-  "independentRuns": 1,
+  "independentRuns": 10,
   "objectives": [
     "energy", "makespan"
   ],
-  "jmetalAnalysis": false
+  "jmetalAnalysis": true
 }

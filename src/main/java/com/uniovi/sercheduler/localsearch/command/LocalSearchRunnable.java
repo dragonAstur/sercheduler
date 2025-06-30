@@ -39,7 +39,8 @@ public class LocalSearchRunnable {
                         "simple",
                         seed,
                         objectives,
-                        Objective.MAKESPAN.objectiveName);
+                        Objective.MAKESPAN.objectiveName,
+                1);
 
         operatorsExperiment(instanceName, problem, TIME_LIMIT, false);
     }
