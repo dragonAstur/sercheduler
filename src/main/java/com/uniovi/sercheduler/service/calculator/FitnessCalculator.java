@@ -60,10 +60,10 @@ public abstract class FitnessCalculator {
           "simple-energy-mono",
           "simple-ibea",
           "simple-spea2",
-          "moheft",
-          "moaco" ->
+          "simple-moheft",
+          "simple-moaco" ->
           new FitnessCalculatorSimple(instanceData, evaluationsHistory);
-      case "heft", "heft-makespan-mono", "heft-spea2", "heft-ibea" ->
+      case "heft", "heft-makespan-mono", "heft-spea2", "heft-ibea", "heft-moaco" ->
           new FitnessCalculatorHeft(instanceData);
       case "heft-energy-active", "heft-energy-mono-active" ->
           new FitnessCalculatorHeftEnergy(instanceData, "active");
@@ -73,22 +73,28 @@ public abstract class FitnessCalculator {
       case "min-energy-UM-active",
           "min-energy-UM-mono-active",
           "min-energy-UM-active-spea2",
-          "min-energy-UM-active-ibea" ->
+          "min-energy-UM-active-ibea",
+          "min-energy-UM-active-moaco" ->
           new FitnessCalculatorMinEnergyUM(instanceData, "active");
       case "min-energy-UM-semi-active", "min-energy-UM-mono-semi-active" ->
           new FitnessCalculatorMinEnergyUM(instanceData, "semi-active");
 
-      case "fvlt-me-active", "fvlt-me-mono-active", "fvlt-me-active-spea2", "fvlt-me-active-ibea" ->
+      case "fvlt-me-active",
+          "fvlt-me-mono-active",
+          "fvlt-me-active-spea2",
+          "fvlt-me-active-ibea",
+          "fvlt-me-active-moaco" ->
           new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "active");
       case "fvlt-me-semi-active", "fvlt-me-mono-semi-active" ->
           new FitnessCalculatorFastVirtualMachineForLargeTasks(instanceData, "semi-active");
 
-      case "rank", "rank-makespan", "rank-makespan-mono", "rank-spea2", "rank-ibea" ->
+      case "rank", "rank-makespan", "rank-makespan-mono", "rank-spea2", "rank-ibea", "rank-moaco" ->
           new FitnessCalculatorRank(instanceData, evaluationsHistory);
       case "multi",
           "multi-double-eval",
           "multi-spea2",
           "multi-ibea",
+          "multi-moaco",
           "multi-pop-50-prob-0.7",
           "multi-pop-50-prob-0.9",
           "multi-pop-50-prob-1.0",
@@ -114,7 +120,11 @@ public abstract class FitnessCalculator {
               "none",
               evaluationsHistory);
 
-      case "multi-makespan", "multi-makespan-mono", "multi-makespan-spea2", "multi-makespan-ibea" ->
+      case "multi-makespan",
+          "multi-makespan-mono",
+          "multi-makespan-spea2",
+          "multi-makespan-ibea",
+          "multi-makespan-moaco" ->
           new FitnessCalculatorMulti(
               instanceData,
               List.of(
@@ -136,7 +146,11 @@ public abstract class FitnessCalculator {
                   new FitnessCalculatorHeftEnergy(instanceData, "active"),
                   new FitnessCalculatorMinEnergyUM(instanceData, "active")),
               evaluationsHistory);
-      case "multi-energy", "multi-energy-mono", "multi-energy-spea2", "multi-energy-ibea" ->
+      case "multi-energy",
+          "multi-energy-mono",
+          "multi-energy-spea2",
+          "multi-energy-ibea",
+          "multi-energy-moaco" ->
           new FitnessCalculatorMulti(
               instanceData,
               Collections.emptyList(),

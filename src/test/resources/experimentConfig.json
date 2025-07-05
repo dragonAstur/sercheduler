@@ -1,6 +1,12 @@
 {
   "fitness": [
-    "moheft", "multi", "moaco", "simple"
+    "simple-moheft",
+    "multi",
+    "simple-moaco",
+    "simple",
+    "multi-moaco",
+    "multi-energy-moaco",
+    "multi-makespan-moaco"
   ],
   "workflows": [
     "montage-chameleon-2mass-005d-001",
@@ -12,7 +18,8 @@
   "referenceSpeed": "121.6Gf",
   "independentRuns": 10,
   "objectives": [
-    "energy", "makespan"
+    "energy",
+    "makespan"
   ],
   "jmetalAnalysis": true
 }

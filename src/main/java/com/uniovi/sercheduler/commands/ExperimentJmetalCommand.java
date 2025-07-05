@@ -579,7 +579,7 @@ public class ExperimentJmetalCommand {
                           .setEvaluation(getEvaluator("multi", problem, objectives))
                           .build();
               case MOHEFT -> algorithm = new MOHEFT(problem, 10);
-              case MOACO ->  algorithm = new MOACO(problem, random);
+              case MOACO -> algorithm = new MOACO(problem, random, new SequentialEvaluationMulti(0, problem, objectives.get(1).objectiveName));
 
               default ->
                   algorithm =
