@@ -2,6 +2,7 @@ package com.uniovi.sercheduler.jmetal.algorithm;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.dto.Host;
+import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.jmetal.evaluation.SequentialEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.uniovi.sercheduler.service.PlanPair;
 import com.uniovi.sercheduler.service.TaskSchedule;
+import com.uniovi.sercheduler.service.core.SchedulingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uma.jmetal.algorithm.Algorithm;
@@ -36,17 +38,17 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
 
   // Parameters (can be tuned later)
   private final double alpha = 1.0; // Pheromone importance
-  private final double beta = 2.0; // Heuristic importance
-  private final double evaporationRate = 0.1; // Global evaporation rate
+  private final double beta = 1.0; // Heuristic importance
   private final double rho = 0.1; // Local pheromone volatility
-  private final double lambda = 1.0; // Global update contribution
+  private final double lambda = 2.0; // Global update contribution
 
-  private final double depositAmount = 10.0;
 
-  private final int maxIterations = 100;
-  private final int antsPerIteration = 20;
+  private final int maxIterations = 350;
+  private final int antsPerIteration = 10;
 
   double initialPheromone;
+
+  Map<String, Map<String, Double>> computationMatrix;
 
   private final CrowdingDistanceArchive<SchedulePermutationSolution> archive;
   private List<SchedulePermutationSolution> solutions;
@@ -73,6 +75,9 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
     this.random = random;
     this.initialPheromone = antsPerIteration / (double) taskIds.size();
     this.evaluation = evaluation;
+    this.computationMatrix =
+        SchedulingHelper.calculateComputationMatrix(
+            problem.getInstanceData(), problem.getInstanceData().referenceFlops());
   }
 
   /** Constructs a schedule solution probabilistically using pheromone and heuristic information. */
@@ -150,7 +155,8 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
 
   private double estimateExecutionTime(Task task, String hostId) {
     Host host = problem.getInstanceData().hosts().get(hostId);
-    return task.getRuntime() / host.getFlops();
+    var computationTime = computationMatrix.get(task.getName()).get(hostId);
+    return computationTime + ((double) task.getOutput().getSizeInBits() / host.getDiskSpeed());
   }
 
   private double estimateEnergy(Task task, String hostId) {
@@ -168,14 +174,12 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
 
       for (int i = 0; i < antsPerIteration; i++) {
         SchedulePermutationSolution solution = constructAntSolution();
-        // TODO: Evaluate the same ant using multi-energy and multi-makespan.
         var solutions = evaluation.evaluate(List.of(solution));
 
         // update the local pheromone
         solutions.forEach(this::localPheromoneUpdate);
 
         solutions.forEach(archive::add);
-
 
         currentAnts.addAll(solutions); // For update
         // logSolution(iteration, i, solution);
@@ -194,7 +198,7 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
     // Step 1: Evaporation (keep this)
     for (int i = 0; i < pheromone.length; i++) {
       for (int j = 0; j < pheromone[i].length; j++) {
-        pheromone[i][j] *= (1 - evaporationRate);
+        pheromone[i][j] *= (1 - rho);
       }
     }
 
@@ -210,22 +214,24 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
         double time = assignment.eft();
         double energy = assignment.eft() * assignment.host().getEnergyCost();
 
-        //  pheromone[taskIdx][hostIdx] += lambda / (time + energy);
-        pheromone[taskIdx][hostIdx] += depositAmount;
+        pheromone[taskIdx][hostIdx] += lambda / (time + energy);
+        // planB pheromone[taskIdx][hostIdx] += lambda / archive.size();
+
+        //  pheromone[taskIdx][hostIdx] += depositAmount;
       }
     }
   }
 
   private void localPheromoneUpdate(SchedulePermutationSolution solution) {
-    for(var pair : solution.getPlan()){
+    for (var pair : solution.getPlan()) {
       int taskIdx = getTaskIndex(pair.task().getName());
       int hostIdx = getHostIndex(pair.host().getName());
-    localPheromoneUpdate(taskIdx, hostIdx);
+      localPheromoneUpdate(taskIdx, hostIdx);
     }
-
   }
+
   private void localPheromoneUpdate(int taskIdx, int hostIdx) {
-    pheromone[taskIdx][hostIdx] = (1 - rho) * pheromone[taskIdx][hostIdx] + rho * initialPheromone;
+    pheromone[taskIdx][hostIdx] = (1 - rho) * pheromone[taskIdx][hostIdx];
   }
 
   private SchedulePermutationSolution getBestSolutionByMakespan(
