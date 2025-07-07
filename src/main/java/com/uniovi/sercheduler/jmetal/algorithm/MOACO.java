@@ -43,6 +43,9 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
   private final int maxIterations;
   private final int antsPerIteration;
 
+  private final double depositAmount = 10.0;
+
+
   private final Map<String, Map<String, Double>> computationMatrix;
 
   private final CrowdingDistanceArchive<SchedulePermutationSolution> archive;
@@ -51,6 +54,7 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
   private static final int ARCHIVE_SIZE = 100;
 
   private Evaluation<SchedulePermutationSolution> evaluation;
+
 
   /**
    * Constructor for the MOACO algorithm.
@@ -81,7 +85,6 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
     this.rho = parameters.rho();
     this.maxIterations = parameters.iterations();
     this.antsPerIteration = parameters.numberOfAnts();
-
     initializePheromoneMatrix();
 
 
@@ -221,10 +224,10 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
         double time = assignment.eft();
         double energy = assignment.eft() * assignment.host().getEnergyCost();
 
-        pheromone[taskIdx][hostIdx] += lambda / (time + energy);
+        // pheromone[taskIdx][hostIdx] += lambda / (time + energy);
         // planB pheromone[taskIdx][hostIdx] += lambda / archive.size();
 
-        //  pheromone[taskIdx][hostIdx] += depositAmount;
+         pheromone[taskIdx][hostIdx] += depositAmount;
       }
     }
   }

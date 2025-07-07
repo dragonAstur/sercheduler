@@ -48,24 +48,16 @@ class MoAcoTest {
 
     var result = moAco.result();
 
-    assertEquals(12, result.size());
+    assertEquals(4, result.size());
     // Verify non-domination
     assertTrue(NonDominatedChecker.areAllNonDominated(result));
 
-    List<Map<String, Double>> expectedObjectives =
-        List.of(
-            Map.of("energy", 538.5, "makespan", 204.0),
-            Map.of("energy", 368.9, "makespan", 263.5),
-            Map.of("energy", 574.5, "makespan", 195.0),
-            Map.of("energy", 404.9, "makespan", 254.5),
-            Map.of("energy", 515.3, "makespan", 208.0),
-            Map.of("energy", 451.69999999999993, "makespan", 245.5),
-            Map.of("energy", 562.0999999999999, "makespan", 199.0),
-            Map.of("energy", 476.69999999999993, "makespan", 223.5),
-            Map.of("energy", 495.69999999999993, "makespan", 216.5),
-            Map.of("energy", 469.49999999999994, "makespan", 241.5),
-            Map.of("energy", 555.8999999999999, "makespan", 201.0),
-            Map.of("energy", 594.15, "makespan", 187.5));
+    List<Map<String, Double>> expectedObjectives = List.of(
+            Map.of("energy", 589.5, "makespan", 198.0),
+            Map.of("energy", 519.1, "makespan", 212.0),
+            Map.of("energy", 545.25, "makespan", 199.5),
+            Map.of("energy", 604.65, "makespan", 181.5)
+    );
 
     for (int i = 0; i < result.size(); i++) {
       var fitness = result.get(i).getFitnessInfo().fitness();
@@ -107,16 +99,15 @@ class MoAcoTest {
 
     var result = moAco.result();
 
-    assertEquals(4, result.size());
+    assertEquals(3, result.size());
     // Verify non-domination
     assertTrue(NonDominatedChecker.areAllNonDominated(result));
 
-    List<Map<String, Double>> expectedObjectives = List.of(
-            Map.of("energy", 575.2, "makespan", 186.5),
-            Map.of("energy", 526.4, "makespan", 187.0),
-            Map.of("energy", 609.5500000000001, "makespan", 180.5),
-            Map.of("energy", 575.55, "makespan", 184.5)
-    );
+    List<Map<String, Double>> expectedObjectives =
+        List.of(
+            Map.of("energy", 629.3500000000001, "makespan", 180.5),
+            Map.of("energy", 499.59999999999997, "makespan", 186.5),
+            Map.of("energy", 596.55, "makespan", 181.5));
     for (int i = 0; i < result.size(); i++) {
       var fitness = result.get(i).getFitnessInfo().fitness();
       assertEquals(
