@@ -2,7 +2,6 @@ package com.uniovi.sercheduler.jmetal.algorithm;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.dto.Host;
-import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.jmetal.evaluation.SequentialEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.util.archive.impl.CrowdingDistanceArchive;
-import org.uma.jmetal.util.archive.impl.NonDominatedSolutionListArchive;
 
 /**
  * Initial skeleton for the Multi-Objective Ant Colony Optimization (MOACO) algorithm specifically
@@ -37,18 +35,15 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
   private List<String> hostIds;
 
   // Parameters (can be tuned later)
-  private final double alpha = 1.0; // Pheromone importance
-  private final double beta = 1.0; // Heuristic importance
-  private final double rho = 0.1; // Local pheromone volatility
-  private final double lambda = 2.0; // Global update contribution
+  private final double alpha; // Pheromone importance
+  private final double beta; // Heuristic importance
+  private final double lambda; // Global update contribution
+  private final double rho; // Local pheromone volatility
 
+  private final int maxIterations;
+  private final int antsPerIteration;
 
-  private final int maxIterations = 350;
-  private final int antsPerIteration = 10;
-
-  double initialPheromone;
-
-  Map<String, Map<String, Double>> computationMatrix;
+  private final Map<String, Map<String, Double>> computationMatrix;
 
   private final CrowdingDistanceArchive<SchedulePermutationSolution> archive;
   private List<SchedulePermutationSolution> solutions;
@@ -65,19 +60,31 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
   public MOACO(
       SchedulingProblem problem,
       Random random,
-      Evaluation<SchedulePermutationSolution> evaluation) {
+      Evaluation<SchedulePermutationSolution> evaluation,
+      MoAcoParameters parameters) {
     this.problem = problem;
     this.taskIds = problem.getInstanceData().workflow().keySet().stream().toList();
     this.hostIds = problem.getInstanceData().hosts().keySet().stream().toList();
-    initializePheromoneMatrix();
     this.archive = new CrowdingDistanceArchive<>(ARCHIVE_SIZE);
     this.solutions = new ArrayList<>();
     this.random = random;
-    this.initialPheromone = antsPerIteration / (double) taskIds.size();
+
     this.evaluation = evaluation;
     this.computationMatrix =
         SchedulingHelper.calculateComputationMatrix(
             problem.getInstanceData(), problem.getInstanceData().referenceFlops());
+
+    // Parameters initialization
+    this.alpha = parameters.alpha();
+    this.beta = parameters.beta();
+    this.lambda = parameters.lambda();
+    this.rho = parameters.rho();
+    this.maxIterations = parameters.iterations();
+    this.antsPerIteration = parameters.numberOfAnts();
+
+    initializePheromoneMatrix();
+
+
   }
 
   /** Constructs a schedule solution probabilistically using pheromone and heuristic information. */

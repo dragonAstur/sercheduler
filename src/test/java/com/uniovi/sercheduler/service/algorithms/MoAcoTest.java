@@ -3,6 +3,7 @@ package com.uniovi.sercheduler.service.algorithms;
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.jmetal.algorithm.MOACO;
+import com.uniovi.sercheduler.jmetal.algorithm.MoAcoParameters;
 import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.evaluation.SequentialEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
@@ -36,7 +37,12 @@ class MoAcoTest {
             "energy",
             1);
 
-    var moAco = new MOACO(problem, new Random(randomSeed), new SequentialEvaluation<>(problem));
+    var moAco =
+        new MOACO(
+            problem,
+            new Random(randomSeed),
+            new SequentialEvaluation<>(problem),
+            new MoAcoParameters(350, 10, 1.0, 1.0, 2.0, 0.1));
 
     moAco.run();
 
@@ -46,7 +52,8 @@ class MoAcoTest {
     // Verify non-domination
     assertTrue(NonDominatedChecker.areAllNonDominated(result));
 
-    List<Map<String, Double>> expectedObjectives = List.of(
+    List<Map<String, Double>> expectedObjectives =
+        List.of(
             Map.of("energy", 538.5, "makespan", 204.0),
             Map.of("energy", 368.9, "makespan", 263.5),
             Map.of("energy", 574.5, "makespan", 195.0),
@@ -58,8 +65,7 @@ class MoAcoTest {
             Map.of("energy", 495.69999999999993, "makespan", 216.5),
             Map.of("energy", 469.49999999999994, "makespan", 241.5),
             Map.of("energy", 555.8999999999999, "makespan", 201.0),
-            Map.of("energy", 594.15, "makespan", 187.5)
-    );
+            Map.of("energy", 594.15, "makespan", 187.5));
 
     for (int i = 0; i < result.size(); i++) {
       var fitness = result.get(i).getFitnessInfo().fitness();
@@ -94,22 +100,22 @@ class MoAcoTest {
         new MOACO(
             problem,
             new Random(randomSeed),
-            new MultiThreadEvaluationMulti(0, problem, Objective.MAKESPAN.objectiveName));
+            new SequentialEvaluationMulti(0, problem, Objective.MAKESPAN.objectiveName),
+            new MoAcoParameters(100, 20, 1.0, 2.0, 1.0, 0.1));
 
     moAco.run();
 
     var result = moAco.result();
 
-    assertEquals(5, result.size());
+    assertEquals(4, result.size());
     // Verify non-domination
     assertTrue(NonDominatedChecker.areAllNonDominated(result));
 
     List<Map<String, Double>> expectedObjectives = List.of(
-            Map.of("energy", 473.95, "makespan", 186.5),
-            Map.of("energy", 448.54999999999995, "makespan", 187.0),
-            Map.of("energy", 474.09999999999997, "makespan", 180.5),
-            Map.of("energy", 368.9, "makespan", 263.5),
-            Map.of("energy", 412.8, "makespan", 205.5)
+            Map.of("energy", 575.2, "makespan", 186.5),
+            Map.of("energy", 526.4, "makespan", 187.0),
+            Map.of("energy", 609.5500000000001, "makespan", 180.5),
+            Map.of("energy", 575.55, "makespan", 184.5)
     );
     for (int i = 0; i < result.size(); i++) {
       var fitness = result.get(i).getFitnessInfo().fitness();
