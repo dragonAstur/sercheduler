@@ -1,7 +1,11 @@
 package com.uniovi.sercheduler.localsearch.command;
 
 import com.uniovi.sercheduler.dao.Objective;
+import com.uniovi.sercheduler.expception.HostLoadException;
+import com.uniovi.sercheduler.expception.WorkflowLoadException;
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
+import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalSearchAlgorithm;
 import com.uniovi.sercheduler.localsearch.export.XLSXExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
@@ -10,12 +14,13 @@ import com.uniovi.sercheduler.localsearch.algorithms.MaximumGradientStrategy;
 import com.uniovi.sercheduler.localsearch.algorithms.SimpleClimbingStrategy;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LocalSearchRunnable {
 
-    public static final String WORFLOW_FILE = "src/test/resources/1000genome.json";
+    public static final String WORFLOW_FILE = "src/test/resources/cycles.json";
     public static final String HOSTS_FILE = "src/test/resources/extreme/hosts-16.json";
     public static final long TIME_LIMIT = 10000L;
 
@@ -31,22 +36,48 @@ public class LocalSearchRunnable {
 
         long seed = System.nanoTime();
 
-        SchedulingProblem problem =
-                new SchedulingProblem(
-                        new File(WORFLOW_FILE),
-                        new File(HOSTS_FILE),
-                        "441Gf",
-                        "simple",
-                        seed,
-                        objectives,
-                        Objective.MAKESPAN.objectiveName);
+        SchedulingProblem problem;
 
-        operatorsExperiment(instanceName, problem, TIME_LIMIT, false);
+        try {
+            problem =
+                    new SchedulingProblem(
+                            new File(WORFLOW_FILE),
+                            new File(HOSTS_FILE),
+                            "441Gf",
+                            "simple",
+                            seed,
+                            objectives,
+                            Objective.MAKESPAN.objectiveName);
+        } catch(HostLoadException e) {
+            System.out.println("The hosts file could not be found. Please review that the path is correctly written " +
+                    "and make sure that the desired file is there.");
+            return;
+        } catch(WorkflowLoadException e) {
+            System.out.println("The workflow file could not be found. Please review that the path is correctly written " +
+                    "and make sure that the desired file is there.");
+            return;
+        }catch(RuntimeException e){
+            System.out.println("Exception's message:\n" + e.getMessage());
+            return;
+        }
+
+        operatorsExperiment(instanceName, problem, TIME_LIMIT, true);
     }
 
     protected static String getFileName(String filePath) {
         String[] filePathSplit = filePath.split("/");
         return filePathSplit[filePathSplit.length - 1].split("\\.")[0];
+    }
+
+    protected static void debug(String instanceName, SchedulingProblem problem){
+        LocalSearchAlgorithm localSearchAlgorithm = new LocalSearchAlgorithm.Builder(problem).build();
+
+        long startingTime = localSearchAlgorithm.startTimeCounter();
+
+        SchedulePermutationSolution achievedSolution =
+                localSearchAlgorithm.runLocalSearchGlobal(
+                        List.of(new NeighborhoodChangeHostGlobal(problem.getInstanceData())),
+                        new LocalSearchObserver("jansjnjs", "ksmdk"));
     }
 
     protected static void operatorsExperiment(String instanceName, SchedulingProblem problem, long timeLimit, boolean createFile){
@@ -64,9 +95,15 @@ public class LocalSearchRunnable {
 
         final String fileName = "operators_experiment_results";
 
-        if(createFile)
+        if (createFile)
             XLSXTableExporter.createWorkbook(fileName);
-        XLSXTableExporter.createInstanceSheet(fileName, instanceName);
+
+        try {
+            XLSXTableExporter.createInstanceSheet(fileName, instanceName);
+        }catch (RuntimeException e) {
+            System.out.println("Exception's message:\n" + e.getMessage());
+            return;
+        }
 
 
 

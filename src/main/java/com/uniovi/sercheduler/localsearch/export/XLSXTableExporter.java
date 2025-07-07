@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +26,7 @@ public class XLSXTableExporter {
                 workbook.write(outputStream);
             }
 
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -40,8 +42,8 @@ public class XLSXTableExporter {
 
             headerRow.createCell(1).setCellValue("Run");
 
-            for(int i = 1; i <= 30; i++)
-                headerRow.createCell(i+1).setCellValue(i);
+            for (int i = 1; i <= 30; i++)
+                headerRow.createCell(i + 1).setCellValue(i);
 
             headerRow.createCell(32).setCellValue("");
             headerRow.createCell(33).setCellValue("min");
@@ -60,7 +62,15 @@ public class XLSXTableExporter {
                 workbook.write(outputStream);
             }
 
+        }catch(FileNotFoundException e){
+            System.out.println("There is not an 'operators_experiment_results.xlsx' file in this directory. If you want to " +
+                    "create one from scratch, write '-C' as a parameter when executing the JAR file.\n");
+            throw new RuntimeException(e);
+        } catch(IllegalArgumentException e){
+            System.out.println("An experiment with this exact configuration has already been done.\n");
+            throw e;
         } catch (IOException e) {
+            System.out.println("An unexpected input-output exception has happened.\n");
             throw new RuntimeException(e);
         }
 
