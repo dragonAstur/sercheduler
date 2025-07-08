@@ -1,6 +1,8 @@
 package com.uniovi.sercheduler.localsearch.command;
 
 import com.uniovi.sercheduler.dao.Objective;
+import com.uniovi.sercheduler.expception.HostLoadException;
+import com.uniovi.sercheduler.expception.WorkflowLoadException;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
@@ -26,23 +28,38 @@ public class LocalSearchCommand {
 
         List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
 
-        String hostsFileName = LocalSearchRunnable.getFileName(hostsFile);
-
         String workflowFileName = LocalSearchRunnable.getFileName(workflowFile);
+
+        String hostsFileName = LocalSearchRunnable.getFileName(hostsFile);
 
         String instanceName = workflowFileName + "_" + hostsFileName + "_" + timeLimit;
 
         long seed = System.nanoTime();
 
-        SchedulingProblem problem =
-                new SchedulingProblem(
-                        new File(workflowFileName),
-                        new File(hostsFileName),
-                        "441Gf",
-                        "simple",
-                        seed,
-                        objectives,
-                        Objective.MAKESPAN.objectiveName);
+        SchedulingProblem problem;
+
+        try {
+            problem =
+                    new SchedulingProblem(
+                            new File(workflowFile),
+                            new File(hostsFile),
+                            "441Gf",
+                            "simple",
+                            seed,
+                            objectives,
+                            Objective.MAKESPAN.objectiveName);
+        } catch(HostLoadException e) {
+            System.out.println("The hosts file could not be found. Please review that the path is correctly written " +
+                    "and make sure that the desired file is there.");
+            return;
+        } catch(WorkflowLoadException e) {
+            System.out.println("The workflow file could not be found. Please review that the path is correctly written " +
+                    "and make sure that the desired file is there.");
+            return;
+        }catch(RuntimeException e){
+            System.out.println("Exception's message:\n" + e.getMessage());
+            return;
+        }
 
         LocalSearchRunnable.operatorsExperiment(instanceName, problem, timeLimit, createFile);
     }

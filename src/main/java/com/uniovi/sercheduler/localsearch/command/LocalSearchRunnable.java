@@ -61,7 +61,7 @@ public class LocalSearchRunnable {
             return;
         }
 
-        operatorsExperiment(instanceName, problem, TIME_LIMIT, true);
+        operatorsExperiment(instanceName, problem, TIME_LIMIT, false);
     }
 
     protected static String getFileName(String filePath) {
