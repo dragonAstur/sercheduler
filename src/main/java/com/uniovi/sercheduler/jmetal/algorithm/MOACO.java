@@ -43,6 +43,8 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
   private final int maxIterations;
   private final int antsPerIteration;
 
+  private final double initialPheromone;
+
   private final double depositAmount = 10.0;
 
 
@@ -85,6 +87,7 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
     this.rho = parameters.rho();
     this.maxIterations = parameters.iterations();
     this.antsPerIteration = parameters.numberOfAnts();
+    this.initialPheromone = (double) antsPerIteration / taskIds.size();
     initializePheromoneMatrix();
 
 
@@ -241,7 +244,7 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
   }
 
   private void localPheromoneUpdate(int taskIdx, int hostIdx) {
-    pheromone[taskIdx][hostIdx] = (1 - rho) * pheromone[taskIdx][hostIdx];
+    pheromone[taskIdx][hostIdx] = (1 - rho) * pheromone[taskIdx][hostIdx] + rho * initialPheromone ;
   }
 
   private SchedulePermutationSolution getBestSolutionByMakespan(
@@ -284,11 +287,11 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
     int numberOfTasks = taskIds.size();
     int numberOfHosts = hostIds.size();
     pheromone = new double[numberOfTasks][numberOfHosts];
-    double initialPheromoneValue = (double) antsPerIteration / taskIds.size();
+
 
     for (int i = 0; i < numberOfTasks; i++) {
       for (int j = 0; j < numberOfHosts; j++) {
-        pheromone[i][j] = initialPheromoneValue;
+        pheromone[i][j] = initialPheromone;
       }
     }
   }

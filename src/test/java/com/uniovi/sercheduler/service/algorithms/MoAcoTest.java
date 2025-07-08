@@ -4,7 +4,6 @@ import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.jmetal.algorithm.MOACO;
 import com.uniovi.sercheduler.jmetal.algorithm.MoAcoParameters;
-import com.uniovi.sercheduler.jmetal.evaluation.MultiThreadEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.evaluation.SequentialEvaluationMulti;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.util.NonDominatedChecker;
@@ -48,15 +47,17 @@ class MoAcoTest {
 
     var result = moAco.result();
 
-    assertEquals(4, result.size());
+    assertEquals(6, result.size());
     // Verify non-domination
     assertTrue(NonDominatedChecker.areAllNonDominated(result));
 
     List<Map<String, Double>> expectedObjectives = List.of(
-            Map.of("energy", 589.5, "makespan", 198.0),
             Map.of("energy", 519.1, "makespan", 212.0),
-            Map.of("energy", 545.25, "makespan", 199.5),
-            Map.of("energy", 604.65, "makespan", 181.5)
+            Map.of("energy", 535.05, "makespan", 211.5),
+            Map.of("energy", 497.29999999999995, "makespan", 212.5),
+            Map.of("energy", 565.3499999999999, "makespan", 196.5),
+            Map.of("energy", 604.65, "makespan", 181.5),
+            Map.of("energy", 583.5999999999999, "makespan", 183.5)
     );
 
     for (int i = 0; i < result.size(); i++) {
@@ -99,15 +100,18 @@ class MoAcoTest {
 
     var result = moAco.result();
 
-    assertEquals(3, result.size());
+    assertEquals(5, result.size());
     // Verify non-domination
     assertTrue(NonDominatedChecker.areAllNonDominated(result));
 
-    List<Map<String, Double>> expectedObjectives =
-        List.of(
-            Map.of("energy", 629.3500000000001, "makespan", 180.5),
-            Map.of("energy", 499.59999999999997, "makespan", 186.5),
-            Map.of("energy", 596.55, "makespan", 181.5));
+    List<Map<String, Double>> expectedObjectives = List.of(
+            Map.of("energy", 521.2, "makespan", 186.5),
+            Map.of("energy", 578.5, "makespan", 180.5),
+            Map.of("energy", 519.8, "makespan", 203.5),
+            Map.of("energy", 513.1, "makespan", 213.5),
+            Map.of("energy", 524.1, "makespan", 181.5)
+    );
+
     for (int i = 0; i < result.size(); i++) {
       var fitness = result.get(i).getFitnessInfo().fitness();
       assertEquals(
