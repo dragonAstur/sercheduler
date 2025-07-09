@@ -36,6 +36,7 @@ import org.springframework.shell.command.annotation.Option;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2Builder;
 import org.uma.jmetal.component.algorithm.multiobjective.NSGAIIBuilder;
+import org.uma.jmetal.component.algorithm.multiobjective.SMPSOBuilder;
 import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.SequentialEvaluation;
@@ -409,10 +410,12 @@ public class ExperimentJmetalCommand {
       return AlgoFlag.MULTI_DOUBLE_EVAL;
     } else if (f.contains("multi-pop-")) {
       return AlgoFlag.MULTI;
-    } else if (f.equals("moheft")) {
+    } else if (f.contains("moheft")) {
       return AlgoFlag.MOHEFT;
-    } else if (f.equals("moaco")) {
+    } else if (f.contains("moaco")) {
       return AlgoFlag.MOACO;
+    } else if (f.contains("SPSO")) {
+      return AlgoFlag.SPSO;
     } else {
       return AlgoFlag.DEFAULT;
     }
@@ -587,6 +590,8 @@ public class ExperimentJmetalCommand {
                           new SequentialEvaluationMulti(
                               0, problem, objectives.get(1).objectiveName),
                           new MoAcoParameters(100, 20, 1.0, 2.0, 1.0, 0.1));
+              // case SPSO ->   algorithm = new SMPSOBuilder(problem, problem.length()).setEvaluation(getEvaluator("simple", problem, objectives));
+
 
               default ->
                   algorithm =
@@ -674,6 +679,7 @@ public class ExperimentJmetalCommand {
     MULTI_DOUBLE_EVAL,
     MOHEFT,
     MOACO,
+    SPSO,
     DEFAULT;
   }
 
