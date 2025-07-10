@@ -11,6 +11,7 @@ import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleSelection;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.jmetal.problem.SchedulingDoubleProblem;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowLoader;
@@ -29,6 +30,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import com.uniovi.sercheduler.service.core.RandomKeysCoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
@@ -63,6 +66,7 @@ import org.uma.jmetal.qualityindicator.impl.InvertedGenerationalDistance;
 import org.uma.jmetal.qualityindicator.impl.InvertedGenerationalDistancePlus;
 import org.uma.jmetal.qualityindicator.impl.Spread;
 import org.uma.jmetal.qualityindicator.impl.hypervolume.impl.PISAHypervolume;
+import org.uma.jmetal.solution.Solution;
 
 /** Class for running experiments using JMetal experiment tools. */
 @Command
@@ -414,8 +418,8 @@ public class ExperimentJmetalCommand {
       return AlgoFlag.MOHEFT;
     } else if (f.contains("moaco")) {
       return AlgoFlag.MOACO;
-    } else if (f.contains("SPSO")) {
-      return AlgoFlag.SPSO;
+    } else if (f.contains("smpso")) {
+      return AlgoFlag.SMPSO;
     } else {
       return AlgoFlag.DEFAULT;
     }
@@ -590,8 +594,22 @@ public class ExperimentJmetalCommand {
                           new SequentialEvaluationMulti(
                               0, problem, objectives.get(1).objectiveName),
                           new MoAcoParameters(100, 20, 1.0, 2.0, 1.0, 0.1));
-              // case SPSO ->   algorithm = new SMPSOBuilder(problem, problem.length()).setEvaluation(getEvaluator("simple", problem, objectives));
-
+//              case SMPSO ->
+//                  algorithm =
+//                      new SMPSOBuilder(
+//                              new SchedulingDoubleProblem(
+//                                  benchmark + "-hosts-" + i,
+//                                  new File(workflowsPath + benchmark + ".json"),
+//                                  new File(hostsPath + type + "/hosts-" + i + ".json"),
+//                                  experimentConfig.referenceSpeed(),
+//                                  f,
+//                                  seed,
+//                                  objectives,
+//                                  objectives.get(0).objectiveName,
+//                                  executions,
+//                                  new RandomKeysCoder(problem.getInstanceData())),
+//                              problem.length())
+//                              .build();
 
               default ->
                   algorithm =
@@ -679,7 +697,7 @@ public class ExperimentJmetalCommand {
     MULTI_DOUBLE_EVAL,
     MOHEFT,
     MOACO,
-    SPSO,
+    SMPSO,
     DEFAULT;
   }
 
