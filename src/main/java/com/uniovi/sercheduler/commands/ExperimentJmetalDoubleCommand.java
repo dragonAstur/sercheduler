@@ -2,6 +2,8 @@ package com.uniovi.sercheduler.commands;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.algorithm.*;
+import com.uniovi.sercheduler.jmetal.evaluation.SequentialEvaluationMultiDouble;
+import com.uniovi.sercheduler.jmetal.problem.ScheduleDoubleSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingDoubleProblem;
 import com.uniovi.sercheduler.parser.HostLoader;
 import com.uniovi.sercheduler.parser.WorkflowLoader;
@@ -22,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
+import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.component.algorithm.ParticleSwarmOptimizationAlgorithm;
 import org.uma.jmetal.component.algorithm.multiobjective.SMPSOBuilder;
 import org.uma.jmetal.component.catalogue.common.termination.Termination;
@@ -38,6 +41,7 @@ import org.uma.jmetal.lab.experiment.component.impl.GenerateReferenceParetoFront
 import org.uma.jmetal.lab.experiment.component.impl.GenerateWilcoxonTestTablesWithR;
 import org.uma.jmetal.lab.experiment.util.ExperimentAlgorithm;
 import org.uma.jmetal.lab.experiment.util.ExperimentProblem;
+import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.qualityindicator.impl.Epsilon;
 import org.uma.jmetal.qualityindicator.impl.GenerationalDistance;
 import org.uma.jmetal.qualityindicator.impl.InvertedGenerationalDistance;
@@ -208,9 +212,13 @@ public class ExperimentJmetalDoubleCommand {
   }
 
   private static AlgoFlag parseFlag(String f) {
+    if (f.equals("multi-smpso")){
+      return AlgoFlag.MULTI_SMPSO;
+    }
     if (f.contains("smpso")) {
       return AlgoFlag.SMPSO;
-    } else {
+    }
+    else {
       return AlgoFlag.DEFAULT;
     }
   }
@@ -244,7 +252,7 @@ public class ExperimentJmetalDoubleCommand {
     List<ExperimentProblem<DoubleSolution>> problemList = new ArrayList<>();
     List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> algorithmList =
         new ArrayList<>();
-    List<SchedulingDoubleProblem> schedulingProblemList = new ArrayList<>();
+    List<Problem<DoubleSolution>> schedulingProblemList = new ArrayList<>();
 
     var objectives = experimentConfig.objectives().stream().map(Objective::of).toList();
 
@@ -270,7 +278,7 @@ public class ExperimentJmetalDoubleCommand {
 
         for (var f : fitness) {
 
-          var problem =
+         var problem =
               new SchedulingDoubleProblem(
                   benchmark + "-hosts-" + i,
                   new File(workflowsPath + benchmark + ".json"),
@@ -284,11 +292,13 @@ public class ExperimentJmetalDoubleCommand {
           schedulingProblemList.add(problem);
 
           for (int run = 0; run < experimentConfig.independentRuns(); run++) {
-            ParticleSwarmOptimizationAlgorithm algorithm;
+            Algorithm<List<DoubleSolution>> algorithm;
 
             AlgoFlag flag = parseFlag(f);
             switch (flag) {
+              case MULTI_SMPSO -> algorithm = new SMPSOBuilderMulti(problem, populationSize).setEvaluation(new SequentialEvaluationMultiDouble(0, problem,objectives.get(1).objectiveName)).setTermination(termination).build();
               case SMPSO -> algorithm = new SMPSOBuilder(problem, populationSize).setTermination(termination).build();
+
 
               default ->
                   algorithm = new SMPSOBuilder(problem, 100).setTermination(termination).build();
@@ -349,6 +359,7 @@ public class ExperimentJmetalDoubleCommand {
   }
 
   enum AlgoFlag {
+    MULTI_SMPSO,
     SMPSO,
     DEFAULT;
   }

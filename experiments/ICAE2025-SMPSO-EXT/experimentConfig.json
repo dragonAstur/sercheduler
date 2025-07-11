@@ -6,7 +6,8 @@
     "rank-smpso",
     "heft-smpso",
     "multi-energy-smpso",
-    "multi-makespan-smpso"
+    "multi-makespan-smpso",
+    "multi-smpso"
   ],
   "workflows": [
     "1000genome-chameleon-18ch-250k-001",
@@ -23,7 +24,8 @@
   "referenceSpeed": "93.6Gf",
   "independentRuns": 10,
   "objectives": [
-    "energy", "makespan"
+    "energy",
+    "makespan"
   ],
   "jmetalAnalysis": true
 }

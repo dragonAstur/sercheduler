@@ -6,7 +6,8 @@
     "rank-smpso",
     "heft-smpso",
     "multi-energy-smpso",
-    "multi-makespan-smpso"
+    "multi-makespan-smpso",
+    "multi-smpso"
   ],
   "workflows": [
     "montage-chameleon-2mass-005d-001",

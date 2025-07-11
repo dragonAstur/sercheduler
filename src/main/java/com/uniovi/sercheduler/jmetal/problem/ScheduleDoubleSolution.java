@@ -49,6 +49,7 @@ public class ScheduleDoubleSolution extends AbstractSolution<Double> implements 
     this.bounds = bounds;
     this.fitnessInfo = fitnessInfo;
     this.arbiter = arbiter;
+    this.attributes.put("arbiter", arbiter);
   }
 
   public ScheduleDoubleSolution(ScheduleDoubleSolution solution) {
@@ -98,6 +99,7 @@ public class ScheduleDoubleSolution extends AbstractSolution<Double> implements 
   }
 
   public void setArbiter(String arbiter) {
+    this.attributes.put("arbiter", arbiter);
     this.arbiter = arbiter;
   }
 

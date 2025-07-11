@@ -416,6 +416,8 @@ public class ExperimentJmetalCommand {
       return AlgoFlag.MULTI;
     } else if (f.contains("moheft")) {
       return AlgoFlag.MOHEFT;
+    } else if (f.equals("multi-moaco")) {
+      return AlgoFlag.MULTI_MOACO;
     } else if (f.contains("moaco")) {
       return AlgoFlag.MOACO;
     } else if (f.contains("smpso")) {
@@ -591,26 +593,15 @@ public class ExperimentJmetalCommand {
                       new MOACO(
                           problem,
                           random,
-                          new SequentialEvaluationMulti(
-                              0, problem, objectives.get(1).objectiveName),
+                          getEvaluator("simple", problem, objectives),
                           new MoAcoParameters(100, 20, 1.0, 2.0, 1.0, 0.1));
-//              case SMPSO ->
-//                  algorithm =
-//                      new SMPSOBuilder(
-//                              new SchedulingDoubleProblem(
-//                                  benchmark + "-hosts-" + i,
-//                                  new File(workflowsPath + benchmark + ".json"),
-//                                  new File(hostsPath + type + "/hosts-" + i + ".json"),
-//                                  experimentConfig.referenceSpeed(),
-//                                  f,
-//                                  seed,
-//                                  objectives,
-//                                  objectives.get(0).objectiveName,
-//                                  executions,
-//                                  new RandomKeysCoder(problem.getInstanceData())),
-//                              problem.length())
-//                              .build();
-
+              case MULTI_MOACO ->
+                  algorithm =
+                      new MOACO(
+                          problem,
+                          random,
+                          getEvaluator("multi", problem, objectives),
+                          new MoAcoParameters(100, 20, 1.0, 2.0, 1.0, 0.1));
               default ->
                   algorithm =
                       new NSGAIIBuilder<>(
@@ -696,6 +687,7 @@ public class ExperimentJmetalCommand {
     MULTI,
     MULTI_DOUBLE_EVAL,
     MOHEFT,
+    MULTI_MOACO,
     MOACO,
     SMPSO,
     DEFAULT;
