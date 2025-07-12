@@ -47,20 +47,24 @@ class MoAcoTest {
 
     var result = moAco.result();
 
-    assertEquals(6, result.size());
+    assertEquals(12, result.size());
     // Verify non-domination
     assertTrue(NonDominatedChecker.areAllNonDominated(result));
 
-    // Verify fitness values
     List<Map<String, Double>> expectedObjectives =
         List.of(
-            Map.of("energy", 495.7, "makespan", 216.5),
-            Map.of("energy", 603.3000000000001, "makespan", 181.5),
-            Map.of("energy", 659.95, "makespan", 180.5),
-            Map.of("energy", 537.85, "makespan", 213.5),
-            Map.of("energy", 481.5, "makespan", 265.5),
-            Map.of("energy", 566.9000000000001, "makespan", 187.0));
-
+            Map.of("energy", 538.5, "makespan", 204.0),
+            Map.of("energy", 368.9, "makespan", 263.5),
+            Map.of("energy", 574.5, "makespan", 195.0),
+            Map.of("energy", 404.9, "makespan", 254.5),
+            Map.of("energy", 515.3, "makespan", 208.0),
+            Map.of("energy", 451.69999999999993, "makespan", 245.5),
+            Map.of("energy", 562.0999999999999, "makespan", 199.0),
+            Map.of("energy", 476.69999999999993, "makespan", 223.5),
+            Map.of("energy", 495.69999999999993, "makespan", 216.5),
+            Map.of("energy", 469.49999999999994, "makespan", 241.5),
+            Map.of("energy", 555.8999999999999, "makespan", 201.0),
+            Map.of("energy", 594.15, "makespan", 187.5));
     for (int i = 0; i < result.size(); i++) {
       var fitness = result.get(i).getFitnessInfo().fitness();
       assertEquals(
@@ -101,20 +105,15 @@ class MoAcoTest {
 
     var result = moAco.result();
 
-    assertEquals(7, result.size());
+    assertEquals(3, result.size());
     // Verify non-domination
     assertTrue(NonDominatedChecker.areAllNonDominated(result));
 
-    // Verify fitness values
     List<Map<String, Double>> expectedObjectives =
         List.of(
-            Map.of("energy", 513.55, "makespan", 186.5),
-            Map.of("energy", 456.35, "makespan", 199.0),
-            Map.of("energy", 503.0, "makespan", 187.0),
-            Map.of("energy", 443.4, "makespan", 205.5),
-            Map.of("energy", 479.35, "makespan", 191.0),
-            Map.of("energy", 531.75, "makespan", 181.5),
-            Map.of("energy", 543.8499999999999, "makespan", 180.5));
+            Map.of("energy", 503.85, "makespan", 181.5),
+            Map.of("energy", 461.70000000000005, "makespan", 184.5),
+            Map.of("energy", 560.95, "makespan", 180.5));
 
     for (int i = 0; i < result.size(); i++) {
       var fitness = result.get(i).getFitnessInfo().fitness();

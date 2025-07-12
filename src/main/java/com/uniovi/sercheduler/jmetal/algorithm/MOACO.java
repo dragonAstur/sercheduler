@@ -241,7 +241,7 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
   }
 
   private void localPheromoneUpdate(int taskIdx, int hostIdx) {
-    pheromone[taskIdx][hostIdx] = (1 - rho) * pheromone[taskIdx][hostIdx] + rho * initialPheromone ;
+    pheromone[taskIdx][hostIdx] = (1 - rho) * pheromone[taskIdx][hostIdx];
   }
 
   private SchedulePermutationSolution getBestSolutionByMakespan(
