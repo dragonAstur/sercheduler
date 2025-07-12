@@ -594,14 +594,14 @@ public class ExperimentJmetalCommand {
                           problem,
                           random,
                           getEvaluator("simple", problem, objectives),
-                          new MoAcoParameters(100, 20, 1.0, 2.0, 1.0, 0.1));
+                          new MoAcoParameters(1000, 20, 1.0, 2.0, 1.0, 0.1));
               case MULTI_MOACO ->
                   algorithm =
                       new MOACO(
                           problem,
                           random,
                           getEvaluator("multi", problem, objectives),
-                          new MoAcoParameters(100, 20, 1.0, 2.0, 1.0, 0.1));
+                          new MoAcoParameters(1000, 20, 1.0, 2.0, 1.0, 0.1));
               default ->
                   algorithm =
                       new NSGAIIBuilder<>(
