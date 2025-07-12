@@ -45,7 +45,6 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
 
   private final double initialPheromone;
 
-  private final double depositAmount = 10.0;
 
 
   private final Map<String, Map<String, Double>> computationMatrix;
@@ -227,10 +226,8 @@ public class MOACO implements Algorithm<List<SchedulePermutationSolution>> {
         double time = assignment.eft();
         double energy = assignment.eft() * assignment.host().getEnergyCost();
 
-        // pheromone[taskIdx][hostIdx] += lambda / (time + energy);
-        // planB pheromone[taskIdx][hostIdx] += lambda / archive.size();
+        pheromone[taskIdx][hostIdx] += lambda / (time + energy);
 
-         pheromone[taskIdx][hostIdx] += depositAmount;
       }
     }
   }
