@@ -6,6 +6,7 @@ import com.uniovi.sercheduler.localsearch.movement.SwapMovement;
 import com.uniovi.sercheduler.service.PlanPair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,21 +23,25 @@ public class NeighborhoodSwapPositional implements NeighborhoodOperatorPositiona
 
         List<GeneratedNeighbor> neighbors = new ArrayList<>();
 
-        for(int newPosition : validPositions) {
+        for(int otherPosition : validPositions) {
 
-            if(newPosition == position)
+            if(otherPosition == position)
+                continue;
+
+            int[] otherPositionValidDestinations = getValidPositions(plan, otherPosition);
+            if(Arrays.stream(otherPositionValidDestinations).noneMatch(x -> x == position))
                 continue;
 
             SchedulePermutationSolution generatedSolution = new SchedulePermutationSolution(
                     actualSolution.variables().size(),
                     actualSolution.objectives().length,
                     null,
-                    swapWithOneSpecificPosition(plan, position, newPosition),
+                    swapWithOneSpecificPosition(plan, position, otherPosition),
                     actualSolution.getArbiter()
             );
 
             List<Movement> movements = new ArrayList<>();
-            movements.add(new SwapMovement(position, newPosition, NeighborUtils.getParentsPositions(plan, position)));
+            movements.add(new SwapMovement(position, otherPosition, NeighborUtils.getParentsPositions(plan, position)));
             neighbors.add(new GeneratedNeighbor(generatedSolution, movements));
 
         }

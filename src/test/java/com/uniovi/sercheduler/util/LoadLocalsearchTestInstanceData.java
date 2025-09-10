@@ -16,6 +16,10 @@ public class LoadLocalsearchTestInstanceData {
         return loadTestJson("localsearch/hosts.json", "localsearch/workflow.json");
     }
 
+    public static InstanceData loadSpecificSwapTest(){
+        return loadTestJson("localsearch/hosts.json", "localsearch/workflow_swap.json");
+    }
+
     private static InstanceData loadTestJson(String hostFile, String workflowFile) {
         try {
             HostLoader hostLoader = new HostFileLoader();

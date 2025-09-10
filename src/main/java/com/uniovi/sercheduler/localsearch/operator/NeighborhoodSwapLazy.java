@@ -30,6 +30,10 @@ public class NeighborhoodSwapLazy implements NeighborhoodOperatorLazy{
 
                     return Arrays.stream(validPositions)
                             .filter(otherPosition -> otherPosition != position)
+                            .filter(otherPosition -> {
+                                int[] otherPositionValidDestinations = getValidPositions(plan, otherPosition);
+                                return Arrays.stream(otherPositionValidDestinations).anyMatch(x -> x == position);
+                            })
                             .mapToObj(otherPosition -> {
 
                                 SchedulePermutationSolution generatedSolution = new SchedulePermutationSolution(
