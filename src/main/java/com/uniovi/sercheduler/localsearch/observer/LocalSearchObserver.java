@@ -67,7 +67,7 @@ public class LocalSearchObserver implements Observer {
             long elapsedTime = actualTime - lastRecordedTime;
 
             if(elapsedTime >= periodicTimeForMakespanEvolution){
-                timesForMakespanEvolution.add(elapsedTime);
+                timesForMakespanEvolution.add(actualTime - runStartingTime);
                 bestMakespanEvolution.add(bestMakespan);
                 lastRecordedTime = actualTime;
             }

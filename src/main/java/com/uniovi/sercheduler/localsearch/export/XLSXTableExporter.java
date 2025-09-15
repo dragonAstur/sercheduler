@@ -317,9 +317,9 @@ public class XLSXTableExporter {
 
                 RunMetrics run = observer.getRuns().get(i);
 
-                Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-
                 for(int j = 0; j < run.timesForMakespanEvolution().size(); j++){
+
+                    Row row = sheet.createRow(sheet.getLastRowNum() + 1);
 
                     row.createCell(0).setCellValue(observer.getStrategyName());
                     row.createCell(1).setCellValue(operatorLabel);
