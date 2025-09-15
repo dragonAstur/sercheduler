@@ -5,7 +5,11 @@ import java.util.List;
 public record RunMetrics (
         String strategyName,
         List<StartMetrics> starts,
-        long executionTime
+        long executionTime,
+
+        List<Double> bestMakespanEvolution,
+
+        List<Long> timesForMakespanEvolution
 ) {
     public int numberOfStarts(){
         return starts.size();

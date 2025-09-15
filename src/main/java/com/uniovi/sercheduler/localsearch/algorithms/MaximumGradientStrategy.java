@@ -29,12 +29,12 @@ public class MaximumGradientStrategy extends AbstractStrategy {
 
         LocalSearchAlgorithm localSearchAlgorithm = new LocalSearchAlgorithm.Builder(problem).build();
 
-        long startingTime = localSearchAlgorithm.startTimeCounter();
+        getObserver().startRun(localSearchAlgorithm.startTimeCounter());
 
         SchedulePermutationSolution achievedSolution =
                 localSearchAlgorithm.runLocalSearchGlobal(neighborhoodOperatorList, getObserver());
 
-        getObserver().endRun(System.currentTimeMillis() - startingTime);
+        getObserver().endRun();
 
         return achievedSolution;
     }

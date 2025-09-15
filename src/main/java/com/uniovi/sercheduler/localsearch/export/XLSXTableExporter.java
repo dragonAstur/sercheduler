@@ -1,10 +1,12 @@
 package com.uniovi.sercheduler.localsearch.export;
 
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
+import com.uniovi.sercheduler.localsearch.observer.RunMetrics;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import weka.Run;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -268,4 +270,75 @@ public class XLSXTableExporter {
 
     }
 
+    public static void createMakespanEvolutionSheet(String fileName, String instanceName){
+
+        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
+
+            Sheet sheet = workbook.createSheet(instanceName + "_evolution");
+            Row headerRow = sheet.createRow(0);
+
+            headerRow.createCell(0).setCellValue("Strategy");
+
+            headerRow.createCell(1).setCellValue("Operator config");
+
+            headerRow.createCell(2).setCellValue("Run number");
+
+            headerRow.createCell(3).setCellValue("Time instant");
+
+            headerRow.createCell(4).setCellValue("Recorded makespan");
+
+            // Write the workbook to a file
+            try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
+                workbook.write(outputStream);
+            }
+
+        }catch(FileNotFoundException e){
+            System.out.println("There is not an 'operators_experiment_results.xlsx' file in this directory. If you want to " +
+                    "create one from scratch, write '-C' as a parameter when executing the JAR file.\n");
+            throw new RuntimeException(e);
+        } catch(IllegalArgumentException e){
+            System.out.println("An experiment with this exact configuration has already been done.\n");
+            throw e;
+        } catch (IOException e) {
+            System.out.println("An unexpected input-output exception has happened.\n");
+            throw new RuntimeException(e);
+        }
+
+    }
+
+
+    public static void appendMakespanEvolutionSheet(String fileName, String instanceName, LocalSearchObserver observer, String operatorLabel){
+
+        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
+
+            Sheet sheet = workbook.getSheet(instanceName + "_evolution");
+
+            for(int i = 0; i < observer.getRuns().size(); i++) {
+
+                RunMetrics run = observer.getRuns().get(i);
+
+                Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+
+                for(int j = 0; j < run.timesForMakespanEvolution().size(); j++){
+
+                    row.createCell(0).setCellValue(observer.getStrategyName());
+                    row.createCell(1).setCellValue(operatorLabel);
+                    row.createCell(2).setCellValue(i+1);
+                    row.createCell(3).setCellValue(run.timesForMakespanEvolution().get(j));
+                    row.createCell(4).setCellValue(run.bestMakespanEvolution().get(j));
+
+                }
+
+            }
+
+            // Write the workbook to a file
+            try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
+                workbook.write(outputStream);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }

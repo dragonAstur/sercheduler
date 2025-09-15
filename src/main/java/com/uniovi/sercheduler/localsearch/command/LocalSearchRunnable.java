@@ -22,7 +22,7 @@ public class LocalSearchRunnable {
 
     public static final String WORFLOW_FILE = "src/test/resources/cycles.json";
     public static final String HOSTS_FILE = "src/test/resources/extreme/hosts-16.json";
-    public static final long TIME_LIMIT = 10000L;
+    public static final long TIME_LIMIT = 1000L;
 
     public static void main(String[] args) {
 
@@ -61,7 +61,7 @@ public class LocalSearchRunnable {
             return;
         }
 
-        operatorsExperiment(instanceName, problem, TIME_LIMIT, false);
+        operatorsExperiment(instanceName, problem, TIME_LIMIT, true, 250);
     }
 
     protected static String getFileName(String filePath) {
@@ -77,10 +77,11 @@ public class LocalSearchRunnable {
         SchedulePermutationSolution achievedSolution =
                 localSearchAlgorithm.runLocalSearchGlobal(
                         List.of(new NeighborhoodChangeHostGlobal(problem.getInstanceData())),
-                        new LocalSearchObserver("jansjnjs", "ksmdk"));
+                        new LocalSearchObserver("jansjnjs", -1));
     }
 
-    protected static void operatorsExperiment(String instanceName, SchedulingProblem problem, long timeLimit, boolean createFile){
+    protected static void operatorsExperiment(String instanceName, SchedulingProblem problem, long timeLimit,
+                                              boolean createFile, long periodicTimeForMakespanEvolution){
 
         NeighborhoodOperatorGlobal globalOperator;
         NeighborhoodOperatorLazy lazyOperator;
@@ -105,13 +106,20 @@ public class LocalSearchRunnable {
             return;
         }
 
+        try {
+            XLSXTableExporter.createMakespanEvolutionSheet(fileName, instanceName);
+        }catch (RuntimeException e) {
+            System.out.println("Exception's message:\n" + e.getMessage());
+            return;
+        }
 
 
 
-        System.out.println("\n\nDHC | N1 operator\n\n");
+
+        System.out.println("\n\nGD | N1 operator\n\n");
 
         globalOperator = new NeighborhoodChangeHostGlobal(problem.getInstanceData());
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -123,14 +131,15 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1");
 
 
 
 
-        System.out.println("\n\nDHC | N2 operator\n\n");
+        System.out.println("\n\nGD | N2 operator\n\n");
 
         globalOperator = new NeighborhoodInsertionGlobal();
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -146,10 +155,10 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N3 operator\n\n");
+        System.out.println("\n\nGD | N3 operator\n\n");
 
         globalOperator = new NeighborhoodSwapGlobal();
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -165,10 +174,10 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N4 operator\n\n");
+        System.out.println("\n\nGD | N4 operator\n\n");
 
         globalOperator = new NeighborhoodSwapHostGlobal();
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -184,13 +193,13 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N1 U N2 operator\n\n");
+        System.out.println("\n\nGD | N1 U N2 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodInsertionGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -206,13 +215,13 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N1 U N3 operator\n\n");
+        System.out.println("\n\nGD | N1 U N3 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodSwapGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -228,13 +237,13 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N1 U N4 operator\n\n");
+        System.out.println("\n\nGD | N1 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -250,13 +259,13 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N2 U N3 operator\n\n");
+        System.out.println("\n\nGD | N2 U N3 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodInsertionGlobal(),
                 new NeighborhoodSwapGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -271,13 +280,13 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N2 U N4 operator\n\n");
+        System.out.println("\n\nGD | N2 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodInsertionGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -293,13 +302,13 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N3 U N4 operator\n\n");
+        System.out.println("\n\nGD | N3 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodSwapGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -315,14 +324,14 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N1 U N2 U N3 operator\n\n");
+        System.out.println("\n\nGD | N1 U N2 U N3 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodInsertionGlobal(),
                 new NeighborhoodSwapGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -338,14 +347,14 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N1 U N2 U N4 operator\n\n");
+        System.out.println("\n\nGD | N1 U N2 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodInsertionGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -361,14 +370,14 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N1 U N3 U N4 operator\n\n");
+        System.out.println("\n\nGD | N1 U N3 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodSwapGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -383,14 +392,14 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N2 U N3 U N4 operator\n\n");
+        System.out.println("\n\nGD | N2 U N3 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodInsertionGlobal(),
                 new NeighborhoodSwapGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -406,7 +415,7 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | N1 U N2 U N3 U N4 operator\n\n");
+        System.out.println("\n\nGD | N1 U N2 U N3 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
@@ -414,7 +423,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -430,7 +439,7 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nDHC | VNS (random choice) operator\n\n");
+        System.out.println("\n\nGD | VNS (random choice) operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
@@ -438,7 +447,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("DHC", instanceName);
+        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
         maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -457,7 +466,7 @@ public class LocalSearchRunnable {
         System.out.println("\n\nHC | N1 operator\n\n");
 
         lazyOperator = new NeighborhoodChangeHostLazy(problem.getInstanceData());
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -476,7 +485,7 @@ public class LocalSearchRunnable {
         System.out.println("\n\nHC | N2 operator\n\n");
 
         lazyOperator = new NeighborhoodInsertionLazy();
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -495,7 +504,7 @@ public class LocalSearchRunnable {
         System.out.println("\n\nHC | N3 operator\n\n");
 
         lazyOperator = new NeighborhoodSwapLazy();
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -514,7 +523,7 @@ public class LocalSearchRunnable {
         System.out.println("\n\nHC | N4 operator\n\n");
 
         lazyOperator = new NeighborhoodSwapHostLazy();
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -536,7 +545,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                 new NeighborhoodInsertionLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -558,7 +567,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                 new NeighborhoodSwapLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -580,7 +589,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -602,7 +611,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodInsertionLazy(),
                 new NeighborhoodSwapLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -624,7 +633,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodInsertionLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -646,7 +655,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -669,7 +678,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodInsertionLazy(),
                 new NeighborhoodSwapLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -692,7 +701,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodInsertionLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -715,7 +724,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -738,7 +747,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -762,7 +771,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -785,7 +794,7 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
         simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
         for(int i = 0; i < 30; i++) {
@@ -821,7 +830,7 @@ public class LocalSearchRunnable {
         //Here you can change the operator
         NeighborhoodOperatorGlobal globalOperator = new NeighborhoodSwapHostGlobal();
 
-        LocalSearchObserver observer = new LocalSearchObserver("DHC", instanceName);
+        LocalSearchObserver observer = new LocalSearchObserver("GD", -1);
 
         MaximumGradientStrategy maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
@@ -844,7 +853,7 @@ public class LocalSearchRunnable {
         //Here you can change the operator
         NeighborhoodOperatorLazy lazyOperator = new NeighborhoodSwapHostLazy();
 
-        observer = new LocalSearchObserver("HC", instanceName);
+        observer = new LocalSearchObserver("HC", -1);
 
         SimpleClimbingStrategy simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 

@@ -24,7 +24,8 @@ public class LocalSearchCommand {
             @Option(shortNames = 'H', required = true) String hostsFile,
             @Option(shortNames = 'W', required = true) String workflowFile,
             @Option(shortNames = 'T', defaultValue = "5000") long timeLimit,
-            @Option(shortNames = 'C', defaultValue = "false") boolean createFile) {
+            @Option(shortNames = 'C', defaultValue = "false") boolean createFile,
+            @Option(shortNames = 'P', defaultValue = "0") long periodicTimeForMakespanEvolution) {
 
         List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
 
@@ -61,6 +62,6 @@ public class LocalSearchCommand {
             return;
         }
 
-        LocalSearchRunnable.operatorsExperiment(instanceName, problem, timeLimit, createFile);
+        LocalSearchRunnable.operatorsExperiment(instanceName, problem, timeLimit, createFile, periodicTimeForMakespanEvolution);
     }
 }

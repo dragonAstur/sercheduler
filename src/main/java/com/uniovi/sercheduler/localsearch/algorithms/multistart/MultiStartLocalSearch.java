@@ -26,6 +26,8 @@ public class MultiStartLocalSearch {
 
         long startingTime = localSearchAlgorithm.startTimeCounter();
 
+        observer.startRun(startingTime);
+
         SchedulePermutationSolution totalBestNeighbor = null;
 
         List<NeighborhoodOperatorGlobal> chosenOperators;
@@ -48,7 +50,7 @@ public class MultiStartLocalSearch {
 
         } while(System.currentTimeMillis() - startingTime < limitTime);
 
-        observer.endRun(System.currentTimeMillis() - startingTime);
+        observer.endRun();
 
         return totalBestNeighbor;
     }
@@ -59,7 +61,9 @@ public class MultiStartLocalSearch {
                                                LocalSearchObserver observer)
     {
 
-        long startingTime = System.currentTimeMillis();
+        long startingTime = System.currentTimeMillis(); //TODO: aquí no sería igual? O el termination condition es diferente
+
+        observer.startRun(startingTime);
 
         SchedulePermutationSolution totalBestNeighbor = null;
 
@@ -84,7 +88,7 @@ public class MultiStartLocalSearch {
         } while(System.currentTimeMillis() - startingTime < limitTime);
 
 
-        observer.endRun(System.currentTimeMillis() - startingTime);
+        observer.endRun();
 
         return totalBestNeighbor;
     }

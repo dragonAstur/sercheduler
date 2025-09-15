@@ -26,7 +26,21 @@ public class LocalSearchObserver implements Observer {
     private long timeForFindingBestSolution;
     private int generatedNeighborsForFindingBestSolution;
 
-    public LocalSearchObserver(String strategyName, String instanceName){
+    private long periodicTimeForMakespanEvolution;
+    private List<Double> bestMakespanEvolution;
+    private List<Long> timesForMakespanEvolution;
+    private long lastRecordedTime;
+
+    private long runStartingTime;
+
+    public LocalSearchObserver(String strategyName, long periodicTimeForMakespanEvolution){
+
+        this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
+        this.bestMakespanEvolution = new ArrayList<>();
+        this.timesForMakespanEvolution = new ArrayList<>();
+        this.lastRecordedTime = -1;
+        this.runStartingTime = -1;
+
         this.strategyName = strategyName;
         this.runs = new ArrayList<>();
 
@@ -42,6 +56,28 @@ public class LocalSearchObserver implements Observer {
         reachedMakespanImprovingRatioWithRespectLastIteration = -1;
     }
 
+    public void updateMakespanEvolution(double bestMakespan){
+
+        if(periodicTimeForMakespanEvolution > 0L){
+
+            long actualTime = System.currentTimeMillis();
+
+            lastRecordedTime = lastRecordedTime <= 0? runStartingTime : lastRecordedTime;
+
+            long elapsedTime = actualTime - lastRecordedTime;
+
+            if(elapsedTime >= periodicTimeForMakespanEvolution){
+                timesForMakespanEvolution.add(elapsedTime);
+                bestMakespanEvolution.add(bestMakespan);
+                lastRecordedTime = actualTime;
+            }
+        }
+    }
+
+    public void startRun(long startingTime){
+        this.runStartingTime = startingTime;
+    }
+
     public List<RunMetrics> getRuns() {
         return new ArrayList<>(runs);
     }
@@ -50,18 +86,26 @@ public class LocalSearchObserver implements Observer {
         return runs.size();
     }
 
-    public void endRun(long executionTime) {
+    public void endRun() {
 
         if (starts.isEmpty())
             endStart();
 
+        long executionTime = System.currentTimeMillis() - runStartingTime;
+
         runs.add(
-                new RunMetrics(strategyName, starts, executionTime)
+                new RunMetrics(strategyName, starts, executionTime, bestMakespanEvolution, timesForMakespanEvolution)
         );
 
         checkBestSolution();
 
         starts = new ArrayList<>();
+
+        runStartingTime = -1;
+
+        bestMakespanEvolution = new ArrayList<>();
+        timesForMakespanEvolution = new ArrayList<>();
+        lastRecordedTime = 0;
     }
 
     public void endStart(){
