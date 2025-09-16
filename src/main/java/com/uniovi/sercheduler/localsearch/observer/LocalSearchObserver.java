@@ -26,7 +26,7 @@ public class LocalSearchObserver implements Observer {
     private long timeForFindingBestSolution;
     private int generatedNeighborsForFindingBestSolution;
 
-    private long periodicTimeForMakespanEvolution;
+    private final long periodicTimeForMakespanEvolution;
     private List<Double> bestMakespanEvolution;
     private List<Long> timesForMakespanEvolution;
     private long lastRecordedTime;
@@ -80,6 +80,10 @@ public class LocalSearchObserver implements Observer {
 
     public List<RunMetrics> getRuns() {
         return new ArrayList<>(runs);
+    }
+
+    public long getPeriodicTimeForMakespanEvolution() {
+        return periodicTimeForMakespanEvolution;
     }
 
     public int numberOfRuns(){

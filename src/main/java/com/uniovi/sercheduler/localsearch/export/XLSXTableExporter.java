@@ -287,6 +287,8 @@ public class XLSXTableExporter {
 
             headerRow.createCell(4).setCellValue("Recorded makespan");
 
+            headerRow.createCell(5).setCellValue("Periodic time");
+
             // Write the workbook to a file
             try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
                 workbook.write(outputStream);
@@ -326,6 +328,7 @@ public class XLSXTableExporter {
                     row.createCell(2).setCellValue(i+1);
                     row.createCell(3).setCellValue(run.timesForMakespanEvolution().get(j));
                     row.createCell(4).setCellValue(run.bestMakespanEvolution().get(j));
+                    row.createCell(5).setCellValue(observer.getPeriodicTimeForMakespanEvolution());
 
                 }
 

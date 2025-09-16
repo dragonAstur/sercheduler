@@ -24,6 +24,8 @@ public class LocalSearchRunnable {
     public static final String HOSTS_FILE = "src/test/resources/extreme/hosts-16.json";
     public static final long TIME_LIMIT = 1000L;
 
+    public static final long PERIODIC_TIME = 250;
+
     public static void main(String[] args) {
 
         List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
@@ -61,7 +63,7 @@ public class LocalSearchRunnable {
             return;
         }
 
-        operatorsExperiment(instanceName, problem, TIME_LIMIT, true, 250);
+        operatorsExperiment(instanceName, problem, TIME_LIMIT, true, PERIODIC_TIME);
     }
 
     protected static String getFileName(String filePath) {
