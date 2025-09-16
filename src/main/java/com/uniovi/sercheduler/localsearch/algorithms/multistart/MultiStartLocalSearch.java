@@ -61,7 +61,7 @@ public class MultiStartLocalSearch {
                                                LocalSearchObserver observer)
     {
 
-        long startingTime = System.currentTimeMillis(); //TODO: aquí no sería igual? O el termination condition es diferente
+        long startingTime = localSearchAlgorithm.startTimeCounter();
 
         observer.startRun(startingTime);
 

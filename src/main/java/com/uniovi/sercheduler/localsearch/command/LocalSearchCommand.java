@@ -25,7 +25,7 @@ public class LocalSearchCommand {
             @Option(shortNames = 'W', required = true) String workflowFile,
             @Option(shortNames = 'T', defaultValue = "5000") long timeLimit,
             @Option(shortNames = 'C', defaultValue = "false") boolean createFile,
-            @Option(shortNames = 'P', defaultValue = "0") long periodicTimeForMakespanEvolution) {
+            @Option(shortNames = 'P', defaultValue = "-1") long periodicTimeForMakespanEvolution) {
 
         List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
 
