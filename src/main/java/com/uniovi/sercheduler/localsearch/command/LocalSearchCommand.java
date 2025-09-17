@@ -25,7 +25,9 @@ public class LocalSearchCommand {
             @Option(shortNames = 'W', required = true) String workflowFile,
             @Option(shortNames = 'T', defaultValue = "5000") long timeLimit,
             @Option(shortNames = 'C', defaultValue = "false") boolean createFile,
-            @Option(shortNames = 'P', defaultValue = "-1") long periodicTimeForMakespanEvolution) {
+            @Option(shortNames = 'P', defaultValue = "-1") long periodicTimeForMakespanEvolution,
+            @Option(shortNames = 'N', defaultValue = "null") String instanceName
+            ) {
 
         List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
 
@@ -33,7 +35,9 @@ public class LocalSearchCommand {
 
         String hostsFileName = LocalSearchRunnable.getFileName(hostsFile);
 
-        String instanceName = workflowFileName + "_" + hostsFileName + "_" + timeLimit;
+        instanceName = instanceName.equals("null") ?
+                workflowFileName + "_" + hostsFileName + "_" + timeLimit
+                : instanceName;
 
         long seed = System.nanoTime();
 
