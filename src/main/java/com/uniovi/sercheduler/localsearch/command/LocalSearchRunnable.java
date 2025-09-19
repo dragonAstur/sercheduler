@@ -153,6 +153,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2");
 
 
 
@@ -172,6 +173,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N3");
 
 
 
@@ -191,6 +193,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N4");
 
 
 
@@ -213,6 +216,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2");
 
 
 
@@ -235,6 +239,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N3");
 
 
 
@@ -257,6 +262,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N4");
 
 
 
@@ -279,6 +285,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N3");
 
 
 
@@ -300,6 +307,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N4");
 
 
 
@@ -322,6 +330,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N3 U N4");
 
 
 
@@ -345,6 +354,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N3");
 
 
 
@@ -368,6 +378,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N4");
 
 
 
@@ -391,6 +402,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N3 U N4");
 
 
 
@@ -413,6 +425,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N3 U N4");
 
 
 
@@ -437,6 +450,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
 
 
 
@@ -461,6 +475,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "VNS (random choice)");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "VNS (random choice)");
 
 
 
@@ -481,6 +496,8 @@ public class LocalSearchRunnable {
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1");
 
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1");
+
 
 
 
@@ -499,6 +516,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2");
 
 
 
@@ -518,6 +536,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N3");
 
 
 
@@ -537,6 +556,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N4");
 
 
 
@@ -559,6 +579,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2");
 
 
 
@@ -581,6 +602,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N3");
 
 
 
@@ -603,6 +625,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N4");
 
 
 
@@ -625,6 +648,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N3");
 
 
 
@@ -647,6 +671,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N4");
 
 
 
@@ -669,6 +694,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N3 U N4");
 
 
 
@@ -692,6 +718,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N3");
 
 
 
@@ -715,6 +742,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N4");
 
 
 
@@ -738,6 +766,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N3 U N4");
 
 
 
@@ -761,6 +790,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N3 U N4");
 
 
 
@@ -785,6 +815,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
 
 
 
@@ -808,6 +839,7 @@ public class LocalSearchRunnable {
         bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "VNS (random choice)");
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "VNS (random choice)");
 
 
 
