@@ -26,7 +26,8 @@ public class LocalSearchCommand {
             @Option(shortNames = 'T', defaultValue = "5000") long timeLimit,
             @Option(shortNames = 'C', defaultValue = "false") boolean createFile,
             @Option(shortNames = 'P', defaultValue = "-1") long periodicTimeForMakespanEvolution,
-            @Option(shortNames = 'N', defaultValue = "null") String instanceName
+            @Option(shortNames = 'N', defaultValue = "null") String instanceName,
+            @Option(shortNames = 'F', defaultValue = "null") String fileName
             ) {
 
         List<Objective> objectives = List.of(Objective.MAKESPAN, Objective.ENERGY);
@@ -38,6 +39,10 @@ public class LocalSearchCommand {
         instanceName = instanceName.equals("null") ?
                 workflowFileName + "_" + hostsFileName + "_" + timeLimit
                 : instanceName;
+
+        fileName = fileName.equals("null") ?
+                instanceName
+                : fileName;
 
         long seed = System.nanoTime();
 
@@ -66,6 +71,6 @@ public class LocalSearchCommand {
             return;
         }
 
-        LocalSearchRunnable.operatorsExperiment(instanceName, problem, timeLimit, createFile, periodicTimeForMakespanEvolution);
+        LocalSearchRunnable.operatorsExperiment(fileName, instanceName, problem, timeLimit, createFile, periodicTimeForMakespanEvolution);
     }
 }

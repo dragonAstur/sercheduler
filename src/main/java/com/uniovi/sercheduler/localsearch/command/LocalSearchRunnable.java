@@ -36,6 +36,8 @@ public class LocalSearchRunnable {
 
         String instanceName = workflowFileName + "_" + hostsFileName + "_" + TIME_LIMIT;
 
+        String fileName = "operators_experiment_results";
+
         long seed = System.nanoTime();
 
         SchedulingProblem problem;
@@ -63,7 +65,7 @@ public class LocalSearchRunnable {
             return;
         }
 
-        operatorsExperiment(instanceName, problem, TIME_LIMIT, CREATE_FILE, PERIODIC_TIME);
+        operatorsExperiment(fileName, instanceName, problem, TIME_LIMIT, CREATE_FILE, PERIODIC_TIME);
     }
 
     protected static String getFileName(String filePath) {
@@ -82,7 +84,7 @@ public class LocalSearchRunnable {
                         new LocalSearchObserver("jansjnjs", -1));
     }
 
-    protected static void operatorsExperiment(String instanceName, SchedulingProblem problem, long timeLimit,
+    protected static void operatorsExperiment(String fileName, String instanceName, SchedulingProblem problem, long timeLimit,
                                               boolean createFile, long periodicTimeForMakespanEvolution){
 
         NeighborhoodOperatorGlobal globalOperator;
@@ -95,8 +97,6 @@ public class LocalSearchRunnable {
 
         List<Double> avgMakespanList = new ArrayList<>();
         List<Double> bestKnownCostList = new ArrayList<>();
-
-        final String fileName = "operators_experiment_results";
 
         if (createFile)
             XLSXTableExporter.createWorkbook(fileName);
