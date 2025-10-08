@@ -6,7 +6,6 @@ import com.uniovi.sercheduler.expception.WorkflowLoadException;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalSearchAlgorithm;
-import com.uniovi.sercheduler.localsearch.export.XLSXExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.operator.*;
@@ -24,6 +23,11 @@ public class LocalSearchRunnable {
     public static final long TIME_LIMIT = 1000L;
     public static final long PERIODIC_TIME = 100;
     public static final boolean CREATE_FILE = true;
+    public static final String STRATEGY_NAME = "GD";
+    public static final String OPERATOR_CONFIG = "N1";
+
+    public static final String FILE_NAME = "30_16_1_GD_N1";
+
 
     public static void main(String[] args) {
 
@@ -64,7 +68,8 @@ public class LocalSearchRunnable {
             return;
         }
 
-        operatorsExperiment(fileName, instanceName, problem, TIME_LIMIT, CREATE_FILE, PERIODIC_TIME);
+        executeOperatorsExperiment(TIME_LIMIT, CREATE_FILE, PERIODIC_TIME, FILE_NAME, FILE_NAME,
+                STRATEGY_NAME, OPERATOR_CONFIG, problem);
     }
 
     protected static String getFileName(String filePath) {
@@ -83,8 +88,188 @@ public class LocalSearchRunnable {
                         new LocalSearchObserver("jansjnjs", "hkadjad", -1));
     }
 
-    protected static void operatorsExperiment(String fileName, String instanceName, SchedulingProblem problem, long timeLimit,
-                                              boolean createFile, long periodicTimeForMakespanEvolution){
+
+
+    protected static void executeOperatorsExperiment(long timeLimit, boolean createFile,
+                                                     long periodicTimeForMakespanEvolution, String instanceName,
+                                                     String fileName, String strategy, String operatorConfig,
+                                                     SchedulingProblem problem) {
+        switch(strategy){
+            case "all":
+                LocalSearchRunnable.allOperatorsExperiment(fileName, instanceName, problem, timeLimit, createFile, periodicTimeForMakespanEvolution);
+                break;
+            case "GD":
+            case "gd":
+
+                XLSXTableExporter.createWorkbook(fileName); //TODO: extract as a method
+
+                createSheets(fileName, instanceName);
+
+                List<NeighborhoodOperatorGlobal> globalOperatorList =
+                        switch (operatorConfig) {
+                            case "N1" -> List.of(new NeighborhoodChangeHostGlobal(problem.getInstanceData()));
+                            case "N2" -> List.of(new NeighborhoodInsertionGlobal());
+                            case "N3" -> List.of(new NeighborhoodSwapGlobal());
+                            case "N4" -> List.of(new NeighborhoodSwapHostGlobal());
+                            case "N1uN2" -> List.of(
+                                    new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                                    new NeighborhoodInsertionGlobal()
+                            );
+                            case "N1uN3" -> List.of(
+                                    new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                                    new NeighborhoodSwapGlobal()
+                            );
+                            case "N1uN4" -> List.of(
+                                    new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                                    new NeighborhoodSwapHostGlobal()
+                            );
+                            case "N2uN3" -> List.of(
+                                    new NeighborhoodInsertionGlobal(),
+                                    new NeighborhoodSwapGlobal()
+                            );
+                            case "N2uN4" -> List.of(
+                                    new NeighborhoodInsertionGlobal(),
+                                    new NeighborhoodSwapHostGlobal()
+                            );
+                            case "N3uN4" -> List.of(
+                                    new NeighborhoodSwapGlobal(),
+                                    new NeighborhoodSwapHostGlobal()
+                            );
+                            case "N1uN2uN3" -> List.of(
+                                    new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                                    new NeighborhoodInsertionGlobal(),
+                                    new NeighborhoodSwapGlobal()
+                            );
+                            case "N1uN2uN4" -> List.of(
+                                    new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                                    new NeighborhoodInsertionGlobal(),
+                                    new NeighborhoodSwapHostGlobal()
+                            );
+                            case "N1uN3uN4" -> List.of(
+                                    new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                                    new NeighborhoodSwapGlobal(),
+                                    new NeighborhoodSwapHostGlobal()
+                            );
+                            case "N2uN3uN4" -> List.of(
+                                    new NeighborhoodInsertionGlobal(),
+                                    new NeighborhoodSwapGlobal(),
+                                    new NeighborhoodSwapHostGlobal()
+                            );
+                            case "N1uN2uN3uN4", "VNS" -> List.of(
+                                    new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
+                                    new NeighborhoodInsertionGlobal(),
+                                    new NeighborhoodSwapGlobal(),
+                                    new NeighborhoodSwapHostGlobal()
+                            );
+                            default -> new ArrayList<>();
+                        };
+
+                if(globalOperatorList.isEmpty())
+                    System.out.println("Please define a valid operator configuration");
+
+
+                LocalSearchObserver globalObserver = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                        new ArrayList<>(), new ArrayList<>(), globalOperatorList, operatorConfig);
+
+                appendSheets(fileName, instanceName, globalObserver);
+
+                break;
+            case "HC":
+            case "hc":
+
+                XLSXTableExporter.createWorkbook(fileName); //TODO: extract as a method
+
+                createSheets(fileName, instanceName);
+
+                List<NeighborhoodOperatorLazy> lazyOperatorList =
+                        switch (operatorConfig) {
+                            case "N1" -> List.of(
+                                    new NeighborhoodChangeHostLazy(problem.getInstanceData())
+                            );
+                            case "N2" -> List.of(
+                                    new NeighborhoodInsertionLazy()
+                            );
+                            case "N3" -> List.of(
+                                    new NeighborhoodSwapLazy()
+                            );
+                            case "N4" -> List.of(
+                                    new NeighborhoodSwapHostLazy()
+                            );
+                            case "N1uN2" -> List.of(
+                                    new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                                    new NeighborhoodInsertionLazy()
+                            );
+
+                            case "N1uN3" -> List.of(
+                                    new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                                    new NeighborhoodSwapLazy()
+                            );
+                            case "N1uN4" -> List.of(
+                                    new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                                    new NeighborhoodSwapHostLazy()
+                            );
+                            case "N2uN3" -> List.of(
+                                    new NeighborhoodInsertionLazy(),
+                                    new NeighborhoodSwapLazy()
+                            );
+
+                            case "N2uN4" -> List.of(
+                                    new NeighborhoodInsertionLazy(),
+                                    new NeighborhoodSwapHostLazy()
+                            );
+                            case "N3uN4" -> List.of(
+                                    new NeighborhoodSwapLazy(),
+                                    new NeighborhoodSwapHostLazy()
+                            );
+                            case "N1uN2uN3" -> List.of(
+                                    new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                                    new NeighborhoodInsertionLazy(),
+                                    new NeighborhoodSwapLazy()
+                            );
+                            case "N1uN2uN4" -> List.of(
+                                    new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                                    new NeighborhoodInsertionLazy(),
+                                    new NeighborhoodSwapHostLazy()
+                            );
+                            case "N1uN3uN4" -> List.of(
+                                    new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                                    new NeighborhoodSwapLazy(),
+                                    new NeighborhoodSwapHostLazy()
+                            );
+                            case "N2uN3uN4" -> List.of(
+                                    new NeighborhoodInsertionLazy(),
+                                    new NeighborhoodSwapLazy(),
+                                    new NeighborhoodSwapHostLazy()
+                            );
+                            case "N1uN2uN3uN4", "VNS" -> List.of(
+                                    new NeighborhoodChangeHostLazy(problem.getInstanceData()),
+                                    new NeighborhoodInsertionLazy(),
+                                    new NeighborhoodSwapLazy(),
+                                    new NeighborhoodSwapHostLazy()
+                            );
+                            default -> new ArrayList<>();
+                        };
+
+                if(lazyOperatorList.isEmpty())
+                    System.out.println("Please define a valid operator configuration");
+
+                LocalSearchObserver lazyObserver = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                        new ArrayList<>(), new ArrayList<>(), lazyOperatorList, operatorConfig);
+
+                appendSheets(fileName, instanceName, lazyObserver);
+
+                break;
+            default:
+                System.out.println("Please define a valid strategy");
+                break;
+        }
+    }
+
+
+
+
+    protected static void allOperatorsExperiment(String fileName, String instanceName, SchedulingProblem problem, long timeLimit,
+                                                 boolean createFile, long periodicTimeForMakespanEvolution){
 
         String operatorsName;
         LocalSearchObserver observer;
@@ -94,8 +279,11 @@ public class LocalSearchRunnable {
         List<Double> avgMakespanList = new ArrayList<>();
         List<Double> bestKnownCostList = new ArrayList<>();
 
+        if (createFile)
+            XLSXTableExporter.createWorkbook(fileName); //TODO: extract as a method
+
         try{
-            createSheets(fileName, instanceName, createFile);
+            createSheets(fileName, instanceName);
         } catch(RuntimeException e){
             return;
         }
@@ -590,9 +778,7 @@ public class LocalSearchRunnable {
 
     }
 
-    private static void createSheets(String fileName, String instanceName, boolean createFile) {
-        if (createFile)
-            XLSXTableExporter.createWorkbook(fileName);
+    protected static void createSheets(String fileName, String instanceName) {
 
         try {
             XLSXTableExporter.createInstanceSheet(fileName, instanceName);
@@ -657,7 +843,7 @@ public class LocalSearchRunnable {
 
     }
 
-    private static void appendSheets(String fileName, String instanceName, LocalSearchObserver observer) {
+    protected static void appendSheets(String fileName, String instanceName, LocalSearchObserver observer) {
         XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer);
         XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer);
     }
@@ -674,7 +860,7 @@ public class LocalSearchRunnable {
             return result.toString();
 
         for(NeighborhoodOperatorGlobal operator : globalOperatorList)
-            result.append(" U ").append(operator.getName());
+            result.append("u").append(operator.getName());
 
         return result.toString();
     }
@@ -690,7 +876,7 @@ public class LocalSearchRunnable {
             return result.toString();
 
         for(NeighborhoodOperatorLazy operator : lazyOperatorList)
-            result.append(" U ").append(operator.getName());
+            result.append("u").append(operator.getName());
 
         return result.toString();
     }
