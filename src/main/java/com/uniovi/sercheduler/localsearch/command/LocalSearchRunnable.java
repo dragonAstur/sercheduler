@@ -94,24 +94,11 @@ public class LocalSearchRunnable {
         List<Double> avgMakespanList = new ArrayList<>();
         List<Double> bestKnownCostList = new ArrayList<>();
 
-        if (createFile)
-            XLSXTableExporter.createWorkbook(fileName);
-
-        try {
-            XLSXTableExporter.createInstanceSheet(fileName, instanceName);
-        }catch (RuntimeException e) {
-            System.out.println("Exception's message:\n" + e.getMessage());
+        try{
+            createSheets(fileName, instanceName, createFile);
+        } catch(RuntimeException e){
             return;
         }
-
-        try {
-            XLSXTableExporter.createMakespanEvolutionSheet(fileName, instanceName);
-        }catch (RuntimeException e) {
-            System.out.println("Exception's message:\n" + e.getMessage());
-            return;
-        }
-
-
 
 
         globalOperatorList = List.of( new NeighborhoodChangeHostGlobal(problem.getInstanceData()) );
@@ -532,6 +519,13 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapHostLazy()
         );
 
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
+
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
+
+        appendSheets(fileName, instanceName, observer);
+
 
 
 
@@ -596,7 +590,26 @@ public class LocalSearchRunnable {
 
     }
 
-    private static LocalSearchObserver globalOperatorExperiment(SchedulingProblem problem,
+    private static void createSheets(String fileName, String instanceName, boolean createFile) {
+        if (createFile)
+            XLSXTableExporter.createWorkbook(fileName);
+
+        try {
+            XLSXTableExporter.createInstanceSheet(fileName, instanceName);
+        }catch (RuntimeException e) {
+            System.out.println("Exception's message:\n" + e.getMessage());
+            throw e;
+        }
+
+        try {
+            XLSXTableExporter.createMakespanEvolutionSheet(fileName, instanceName);
+        }catch (RuntimeException e) {
+            System.out.println("Exception's message:\n" + e.getMessage());
+            throw e;
+        }
+    }
+
+    protected static LocalSearchObserver globalOperatorExperiment(SchedulingProblem problem,
                                                                 long timeLimit, long periodicTimeForMakespanEvolution,
                                                                 List<Double> avgMakespanList,
                                                                 List<Double> bestKnownCostList,
@@ -620,7 +633,7 @@ public class LocalSearchRunnable {
 
     }
 
-    private static LocalSearchObserver lazyOperatorExperiment(SchedulingProblem problem,
+    protected static LocalSearchObserver lazyOperatorExperiment(SchedulingProblem problem,
                                                               long timeLimit, long periodicTimeForMakespanEvolution,
                                                               List<Double> avgMakespanList,
                                                               List<Double> bestKnownCostList,
@@ -650,7 +663,7 @@ public class LocalSearchRunnable {
     }
 
 
-    private static String generateGlobalOperatorsListName(List<NeighborhoodOperatorGlobal> globalOperatorList){
+    protected static String generateGlobalOperatorsListName(List<NeighborhoodOperatorGlobal> globalOperatorList){
 
         if(globalOperatorList.isEmpty())
             return "no name";
@@ -666,7 +679,7 @@ public class LocalSearchRunnable {
         return result.toString();
     }
 
-    private static String generateLazyOperatorsListName(List<NeighborhoodOperatorLazy> lazyOperatorList){
+    protected static String generateLazyOperatorsListName(List<NeighborhoodOperatorLazy> lazyOperatorList){
 
         if(lazyOperatorList.isEmpty())
             return "no name";
