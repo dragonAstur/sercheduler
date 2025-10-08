@@ -8,6 +8,7 @@ public class LocalSearchObserver implements Observer {
     private final List<RunMetrics> runs;
 
     private final String strategyName;
+    private final String operatorsName;
 
 
     private List<StartMetrics> starts;
@@ -27,21 +28,19 @@ public class LocalSearchObserver implements Observer {
     private int generatedNeighborsForFindingBestSolution;
 
     private final long periodicTimeForMakespanEvolution;
-    private List<Double> bestMakespanEvolution;
-    private List<Long> timesForMakespanEvolution;
-    private long lastRecordedTime;
+    private EvolutionMetrics evolutionMetrics;
 
     private long runStartingTime;
 
-    public LocalSearchObserver(String strategyName, long periodicTimeForMakespanEvolution){
+    public LocalSearchObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution){
 
         this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
-        this.bestMakespanEvolution = new ArrayList<>();
-        this.timesForMakespanEvolution = new ArrayList<>();
-        this.lastRecordedTime = -1;
+
         this.runStartingTime = -1;
 
         this.strategyName = strategyName;
+        this.operatorsName = operatorsName;
+
         this.runs = new ArrayList<>();
 
         starts = new ArrayList<>();
@@ -56,26 +55,26 @@ public class LocalSearchObserver implements Observer {
         reachedMakespanImprovingRatioWithRespectLastIteration = -1;
     }
 
-    public void updateMakespanEvolution(double bestMakespan){
+    public void updateMakespanEvolution(double actualMakespan, long actualIterationNumberOfNeighbors){
 
-        if(periodicTimeForMakespanEvolution > 0L){
+        long accNumberOfNeighbors = actualIterationNumberOfNeighbors +
+                starts.stream().mapToInt(StartMetrics::numberOfGeneratedNeighbors).sum() +
+                iterations.stream().mapToInt(IterationMetrics::numberOfGeneratedNeighbors).sum();
 
-            long actualTime = System.currentTimeMillis();
+        evolutionMetrics.update(
+                runStartingTime,
+                starts.size()+1,
+                iterations.size()+1,
+                actualMakespan,
+                accNumberOfNeighbors
+        );
 
-            lastRecordedTime = lastRecordedTime <= 0? runStartingTime : lastRecordedTime;
-
-            long elapsedTime = actualTime - lastRecordedTime;
-
-            if(elapsedTime >= periodicTimeForMakespanEvolution){
-                timesForMakespanEvolution.add(actualTime - runStartingTime);
-                bestMakespanEvolution.add(bestMakespan);
-                lastRecordedTime = actualTime;
-            }
-        }
     }
 
     public void startRun(long startingTime){
         this.runStartingTime = startingTime;
+
+        this.evolutionMetrics = new EvolutionMetrics(periodicTimeForMakespanEvolution);
     }
 
     public List<RunMetrics> getRuns() {
@@ -98,7 +97,7 @@ public class LocalSearchObserver implements Observer {
         long executionTime = System.currentTimeMillis() - runStartingTime;
 
         runs.add(
-                new RunMetrics(strategyName, starts, executionTime, bestMakespanEvolution, timesForMakespanEvolution)
+                new RunMetrics(strategyName, starts, executionTime, evolutionMetrics)
         );
 
         checkBestSolution();
@@ -106,10 +105,6 @@ public class LocalSearchObserver implements Observer {
         starts = new ArrayList<>();
 
         runStartingTime = -1;
-
-        bestMakespanEvolution = new ArrayList<>();
-        timesForMakespanEvolution = new ArrayList<>();
-        lastRecordedTime = 0;
     }
 
     public void endStart(){
@@ -142,6 +137,10 @@ public class LocalSearchObserver implements Observer {
 
     public String getStrategyName(){
         return strategyName;
+    }
+
+    public String getOperatorsName() {
+        return operatorsName;
     }
 
     public double getAvgExecutionTime(){

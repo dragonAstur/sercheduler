@@ -53,7 +53,7 @@ public class NeighborhoodInsertionLazy implements NeighborhoodOperatorLazy{
 
     @Override
     public String getName() {
-        return "insertion";
+        return "N2";
     }
 
     private List<PlanPair> insertInOneSpecificPosition(List<PlanPair> plan, int position, int newPosition){

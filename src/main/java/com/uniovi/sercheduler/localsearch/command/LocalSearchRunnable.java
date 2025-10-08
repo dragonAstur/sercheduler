@@ -14,7 +14,6 @@ import com.uniovi.sercheduler.localsearch.algorithms.MaximumGradientStrategy;
 import com.uniovi.sercheduler.localsearch.algorithms.SimpleClimbingStrategy;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class LocalSearchRunnable {
     public static final String WORFLOW_FILE = "src/test/resources/cycles.json";
     public static final String HOSTS_FILE = "src/test/resources/extreme/hosts-16.json";
     public static final long TIME_LIMIT = 1000L;
-    public static final long PERIODIC_TIME = 250;
+    public static final long PERIODIC_TIME = 100;
     public static final boolean CREATE_FILE = true;
 
     public static void main(String[] args) {
@@ -81,17 +80,14 @@ public class LocalSearchRunnable {
         SchedulePermutationSolution achievedSolution =
                 localSearchAlgorithm.runLocalSearchGlobal(
                         List.of(new NeighborhoodChangeHostGlobal(problem.getInstanceData())),
-                        new LocalSearchObserver("jansjnjs", -1));
+                        new LocalSearchObserver("jansjnjs", "hkadjad", -1));
     }
 
     protected static void operatorsExperiment(String fileName, String instanceName, SchedulingProblem problem, long timeLimit,
                                               boolean createFile, long periodicTimeForMakespanEvolution){
 
-        NeighborhoodOperatorGlobal globalOperator;
-        NeighborhoodOperatorLazy lazyOperator;
+        String operatorsName;
         LocalSearchObserver observer;
-        MaximumGradientStrategy maximumGradientStrategy;
-        SimpleClimbingStrategy simpleClimbingStrategy;
         List<NeighborhoodOperatorGlobal> globalOperatorList;
         List<NeighborhoodOperatorLazy> lazyOperatorList;
 
@@ -118,319 +114,205 @@ public class LocalSearchRunnable {
 
 
 
-        System.out.println("\n\nGD | N1 operator\n\n");
+        globalOperatorList = List.of( new NeighborhoodChangeHostGlobal(problem.getInstanceData()) );
 
-        globalOperator = new NeighborhoodChangeHostGlobal(problem.getInstanceData());
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
-        }
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
-
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1");
+        appendSheets(fileName, instanceName, observer);
 
 
 
+        globalOperatorList = List.of( new NeighborhoodInsertionGlobal() );
 
-        System.out.println("\n\nGD | N2 operator\n\n");
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        globalOperator = new NeighborhoodInsertionGlobal();
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
-        }
-
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
-
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2");
+        appendSheets(fileName, instanceName, observer);
 
 
 
 
-        System.out.println("\n\nGD | N3 operator\n\n");
+        globalOperatorList = List.of( new NeighborhoodSwapGlobal() );
 
-        globalOperator = new NeighborhoodSwapGlobal();
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
-        }
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
-
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N3");
+        appendSheets(fileName, instanceName, observer);
 
 
 
 
-        System.out.println("\n\nGD | N4 operator\n\n");
+        globalOperatorList = List.of( new NeighborhoodSwapHostGlobal() );
 
-        globalOperator = new NeighborhoodSwapHostGlobal();
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperator, timeLimit);
-        }
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
-
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N4");
+        appendSheets(fileName, instanceName, observer);
 
 
-
-
-        System.out.println("\n\nGD | N1 U N2 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodInsertionGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nGD | N1 U N3 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodSwapGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N3");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nGD | N1 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nGD | N2 U N3 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodInsertionGlobal(),
                 new NeighborhoodSwapGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N3");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-        System.out.println("\n\nGD | N2 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodInsertionGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nGD | N3 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodSwapGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N3 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nGD | N1 U N2 U N3 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodInsertionGlobal(),
                 new NeighborhoodSwapGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N3");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nGD | N1 U N2 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodInsertionGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nGD | N1 U N3 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                 new NeighborhoodSwapGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N3 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-        System.out.println("\n\nGD | N2 U N3 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodInsertionGlobal(),
                 new NeighborhoodSwapGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N3 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nGD | N1 U N2 U N3 U N4 operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
@@ -438,24 +320,15 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = generateGlobalOperatorsListName(globalOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
-
-
-        System.out.println("\n\nGD | VNS (random choice) operator\n\n");
 
         globalOperatorList = List.of(
                 new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
@@ -463,339 +336,220 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapGlobal(),
                 new NeighborhoodSwapHostGlobal()
         );
-        observer = new LocalSearchObserver("GD", periodicTimeForMakespanEvolution);
-        maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            maximumGradientStrategy.executeVNS(problem, globalOperatorList, timeLimit);
-        }
+        operatorsName = "VNS (random choice)";
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, globalOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "VNS (random choice)");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "VNS (random choice)");
+        appendSheets(fileName, instanceName, observer);
 
 
 
 
-        System.out.println("\n\nHC | N1 operator\n\n");
-
-        lazyOperator = new NeighborhoodChangeHostLazy(problem.getInstanceData());
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
-
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
-        }
-
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
-
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1");
-
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1");
 
 
 
+        lazyOperatorList = List.of(
+                new NeighborhoodChangeHostLazy(problem.getInstanceData())
+        );
 
-        System.out.println("\n\nHC | N2 operator\n\n");
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        lazyOperator = new NeighborhoodInsertionLazy();
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
-        }
+        appendSheets(fileName, instanceName, observer);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2");
+
+        lazyOperatorList = List.of(
+                new NeighborhoodInsertionLazy()
+        );
+
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
+
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
+
+        appendSheets(fileName, instanceName, observer);
 
 
 
 
-        System.out.println("\n\nHC | N3 operator\n\n");
+        lazyOperatorList = List.of(
+                new NeighborhoodSwapLazy()
+        );
 
-        lazyOperator = new NeighborhoodSwapLazy();
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
-        }
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
-
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N3");
+        appendSheets(fileName, instanceName, observer);
 
 
 
 
-        System.out.println("\n\nHC | N4 operator\n\n");
+        lazyOperatorList = List.of(
+                new NeighborhoodSwapHostLazy()
+        );
 
-        lazyOperator = new NeighborhoodSwapHostLazy();
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperator, timeLimit);
-        }
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
-
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nHC | N1 U N2 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                 new NeighborhoodInsertionLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nHC | N1 U N3 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                 new NeighborhoodSwapLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N3");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nHC | N1 U N4 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nHC | N2 U N3 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodInsertionLazy(),
                 new NeighborhoodSwapLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N3");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nHC | N2 U N4 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodInsertionLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nHC | N3 U N4 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodSwapLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N3 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N3 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
-
-
-        System.out.println("\n\nHC | N1 U N2 U N3 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                 new NeighborhoodInsertionLazy(),
                 new NeighborhoodSwapLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N3");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nHC | N1 U N2 U N4 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                 new NeighborhoodInsertionLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nHC | N1 U N3 U N4 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                 new NeighborhoodSwapLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
-
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
-
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
-
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N3 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N3 U N4");
 
 
 
-
-        System.out.println("\n\nHC | N2 U N3 U N4 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodInsertionLazy(),
                 new NeighborhoodSwapLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N2 U N3 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N2 U N3 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
-
-        System.out.println("\n\nHC | N1 U N2 U N3 U N4 operator\n\n");
 
         lazyOperatorList = List.of(
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
@@ -803,43 +557,30 @@ public class LocalSearchRunnable {
                 new NeighborhoodSwapLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = generateLazyOperatorsListName(lazyOperatorList);
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "N1 U N2 U N3 U N4");
+        appendSheets(fileName, instanceName, observer);
 
 
 
 
-        System.out.println("\n\nHC | VNS (random choice) operator\n\n");
         lazyOperatorList = List.of(
                 new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                 new NeighborhoodInsertionLazy(),
                 new NeighborhoodSwapLazy(),
                 new NeighborhoodSwapHostLazy()
         );
-        observer = new LocalSearchObserver("HC", periodicTimeForMakespanEvolution);
-        simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
-        for(int i = 0; i < 30; i++) {
-            System.out.println("Execution number " + (i+1) + "\n");
-            simpleClimbingStrategy.executeVNS(problem, lazyOperatorList, timeLimit);
-        }
+        operatorsName = "VNS (random choice)";
 
-        avgMakespanList.add(observer.getAvgMinReachedMakespan());
-        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+        observer = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
+                avgMakespanList, bestKnownCostList, lazyOperatorList, operatorsName);
 
-        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer, "VNS (random choice)");
-        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer, "VNS (random choice)");
+        appendSheets(fileName, instanceName, observer);
 
 
 
@@ -855,16 +596,101 @@ public class LocalSearchRunnable {
 
     }
 
+    private static LocalSearchObserver globalOperatorExperiment(SchedulingProblem problem,
+                                                                long timeLimit, long periodicTimeForMakespanEvolution,
+                                                                List<Double> avgMakespanList,
+                                                                List<Double> bestKnownCostList,
+                                                                List<NeighborhoodOperatorGlobal> globalOperatorList,
+                                                                String operatorsName) {
+
+        System.out.println("\n\nGD | " + operatorsName + " operator\n\n");
+
+        LocalSearchObserver observer = new LocalSearchObserver("GD", operatorsName, periodicTimeForMakespanEvolution);
+        MaximumGradientStrategy maximumGradientStrategy = new MaximumGradientStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            maximumGradientStrategy.execute(problem, globalOperatorList, timeLimit);
+        }
+
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+
+        return observer;
+
+    }
+
+    private static LocalSearchObserver lazyOperatorExperiment(SchedulingProblem problem,
+                                                              long timeLimit, long periodicTimeForMakespanEvolution,
+                                                              List<Double> avgMakespanList,
+                                                              List<Double> bestKnownCostList,
+                                                              List<NeighborhoodOperatorLazy> lazyOperatorList,
+                                                              String operatorsName) {
+
+        System.out.println("\n\nHC | " + operatorsName + " operator\n\n");
+
+        LocalSearchObserver observer = new LocalSearchObserver("HC", operatorsName, periodicTimeForMakespanEvolution);
+        SimpleClimbingStrategy simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
+
+        for(int i = 0; i < 30; i++) {
+            System.out.println("Execution number " + (i+1) + "\n");
+            simpleClimbingStrategy.execute(problem, lazyOperatorList, timeLimit);
+        }
+
+        avgMakespanList.add(observer.getAvgMinReachedMakespan());
+        bestKnownCostList.add(observer.getBestMinReachedMakespan());
+
+        return observer;
+
+    }
+
+    private static void appendSheets(String fileName, String instanceName, LocalSearchObserver observer) {
+        XLSXTableExporter.appendInstanceSheet(fileName, instanceName, observer);
+        XLSXTableExporter.appendMakespanEvolutionSheet(fileName, instanceName, observer);
+    }
 
 
-    private static void StrategiesExperiment(String instanceName, SchedulingProblem problem) {
+    private static String generateGlobalOperatorsListName(List<NeighborhoodOperatorGlobal> globalOperatorList){
+
+        if(globalOperatorList.isEmpty())
+            return "no name";
+
+        StringBuilder result = new StringBuilder(globalOperatorList.get(0).getName());
+
+        if(globalOperatorList.size() == 1)
+            return result.toString();
+
+        for(NeighborhoodOperatorGlobal operator : globalOperatorList)
+            result.append(" U ").append(operator.getName());
+
+        return result.toString();
+    }
+
+    private static String generateLazyOperatorsListName(List<NeighborhoodOperatorLazy> lazyOperatorList){
+
+        if(lazyOperatorList.isEmpty())
+            return "no name";
+
+        StringBuilder result = new StringBuilder(lazyOperatorList.get(0).getName());
+
+        if(lazyOperatorList.size() == 1)
+            return result.toString();
+
+        for(NeighborhoodOperatorLazy operator : lazyOperatorList)
+            result.append(" U ").append(operator.getName());
+
+        return result.toString();
+    }
+
+
+    /*private static void StrategiesExperiment(String instanceName, SchedulingProblem problem) {
 
         System.out.println("\n\nMaximum Gradient strategy\n\n");
 
         //Here you can change the operator
         NeighborhoodOperatorGlobal globalOperator = new NeighborhoodSwapHostGlobal();
 
-        LocalSearchObserver observer = new LocalSearchObserver("GD", -1);
+        LocalSearchObserver observer = new LocalSearchObserver("GD", globalOperator.getName(), -1);
 
         MaximumGradientStrategy maximumGradientStrategy = new MaximumGradientStrategy(observer);
 
@@ -876,8 +702,8 @@ public class LocalSearchRunnable {
         XLSXExporter.createWorkbook("local_search_results_" + globalOperator.getName());
         XLSXExporter.appendWorkbook(observer, "local_search_results_" + globalOperator.getName());
 
-        /*CSVExporter.createCSV("local_search_results_" + globalOperator.getName());
-        CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());*/
+        *//*CSVExporter.createCSV("local_search_results_" + globalOperator.getName());
+        CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());*//*
 
 
 
@@ -887,7 +713,7 @@ public class LocalSearchRunnable {
         //Here you can change the operator
         NeighborhoodOperatorLazy lazyOperator = new NeighborhoodSwapHostLazy();
 
-        observer = new LocalSearchObserver("HC", -1);
+        observer = new LocalSearchObserver("HC", lazyOperator.getName(), -1);
 
         SimpleClimbingStrategy simpleClimbingStrategy = new SimpleClimbingStrategy(observer);
 
@@ -899,5 +725,5 @@ public class LocalSearchRunnable {
         XLSXExporter.appendWorkbook(observer, "local_search_results_" + globalOperator.getName());
 
         //CSVExporter.appendCSV(observer, "local_search_results_" + globalOperator.getName());
-    }
+    }*/
 }

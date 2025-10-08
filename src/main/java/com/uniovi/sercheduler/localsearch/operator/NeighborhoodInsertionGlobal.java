@@ -33,6 +33,6 @@ public class NeighborhoodInsertionGlobal implements NeighborhoodOperatorGlobal {
 
     @Override
     public String getName() {
-        return "insertion";
+        return "N2";
     }
 }

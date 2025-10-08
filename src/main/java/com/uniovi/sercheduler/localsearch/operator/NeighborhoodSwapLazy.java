@@ -54,7 +54,7 @@ public class NeighborhoodSwapLazy implements NeighborhoodOperatorLazy{
 
     @Override
     public String getName() {
-        return "swap";
+        return "N3";
     }
 
     private List<PlanPair> swapWithOneSpecificPosition(List<PlanPair> plan, int position, int newPosition)

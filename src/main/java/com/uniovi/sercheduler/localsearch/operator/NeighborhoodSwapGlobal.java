@@ -33,6 +33,6 @@ public class NeighborhoodSwapGlobal implements NeighborhoodOperatorGlobal {
 
     @Override
     public String getName() {
-        return "swap";
+        return "N3";
     }
 }

@@ -7,9 +7,7 @@ public record RunMetrics (
         List<StartMetrics> starts,
         long executionTime,
 
-        List<Double> bestMakespanEvolution,
-
-        List<Long> timesForMakespanEvolution
+        EvolutionMetrics evolutionMetrics
 ) {
     public int numberOfStarts(){
         return starts.size();

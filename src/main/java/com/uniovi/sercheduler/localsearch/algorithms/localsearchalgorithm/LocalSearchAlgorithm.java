@@ -122,7 +122,7 @@ public class LocalSearchAlgorithm {
 
             double actualSolutionMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
             observer.setReachedMakespan(actualSolutionMakespan);
-            observer.updateMakespanEvolution(actualSolutionMakespan);
+            observer.updateMakespanEvolution(actualSolutionMakespan, neighbors.size());
             observer.endIteration();
 
         } while(terminationCriterion.checkTerminationCondition());
@@ -161,7 +161,7 @@ public class LocalSearchAlgorithm {
             double actualSolutionMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
 
             observer.setReachedMakespan(actualSolutionMakespan);
-            observer.updateMakespanEvolution(actualSolutionMakespan);
+            observer.updateMakespanEvolution(actualSolutionMakespan, counter.get());
             observer.endIteration();
 
         } while (terminationCriterion.checkTerminationCondition());

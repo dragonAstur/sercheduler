@@ -38,6 +38,6 @@ public class NeighborhoodChangeHostGlobal implements NeighborhoodOperatorGlobal 
 
     @Override
     public String getName() {
-        return "change_host";
+        return "N1";
     }
 }

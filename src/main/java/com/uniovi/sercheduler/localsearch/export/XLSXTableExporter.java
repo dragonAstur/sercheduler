@@ -77,7 +77,7 @@ public class XLSXTableExporter {
 
     }
 
-    public static void appendInstanceSheet(String fileName, String instanceName, LocalSearchObserver observer, String operatorLabel){
+    public static void appendInstanceSheet(String fileName, String instanceName, LocalSearchObserver observer){
 
         try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
 
@@ -86,7 +86,7 @@ public class XLSXTableExporter {
             Row row = sheet.createRow( sheet.getLastRowNum() + 1 );
 
             row.createCell(0).setCellValue(observer.getStrategyName());
-            row.createCell(1).setCellValue(operatorLabel);
+            row.createCell(1).setCellValue(observer.getOperatorsName());
 
             for(int i = 1; i <= 30; i++)
                 row.createCell(i+1).setCellValue(observer.getRuns().get(i-1).minStartsReachedMakespan());
@@ -273,7 +273,7 @@ public class XLSXTableExporter {
 
         try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
 
-            Sheet sheet = workbook.createSheet(instanceName + "_evolution");
+            Sheet sheet = workbook.createSheet(instanceName + "_evol");
             Row headerRow = sheet.createRow(0);
 
             headerRow.createCell(0).setCellValue("Strategy");
@@ -282,11 +282,19 @@ public class XLSXTableExporter {
 
             headerRow.createCell(2).setCellValue("Run number");
 
-            headerRow.createCell(3).setCellValue("Time instant");
+            headerRow.createCell(3).setCellValue("Start number");
 
-            headerRow.createCell(4).setCellValue("Recorded makespan");
+            headerRow.createCell(4).setCellValue("Iteration number");
 
             headerRow.createCell(5).setCellValue("Periodic time");
+
+            headerRow.createCell(6).setCellValue("Time instant");
+
+            headerRow.createCell(7).setCellValue("Actual makespan");
+
+            headerRow.createCell(8).setCellValue("Best makespan in this run");
+
+            headerRow.createCell(9).setCellValue("Acc number of generated neighbors int his run");
 
             // Write the workbook to a file
             try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
@@ -308,27 +316,30 @@ public class XLSXTableExporter {
     }
 
 
-    public static void appendMakespanEvolutionSheet(String fileName, String instanceName, LocalSearchObserver observer, String operatorLabel){
+    public static void appendMakespanEvolutionSheet(String fileName, String instanceName, LocalSearchObserver observer){
 
         try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
 
-            Sheet sheet = workbook.getSheet(instanceName + "_evolution");
+            Sheet sheet = workbook.getSheet(instanceName + "_evol");
 
             for(int i = 0; i < observer.getRuns().size(); i++) {
 
                 RunMetrics run = observer.getRuns().get(i);
 
-                for(int j = 0; j < run.timesForMakespanEvolution().size(); j++){
+                for(int j = 0; j < run.evolutionMetrics().getInstants().size(); j++){
 
                     Row row = sheet.createRow(sheet.getLastRowNum() + 1);
 
                     row.createCell(0).setCellValue(observer.getStrategyName());
-                    row.createCell(1).setCellValue(operatorLabel);
+                    row.createCell(1).setCellValue(observer.getOperatorsName());
                     row.createCell(2).setCellValue(i+1);
-                    row.createCell(3).setCellValue(run.timesForMakespanEvolution().get(j));
-                    row.createCell(4).setCellValue(run.bestMakespanEvolution().get(j));
+                    row.createCell(3).setCellValue(run.evolutionMetrics().getStartNumberList().get(j));
+                    row.createCell(4).setCellValue(run.evolutionMetrics().getIterationNumberList().get(j));
                     row.createCell(5).setCellValue(observer.getPeriodicTimeForMakespanEvolution());
-
+                    row.createCell(6).setCellValue(run.evolutionMetrics().getInstants().get(j));
+                    row.createCell(7).setCellValue(run.evolutionMetrics().getActualMakespanEvolution().get(j));
+                    row.createCell(8).setCellValue(run.evolutionMetrics().getBestMakespanEvolution().get(j));
+                    row.createCell(9).setCellValue(run.evolutionMetrics().getAccNumberOfNeighborsList().get(j));
                 }
 
             }
