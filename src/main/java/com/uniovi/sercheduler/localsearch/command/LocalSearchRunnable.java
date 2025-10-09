@@ -16,6 +16,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+//java -jar target/sercheduler-0.0.1-SNAPSHOT.jar localsearch -W src/test/resources/cycles.json -H src/test/resources/extreme/hosts-16.json -C true -T 1000 -P 100 -N 41_16_100_HC -S HC -O N1uN2
+
 public class LocalSearchRunnable {
 
     public static final String WORFLOW_FILE = "src/test/resources/cycles.json";

@@ -294,7 +294,7 @@ public class XLSXTableExporter {
 
             headerRow.createCell(8).setCellValue("Best makespan in this run");
 
-            headerRow.createCell(9).setCellValue("Acc number of generated neighbors int his run");
+            headerRow.createCell(9).setCellValue("Acc number of generated neighbors in this run");
 
             // Write the workbook to a file
             try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
