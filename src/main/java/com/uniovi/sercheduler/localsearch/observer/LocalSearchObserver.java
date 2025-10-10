@@ -64,7 +64,7 @@ public class LocalSearchObserver implements Observer {
         evolutionMetrics.update(
                 runStartingTime,
                 starts.size()+1,
-                starts.isEmpty() ? 1 : starts.get(starts.size()-1).numberOfIterations()+1,
+                iterations.isEmpty() ? 1 : iterations.size() + 1,
                 actualMakespan,
                 accNumberOfNeighbors
         );
