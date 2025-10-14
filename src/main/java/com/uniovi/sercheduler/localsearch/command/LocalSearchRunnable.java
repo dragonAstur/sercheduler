@@ -166,8 +166,10 @@ public class LocalSearchRunnable {
                             default -> new ArrayList<>();
                         };
 
-                if(globalOperatorList.isEmpty())
+                if(globalOperatorList.isEmpty()) {
                     System.out.println("Please define a valid operator configuration");
+                    break;
+                }
 
 
                 LocalSearchObserver globalObserver = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
@@ -252,8 +254,10 @@ public class LocalSearchRunnable {
                             default -> new ArrayList<>();
                         };
 
-                if(lazyOperatorList.isEmpty())
+                if(lazyOperatorList.isEmpty()){
                     System.out.println("Please define a valid operator configuration");
+                    break;
+                }
 
                 LocalSearchObserver lazyObserver = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
                         new ArrayList<>(), new ArrayList<>(), lazyOperatorList, operatorConfig);
