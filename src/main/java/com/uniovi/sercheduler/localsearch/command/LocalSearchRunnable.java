@@ -103,10 +103,6 @@ public class LocalSearchRunnable {
             case "GD":
             case "gd":
 
-                XLSXTableExporter.createWorkbook(fileName); //TODO: extract as a method
-
-                createSheets(fileName, instanceName);
-
                 List<NeighborhoodOperatorGlobal> globalOperatorList =
                         switch (operatorConfig) {
                             case "N1" -> List.of(new NeighborhoodChangeHostGlobal(problem.getInstanceData()));
@@ -171,6 +167,9 @@ public class LocalSearchRunnable {
                     break;
                 }
 
+                XLSXTableExporter.createWorkbook(fileName); //TODO: extract as a method
+
+                createSheets(fileName, instanceName);
 
                 LocalSearchObserver globalObserver = globalOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
                         new ArrayList<>(), new ArrayList<>(), globalOperatorList, operatorConfig);
@@ -180,10 +179,6 @@ public class LocalSearchRunnable {
                 break;
             case "HC":
             case "hc":
-
-                XLSXTableExporter.createWorkbook(fileName); //TODO: extract as a method
-
-                createSheets(fileName, instanceName);
 
                 List<NeighborhoodOperatorLazy> lazyOperatorList =
                         switch (operatorConfig) {
@@ -258,6 +253,10 @@ public class LocalSearchRunnable {
                     System.out.println("Please define a valid operator configuration");
                     break;
                 }
+
+                XLSXTableExporter.createWorkbook(fileName); //TODO: extract as a method
+
+                createSheets(fileName, instanceName);
 
                 LocalSearchObserver lazyObserver = lazyOperatorExperiment(problem, timeLimit, periodicTimeForMakespanEvolution,
                         new ArrayList<>(), new ArrayList<>(), lazyOperatorList, operatorConfig);
