@@ -20,7 +20,7 @@ import java.util.List;
 
 public class LocalSearchRunnable {
 
-    public static final String WORFLOW_FILE = "src/test/resources/cycles.json";
+    public static final String WORFLOW_FILE = "src/test/resources/localsearch/montage-chameleon-dss-125d-001.json";
     public static final String HOSTS_FILE = "src/test/resources/extreme/hosts-16.json";
     public static final long TIME_LIMIT = 1000L;
     public static final long PERIODIC_TIME = 100;
@@ -70,8 +70,10 @@ public class LocalSearchRunnable {
             return;
         }
 
-        executeOperatorsExperiment(TIME_LIMIT, CREATE_FILE, PERIODIC_TIME, FILE_NAME, FILE_NAME,
-                STRATEGY_NAME, OPERATOR_CONFIG, problem);
+        /*executeOperatorsExperiment(TIME_LIMIT, CREATE_FILE, PERIODIC_TIME, FILE_NAME, FILE_NAME,
+                STRATEGY_NAME, OPERATOR_CONFIG, problem);*/
+
+        debug(problem);
     }
 
     protected static String getFileName(String filePath) {
@@ -79,15 +81,19 @@ public class LocalSearchRunnable {
         return filePathSplit[filePathSplit.length - 1].split("\\.")[0];
     }
 
-    protected static void debug(String instanceName, SchedulingProblem problem){
-        LocalSearchAlgorithm localSearchAlgorithm = new LocalSearchAlgorithm.Builder(problem).build();
+    protected static void debug(SchedulingProblem problem){
 
-        long startingTime = localSearchAlgorithm.startTimeCounter();
+        String fileName = "debug";
 
-        SchedulePermutationSolution achievedSolution =
-                localSearchAlgorithm.runLocalSearchGlobal(
-                        List.of(new NeighborhoodChangeHostGlobal(problem.getInstanceData())),
-                        new LocalSearchObserver("jansjnjs", "hkadjad", -1));
+        XLSXTableExporter.createWorkbook(fileName);
+
+        createSheets(fileName, fileName);
+
+        LocalSearchObserver globalObserver = globalOperatorExperiment(problem, 1000, 100,
+                new ArrayList<>(), new ArrayList<>(), List.of(new NeighborhoodChangeHostGlobal(problem.getInstanceData())),
+                "N1");
+
+        appendSheets(fileName, fileName, globalObserver);
     }
 
 

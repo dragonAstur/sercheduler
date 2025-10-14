@@ -10,8 +10,12 @@ import java.util.stream.Stream;
 
 public interface NeighborGenerator {
 
-    Stream<GeneratedNeighbor> generateNeighborsLazy(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList, SchedulePermutationSolution actualSolution);
+    Stream<GeneratedNeighbor> generateNeighborsLazy(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList,
+                                                    SchedulePermutationSolution actualSolution,
+                                                    TerminationCriterion terminationCriterion);
 
-    List<GeneratedNeighbor> generateNeighborsGlobal(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList, SchedulePermutationSolution actualSolution);
+    List<GeneratedNeighbor> generateNeighborsGlobal(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
+                                                    SchedulePermutationSolution actualSolution,
+                                                    TerminationCriterion terminationCriterion);
 
 }

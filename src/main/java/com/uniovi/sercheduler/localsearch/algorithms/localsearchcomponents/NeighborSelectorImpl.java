@@ -12,8 +12,12 @@ import java.util.stream.Stream;
 
 public class NeighborSelectorImpl implements NeighborSelector {
 
-    public Optional<GeneratedNeighbor> selectBestNeighborLazy(SchedulePermutationSolution actualSolution, Stream<GeneratedNeighbor> neighbors, LocalsearchEvaluator evaluator, AtomicInteger counter, AcceptanceCriterion acceptanceCriterion) {
+    public Optional<GeneratedNeighbor> selectBestNeighborLazy(SchedulePermutationSolution actualSolution,
+                                                              Stream<GeneratedNeighbor> neighbors, LocalsearchEvaluator evaluator,
+                                                              AtomicInteger counter, AcceptanceCriterion acceptanceCriterion,
+                                                              TerminationCriterion terminationCriterion) {
         return neighbors
+                .takeWhile(neighbor -> terminationCriterion.hasTimeExceeded())
                 .filter(neighbor -> {
 
                     counter.incrementAndGet();
@@ -25,7 +29,9 @@ public class NeighborSelectorImpl implements NeighborSelector {
                 .findFirst();   //this breaks laziness
     }
 
-    public SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution, List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator, LocalSearchObserver observer){
+    public SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution,
+                                                                List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator,
+                                                                LocalSearchObserver observer, TerminationCriterion terminationCriterion){
 
         SchedulePermutationSolution bestSolution = originalSolution;
         double originalMakespan = originalSolution.getFitnessInfo().fitness().get("makespan");
@@ -56,6 +62,9 @@ public class NeighborSelectorImpl implements NeighborSelector {
                     bestSolution = neighborSolution;
                 }
             }
+
+            if(terminationCriterion.hasTimeExceeded())
+                break;
 
         }
 

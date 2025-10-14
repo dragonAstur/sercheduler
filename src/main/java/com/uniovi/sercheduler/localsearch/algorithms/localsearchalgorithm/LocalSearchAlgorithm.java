@@ -109,9 +109,14 @@ public class LocalSearchAlgorithm {
 
             terminationCriterion.setUpgradeFound(false);
 
-            neighbors = neighborGenerator.generateNeighborsGlobal(neighborhoodOperatorList, actualSolution);
+            neighbors = neighborGenerator.generateNeighborsGlobal(neighborhoodOperatorList, actualSolution,
+                    terminationCriterion);
 
-            bestNeighbor = neighborSelector.selectBestNeighborGlobal(actualSolution, neighbors, evaluator, observer);
+            bestNeighbor = neighborSelector.selectBestNeighborGlobal(actualSolution, neighbors, evaluator, observer,
+                    terminationCriterion);
+
+            if(terminationCriterion.hasTimeExceeded())
+                break;
 
             observer.setNumberOfGeneratedNeighbors(neighbors.size());
 
@@ -145,11 +150,16 @@ public class LocalSearchAlgorithm {
 
             terminationCriterion.setUpgradeFound(false);
 
-            neighbors = neighborGenerator.generateNeighborsLazy(neighborhoodLazyOperatorList, actualSolution);
+            neighbors = neighborGenerator.generateNeighborsLazy(neighborhoodLazyOperatorList, actualSolution,
+                    terminationCriterion);
 
             AtomicInteger counter = new AtomicInteger();
 
-            maybeBetterNeighbor = neighborSelector.selectBestNeighborLazy(actualSolution, neighbors, evaluator, counter, acceptanceCriterion);
+            maybeBetterNeighbor = neighborSelector.selectBestNeighborLazy(actualSolution, neighbors, evaluator, counter,
+                    acceptanceCriterion, terminationCriterion);
+
+            if(terminationCriterion.hasTimeExceeded())
+                break;
 
             observer.setNumberOfGeneratedNeighbors(counter.get());
 

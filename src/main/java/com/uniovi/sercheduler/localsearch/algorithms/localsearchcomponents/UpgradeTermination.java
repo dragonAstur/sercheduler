@@ -24,5 +24,10 @@ public class UpgradeTermination implements TerminationCriterion {
         return System.currentTimeMillis();
     }
 
+    @Override
+    public boolean hasTimeExceeded() {
+        return false;
+    }
+
 
 }

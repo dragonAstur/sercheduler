@@ -17,10 +17,12 @@ public interface NeighborSelector {
      */
     Optional<GeneratedNeighbor> selectBestNeighborLazy(SchedulePermutationSolution actualSolution,
                                                        Stream<GeneratedNeighbor> neighbors, LocalsearchEvaluator evaluator,
-                                                       AtomicInteger counter, AcceptanceCriterion acceptanceCriterion);
+                                                       AtomicInteger counter, AcceptanceCriterion acceptanceCriterion,
+                                                       TerminationCriterion terminationCriterion);
 
     SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution,
                                                          List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator,
-                                                         LocalSearchObserver observer);
+                                                         LocalSearchObserver observer,
+                                                         TerminationCriterion terminationCriterion);
 
 }

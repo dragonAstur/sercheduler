@@ -12,19 +12,25 @@ import java.util.stream.StreamSupport;
 
 public class NeighborGeneratorImpl implements NeighborGenerator {
 
-    public Stream<GeneratedNeighbor> generateNeighborsLazy(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList, SchedulePermutationSolution actualSolution){
+    public Stream<GeneratedNeighbor> generateNeighborsLazy(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList,
+                                                           SchedulePermutationSolution actualSolution,
+                                                           TerminationCriterion terminationCriterion){
 
         List<Supplier<Stream<GeneratedNeighbor>>> operators = new ArrayList<>();
 
-        for(NeighborhoodOperatorLazy neighborhoodLazyOperator : neighborhoodLazyOperatorList)
+        for(NeighborhoodOperatorLazy neighborhoodLazyOperator : neighborhoodLazyOperatorList) {
             operators.add(() -> neighborhoodLazyOperator.execute(actualSolution));
+            if(terminationCriterion.hasTimeExceeded()) break;
+        }
 
         return shuffleStreams(operators);
     }
 
 
 
-    public List<GeneratedNeighbor> generateNeighborsGlobal(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList, SchedulePermutationSolution actualSolution){
+    public List<GeneratedNeighbor> generateNeighborsGlobal(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
+                                                           SchedulePermutationSolution actualSolution,
+                                                           TerminationCriterion terminationCriterion){
 
         List<GeneratedNeighbor> neighborsList = new ArrayList<>();
 
@@ -32,6 +38,7 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
             neighborsList.addAll(
                     neighborhoodOperator.execute(actualSolution)
             );
+            if(terminationCriterion.hasTimeExceeded()) break;
         }
 
         return neighborsList;
