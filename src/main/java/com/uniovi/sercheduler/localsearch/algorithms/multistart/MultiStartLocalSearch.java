@@ -4,6 +4,7 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalSearchAlgorithm;
 import com.uniovi.sercheduler.localsearch.algorithms.multistartcomponents.StartOperatorSelector;
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
+import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 
@@ -21,7 +22,7 @@ public class MultiStartLocalSearch {
     public SchedulePermutationSolution executeGlobal(LocalSearchAlgorithm localSearchAlgorithm,
                                                List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
                                                Long limitTime,
-                                               LocalSearchObserver observer)
+                                               Observer observer)
     {
 
         long startingTime = localSearchAlgorithm.startTimeCounter();
@@ -58,7 +59,7 @@ public class MultiStartLocalSearch {
     public SchedulePermutationSolution executeLazy(LocalSearchAlgorithm localSearchAlgorithm,
                                                List<NeighborhoodOperatorLazy> neighborhoodOperatorList,
                                                Long limitTime,
-                                               LocalSearchObserver observer)
+                                               Observer observer)
     {
 
         long startingTime = localSearchAlgorithm.startTimeCounter();

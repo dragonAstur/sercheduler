@@ -5,6 +5,7 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.*;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
+import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
@@ -96,7 +97,7 @@ public class LocalSearchAlgorithm {
 
     public SchedulePermutationSolution runLocalSearchGlobal(
             List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
-            LocalSearchObserver observer
+            Observer observer
     ) {
         FitnessCalculator fitnessCalculator = fitnessCalculatorGenerator.createFitnessCalculator();
         SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialSolution(fitnessCalculator);
@@ -115,8 +116,8 @@ public class LocalSearchAlgorithm {
             bestNeighbor = neighborSelector.selectBestNeighborGlobal(actualSolution, neighbors, evaluator, observer,
                     terminationCriterion);
 
-            if(terminationCriterion.hasTimeExceeded())
-                break;
+//            if(terminationCriterion.hasTimeExceeded())
+//                break;
 
             observer.setNumberOfGeneratedNeighbors(neighbors.size());
 
@@ -137,7 +138,7 @@ public class LocalSearchAlgorithm {
 
     public SchedulePermutationSolution runLocalSearchLazy(
             List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList,
-            LocalSearchObserver observer
+            Observer observer
     ) {
         FitnessCalculator fitnessCalculator = fitnessCalculatorGenerator.createFitnessCalculator();
         SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialSolution(fitnessCalculator);
