@@ -40,4 +40,9 @@ public class NeighborhoodChangeHostGlobal implements NeighborhoodOperatorGlobal 
     public String getName() {
         return "N1";
     }
+
+    @Override
+    public NeighborhoodOperatorPositional getNeighborhoodOperatorPositional() {
+        return changeHostPositional;
+    }
 }

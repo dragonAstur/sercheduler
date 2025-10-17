@@ -11,4 +11,6 @@ public interface NeighborhoodOperatorGlobal extends NeighborhoodOperator<List<Ge
     List<GeneratedNeighbor> execute(SchedulePermutationSolution actualSolution);
 
     String getName();
+
+    NeighborhoodOperatorPositional getNeighborhoodOperatorPositional();
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class NeighborhoodSwapGlobal implements NeighborhoodOperatorGlobal {
 
-    private NeighborhoodSwapPositional swapPositional;
+    private final NeighborhoodSwapPositional swapPositional;
 
     public NeighborhoodSwapGlobal(){
         this.swapPositional = new NeighborhoodSwapPositional();
@@ -34,5 +34,10 @@ public class NeighborhoodSwapGlobal implements NeighborhoodOperatorGlobal {
     @Override
     public String getName() {
         return "N3";
+    }
+
+    @Override
+    public NeighborhoodOperatorPositional getNeighborhoodOperatorPositional() {
+        return null;
     }
 }
