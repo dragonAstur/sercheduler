@@ -168,9 +168,6 @@ public class LocalSearchAlgorithm {
             maybeBetterNeighbor = neighborSelector.selectBestNeighborLazy(actualSolution, neighbors, evaluator, counter,
                     acceptanceCriterion, terminationCriterion);
 
-            if(terminationCriterion.hasTimeExceeded())
-                break;
-
             observer.setNumberOfGeneratedNeighbors(counter.get());
 
             if (maybeBetterNeighbor.isPresent()) {
