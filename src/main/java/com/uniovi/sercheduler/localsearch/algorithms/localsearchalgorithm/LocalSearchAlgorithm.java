@@ -113,8 +113,8 @@ public class LocalSearchAlgorithm {
             neighbors = neighborGenerator.generateNeighborsGlobal(neighborhoodOperatorList, actualSolution,
                     terminationCriterion);
 
-            bestNeighbor = neighborSelector.selectBestNeighborGlobal(actualSolution, neighbors, evaluator, observer,
-                    terminationCriterion);
+            bestNeighbor = neighborSelector.selectBestNeighborGlobal(actualSolution, neighbors, evaluator,
+                    terminationCriterion, observer);
 
 //            if(terminationCriterion.hasTimeExceeded())
 //                break;
