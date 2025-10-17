@@ -32,4 +32,6 @@ public interface NeighborSelector {
 
     void updateObserverMetrics(Observer observer);
 
+    int getNumberOfGeneratedNeighbors();
+
 }

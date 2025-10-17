@@ -4,7 +4,6 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.*;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
-import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
@@ -26,6 +25,8 @@ public class LocalSearchAlgorithm {
     private final AcceptanceCriterion acceptanceCriterion;
     private final TerminationCriterion terminationCriterion;
 
+    private final NeighborGeneratorAndSelector neighborGeneratorAndSelector;
+
 
     public LocalSearchAlgorithm(Builder builder){
         this.fitnessCalculatorGenerator = builder.fitnessCalculatorGenerator;
@@ -35,6 +36,7 @@ public class LocalSearchAlgorithm {
         this.neighborSelector = builder.neighborSelector;
         this.acceptanceCriterion = builder.acceptanceCriterion;
         this.terminationCriterion = builder.terminationCriterion;
+        this.neighborGeneratorAndSelector = builder.neighborGeneratorAndSelector;
     }
 
 
@@ -47,6 +49,8 @@ public class LocalSearchAlgorithm {
         private NeighborSelector neighborSelector = new NeighborSelectorImpl();
         private AcceptanceCriterion acceptanceCriterion = new AcceptanceCriterionImpl();
         private TerminationCriterion terminationCriterion = new UpgradeTermination();
+
+        private NeighborGeneratorAndSelector neighborGeneratorAndSelector = new NeighborGeneratorAndSelectorImpl();
 
         public Builder(SchedulingProblem problem){
             this.fitnessCalculatorGenerator = new FitnessCalculatorGeneratorImpl(problem);
@@ -89,6 +93,11 @@ public class LocalSearchAlgorithm {
             return this;
         }
 
+        public Builder neighborGeneratorAndSelector(NeighborGeneratorAndSelector neighborGeneratorAndSelector){
+            this.neighborGeneratorAndSelector = neighborGeneratorAndSelector;
+            return this;
+        }
+
         public LocalSearchAlgorithm build(){
             return new LocalSearchAlgorithm(this);
         }
@@ -110,16 +119,16 @@ public class LocalSearchAlgorithm {
 
             terminationCriterion.setUpgradeFound(false);
 
-            neighbors = neighborGenerator.generateNeighborsGlobal(neighborhoodOperatorList, actualSolution,
+            /*neighbors = neighborGenerator.generateNeighborsGlobal(neighborhoodOperatorList, actualSolution,
                     terminationCriterion);
 
             bestNeighbor = neighborSelector.selectBestNeighborGlobal(actualSolution, neighbors, evaluator,
                     terminationCriterion, observer);
 
-//            if(terminationCriterion.hasTimeExceeded())
-//                break;
+            observer.setNumberOfGeneratedNeighbors(neighbors.size());*/
 
-            observer.setNumberOfGeneratedNeighbors(neighbors.size());
+            bestNeighbor = neighborGeneratorAndSelector.generateAndSelectNeighbors(neighborhoodOperatorList, actualSolution,
+                    terminationCriterion, evaluator, observer);
 
             if (acceptanceCriterion.checkAcceptance(actualSolution, bestNeighbor)) {
                 actualSolution = bestNeighbor;
@@ -128,7 +137,7 @@ public class LocalSearchAlgorithm {
 
             double actualSolutionMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
             observer.setReachedMakespan(actualSolutionMakespan);
-            observer.updateMakespanEvolution(actualSolutionMakespan, neighbors.size());
+            observer.updateMakespanEvolution(actualSolutionMakespan, neighborGeneratorAndSelector.numberOfGeneratedNeighbors());
             observer.endIteration();
 
         } while(terminationCriterion.checkTerminationCondition());

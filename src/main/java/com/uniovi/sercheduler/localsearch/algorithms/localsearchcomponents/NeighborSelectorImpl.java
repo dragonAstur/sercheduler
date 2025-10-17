@@ -34,6 +34,10 @@ public class NeighborSelectorImpl implements NeighborSelector {
                 .findFirst();   //this breaks laziness
     }
 
+    public int getNumberOfGeneratedNeighbors(){
+        return numberOfGeneratedNeighbors;
+    }
+
     /**
      * Dada una solución y todos los vecinos que se han logrado generar aplicándole un esquema de vecindad,
      * se evalúan todos y se selecciona al mejor de todos, devolviéndolo.

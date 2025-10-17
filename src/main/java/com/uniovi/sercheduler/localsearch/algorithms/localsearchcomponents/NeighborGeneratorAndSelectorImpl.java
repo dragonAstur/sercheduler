@@ -4,25 +4,27 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
 import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.*;
-import com.uniovi.sercheduler.service.FitnessInfo;
 import com.uniovi.sercheduler.service.PlanPair;
 
 import java.util.*;
 
-public class NeighborEvaluatorAndSelectorImpl {
+public class NeighborGeneratorAndSelectorImpl implements NeighborGeneratorAndSelector {
 
     private final NeighborSelector selector;
 
-    public NeighborEvaluatorAndSelectorImpl() {
+    public NeighborGeneratorAndSelectorImpl() {
         this.selector = new NeighborSelectorImpl();
     }
 
+    public int numberOfGeneratedNeighbors() {
+        return selector.getNumberOfGeneratedNeighbors();
+    }
 
-    public SchedulePermutationSolution generateAndEvaluateNeighbors(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
-                                                           SchedulePermutationSolution actualSolution,
-                                                           TerminationCriterion terminationCriterion,
-                                                           LocalsearchEvaluator evaluator,
-                                                           Observer observer){
+    public SchedulePermutationSolution generateAndSelectNeighbors(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
+                                                                  SchedulePermutationSolution actualSolution,
+                                                                  TerminationCriterion terminationCriterion,
+                                                                  LocalsearchEvaluator evaluator,
+                                                                  Observer observer){
 
         List<SchedulePermutationSolution> generatedSolutions = new ArrayList<>();
 
@@ -34,6 +36,8 @@ public class NeighborEvaluatorAndSelectorImpl {
 
             if(terminationCriterion.hasTimeExceeded()) break;
         }
+
+        selector.updateObserverMetrics(observer);
 
         return generatedSolutions.stream()
                 .min(Comparator.comparingDouble(s -> s.getFitnessInfo().fitness().get("makespan")))
@@ -67,8 +71,6 @@ public class NeighborEvaluatorAndSelectorImpl {
             if(terminationCriterion.hasTimeExceeded())
                 break;
         }
-
-        this.selector.updateObserverMetrics(observer);
 
         return totalBestNeighbor;
 
