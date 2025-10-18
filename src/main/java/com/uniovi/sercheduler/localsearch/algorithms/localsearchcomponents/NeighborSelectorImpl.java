@@ -22,7 +22,7 @@ public class NeighborSelectorImpl implements NeighborSelector {
                                                               AtomicInteger counter, AcceptanceCriterion acceptanceCriterion,
                                                               TerminationCriterion terminationCriterion) {
         return neighbors
-                .takeWhile(neighbor -> terminationCriterion.hasTimeExceeded())
+                .takeWhile(neighbor -> !terminationCriterion.hasTimeExceeded())
                 .filter(neighbor -> {
 
                     counter.incrementAndGet();

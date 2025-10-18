@@ -20,7 +20,6 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
 
         for(NeighborhoodOperatorLazy neighborhoodLazyOperator : neighborhoodLazyOperatorList) {
             operators.add(() -> neighborhoodLazyOperator.execute(actualSolution));
-            if(terminationCriterion.hasTimeExceeded()) break;
         }
 
         return shuffleStreams(operators);

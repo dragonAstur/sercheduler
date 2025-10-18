@@ -15,16 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 //java -jar target/sercheduler-0.0.1-SNAPSHOT.jar localsearch -W src/test/resources/cycles.json -H src/test/resources/extreme/hosts-16.json -C true -T 1000 -P 100 -N 41_16_100_HC -S HC -O N1uN2
+//"src/test/resources/localsearch/montage-chameleon-dss-125d-001.json"
 
 public class LocalSearchRunnable {
 
-    public static final String WORFLOW_FILE = "src/test/resources/localsearch/montage-chameleon-dss-125d-001.json";
+    public static final String WORFLOW_FILE = "src/test/resources/1000genome.json";
     public static final String HOSTS_FILE = "src/test/resources/extreme/hosts-16.json";
     public static final long TIME_LIMIT = 1000L;
     public static final long PERIODIC_TIME = 100;
     public static final boolean CREATE_FILE = true;
     public static final String STRATEGY_NAME = "HC";
-    public static final String OPERATOR_CONFIG = "N1uN2uN3uN4";
+    public static final String OPERATOR_CONFIG = "N1";
 
     public static final String FILE_NAME = "prueba";
 
