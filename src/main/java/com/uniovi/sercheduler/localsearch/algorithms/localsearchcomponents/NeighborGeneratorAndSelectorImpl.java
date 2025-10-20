@@ -31,7 +31,7 @@ public class NeighborGeneratorAndSelectorImpl implements NeighborGeneratorAndSel
         for(NeighborhoodOperatorGlobal globalOperator : neighborhoodOperatorList){
 
             generatedSolutions.add(
-                    generateAndEvaluateGlobal(actualSolution, globalOperator, terminationCriterion, evaluator, observer)
+                    generateAndSelectNeighborsGlobal(actualSolution, globalOperator, terminationCriterion, evaluator)
             );
 
             if(terminationCriterion.hasTimeExceeded()) break;
@@ -45,11 +45,10 @@ public class NeighborGeneratorAndSelectorImpl implements NeighborGeneratorAndSel
 
     }
 
-    private SchedulePermutationSolution generateAndEvaluateGlobal(SchedulePermutationSolution actualSolution,
-                                                              NeighborhoodOperatorGlobal globalOperator,
-                                                              TerminationCriterion terminationCriterion,
-                                                              LocalsearchEvaluator evaluator,
-                                                              Observer observer){
+    private SchedulePermutationSolution generateAndSelectNeighborsGlobal(SchedulePermutationSolution actualSolution,
+                                                                         NeighborhoodOperatorGlobal globalOperator,
+                                                                         TerminationCriterion terminationCriterion,
+                                                                         LocalsearchEvaluator evaluator){
 
         List<PlanPair> plan = List.copyOf(actualSolution.getPlan());
         List<GeneratedNeighbor> positionalGeneratedNeighbors;
