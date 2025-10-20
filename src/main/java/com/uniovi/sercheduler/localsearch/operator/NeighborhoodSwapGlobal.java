@@ -38,6 +38,6 @@ public class NeighborhoodSwapGlobal implements NeighborhoodOperatorGlobal {
 
     @Override
     public NeighborhoodOperatorPositional getNeighborhoodOperatorPositional() {
-        return null;
+        return swapPositional;
     }
 }
