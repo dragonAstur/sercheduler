@@ -160,13 +160,12 @@ public class LocalSearchAlgorithm {
 
             terminationCriterion.setUpgradeFound(false);
 
-            neighbors = neighborGenerator.generateNeighborsLazy(neighborhoodLazyOperatorList, actualSolution,
-                    terminationCriterion);
+            neighbors = neighborGenerator.generateNeighborsLazy(neighborhoodLazyOperatorList, actualSolution, observer);
 
             AtomicInteger counter = new AtomicInteger();
 
             maybeBetterNeighbor = neighborSelector.selectBestNeighborLazy(actualSolution, neighbors, evaluator, counter,
-                    acceptanceCriterion, terminationCriterion);
+                    acceptanceCriterion, terminationCriterion, observer);
 
             observer.setNumberOfGeneratedNeighbors(counter.get());
 

@@ -28,10 +28,12 @@ public class NeighborGeneratorAndSelectorImpl implements NeighborGeneratorAndSel
 
         List<SchedulePermutationSolution> generatedSolutions = new ArrayList<>();
 
+        Collections.shuffle(neighborhoodOperatorList);
+
         for(NeighborhoodOperatorGlobal globalOperator : neighborhoodOperatorList){
 
             generatedSolutions.add(
-                    generateAndSelectNeighborsGlobal(actualSolution, globalOperator, terminationCriterion, evaluator)
+                    generateAndSelectNeighborsGlobal(actualSolution, globalOperator, terminationCriterion, evaluator, observer)
             );
 
             if(terminationCriterion.hasTimeExceeded()) break;
@@ -48,7 +50,8 @@ public class NeighborGeneratorAndSelectorImpl implements NeighborGeneratorAndSel
     private SchedulePermutationSolution generateAndSelectNeighborsGlobal(SchedulePermutationSolution actualSolution,
                                                                          NeighborhoodOperatorGlobal globalOperator,
                                                                          TerminationCriterion terminationCriterion,
-                                                                         LocalsearchEvaluator evaluator){
+                                                                         LocalsearchEvaluator evaluator,
+                                                                         Observer observer){
 
         List<PlanPair> plan = List.copyOf(actualSolution.getPlan());
         List<GeneratedNeighbor> positionalGeneratedNeighbors;
@@ -66,6 +69,9 @@ public class NeighborGeneratorAndSelectorImpl implements NeighborGeneratorAndSel
 
             if(totalBestNeighbor == null || totalBestNeighbor.getFitnessInfo().fitness().get("makespan") > actualBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                     totalBestNeighbor = actualBestNeighbor;
+
+            observer.updateMakespanEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"),
+                    numberOfGeneratedNeighbors());
 
             if(terminationCriterion.hasTimeExceeded())
                 break;

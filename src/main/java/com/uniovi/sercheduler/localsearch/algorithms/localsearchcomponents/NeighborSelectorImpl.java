@@ -20,12 +20,14 @@ public class NeighborSelectorImpl implements NeighborSelector {
     public Optional<GeneratedNeighbor> selectBestNeighborLazy(SchedulePermutationSolution actualSolution,
                                                               Stream<GeneratedNeighbor> neighbors, LocalsearchEvaluator evaluator,
                                                               AtomicInteger counter, AcceptanceCriterion acceptanceCriterion,
-                                                              TerminationCriterion terminationCriterion) {
+                                                              TerminationCriterion terminationCriterion, Observer observer) {
         return neighbors
                 .takeWhile(neighbor -> !terminationCriterion.hasTimeExceeded())
                 .filter(neighbor -> {
 
                     counter.incrementAndGet();
+
+                    observer.updateMakespanEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"), counter.get());
 
                     evaluator.evaluate(actualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
 

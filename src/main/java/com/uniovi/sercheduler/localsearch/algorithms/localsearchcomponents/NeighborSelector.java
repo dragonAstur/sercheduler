@@ -18,7 +18,8 @@ public interface NeighborSelector {
     Optional<GeneratedNeighbor> selectBestNeighborLazy(SchedulePermutationSolution actualSolution,
                                                        Stream<GeneratedNeighbor> neighbors, LocalsearchEvaluator evaluator,
                                                        AtomicInteger counter, AcceptanceCriterion acceptanceCriterion,
-                                                       TerminationCriterion terminationCriterion);
+                                                       TerminationCriterion terminationCriterion,
+                                                       Observer observer);
 
     SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution,
                                                          List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator,

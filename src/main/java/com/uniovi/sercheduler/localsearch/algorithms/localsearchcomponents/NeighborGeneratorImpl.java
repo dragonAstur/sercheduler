@@ -1,6 +1,7 @@
 package com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
@@ -14,7 +15,7 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
 
     public Stream<GeneratedNeighbor> generateNeighborsLazy(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList,
                                                            SchedulePermutationSolution actualSolution,
-                                                           TerminationCriterion terminationCriterion){
+                                                           Observer observer){
 
         List<Supplier<Stream<GeneratedNeighbor>>> operators = new ArrayList<>();
 
@@ -22,7 +23,7 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
             operators.add(() -> neighborhoodLazyOperator.execute(actualSolution));
         }
 
-        return shuffleStreams(operators);
+        return shuffleStreams(operators, observer, actualSolution.getFitnessInfo().fitness().get("makespan"));
     }
 
 
@@ -43,7 +44,8 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
         return neighborsList;
     }
 
-    private <T> Stream<T> shuffleStreams(List<Supplier<Stream<T>>> streamSuppliers) {
+    private <T> Stream<T> shuffleStreams(List<Supplier<Stream<T>>> streamSuppliers, Observer observer,
+                                         double actualSolutionMakespan) {
 
         List<Iterator<T>> iterators = streamSuppliers.stream()
                 .map(Supplier::get)
@@ -69,6 +71,8 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
                     //Just in case there is concurrency
                     if (available.isEmpty())
                         throw new NoSuchElementException();
+
+                    observer.updateMakespanEvolution(actualSolutionMakespan, 0);
 
                     Iterator<T> chosen = available.get(rand.nextInt(available.size()));
 
