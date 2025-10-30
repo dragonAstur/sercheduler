@@ -335,7 +335,7 @@ public class XLSXTableExporter {
                     row.createCell(2).setCellValue(i+1);
                     row.createCell(3).setCellValue(run.evolutionMetrics().getStartNumberList().get(j));
                     row.createCell(4).setCellValue(run.evolutionMetrics().getIterationNumberList().get(j));
-                    row.createCell(5).setCellValue(observer.getPeriodicTimeForMakespanEvolution());
+                    row.createCell(5).setCellValue(observer.getPeriodicTimeForMakespanEvolution() * (j+1));
                     row.createCell(6).setCellValue(run.evolutionMetrics().getInstants().get(j));
                     row.createCell(7).setCellValue(run.evolutionMetrics().getActualMakespanEvolution().get(j));
                     row.createCell(8).setCellValue(run.evolutionMetrics().getBestMakespanEvolution().get(j));
