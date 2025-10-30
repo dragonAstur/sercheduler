@@ -65,7 +65,7 @@ public class NeighborGeneratorAndSelectorImpl implements NeighborGeneratorAndSel
 
             //Select the best neighbors from all neighbors generated in that position
             actualBestNeighbor = this.selector.selectBestNeighborGlobal(actualSolution,
-                    positionalGeneratedNeighbors, evaluator, terminationCriterion);
+                    positionalGeneratedNeighbors, evaluator, terminationCriterion, observer);
 
             if(totalBestNeighbor == null || totalBestNeighbor.getFitnessInfo().fitness().get("makespan") > actualBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                     totalBestNeighbor = actualBestNeighbor;

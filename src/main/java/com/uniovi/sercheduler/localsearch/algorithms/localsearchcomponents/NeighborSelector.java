@@ -21,7 +21,7 @@ public interface NeighborSelector {
                                                        TerminationCriterion terminationCriterion,
                                                        Observer observer);
 
-    SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution,
+    SchedulePermutationSolution selectBestNeighborGlobalAndUpdateObserver(SchedulePermutationSolution originalSolution,
                                                          List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator,
                                                          TerminationCriterion terminationCriterion,
                                                          Observer observer);
@@ -29,7 +29,8 @@ public interface NeighborSelector {
     SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution,
                                                          List<GeneratedNeighbor> neighborsList,
                                                          LocalsearchEvaluator evaluator,
-                                                         TerminationCriterion terminationCriterion);
+                                                         TerminationCriterion terminationCriterion,
+                                                         Observer observer);
 
     void updateObserverMetrics(Observer observer);
 

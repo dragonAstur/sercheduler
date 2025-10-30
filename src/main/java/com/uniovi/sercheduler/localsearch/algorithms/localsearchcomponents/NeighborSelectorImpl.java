@@ -51,14 +51,14 @@ public class NeighborSelectorImpl implements NeighborSelector {
      * @param terminationCriterion el criterio de parada
      * @return el mejor que vecino que mejore a su vez la solución actual
      */
-    public SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution,
+    public SchedulePermutationSolution selectBestNeighborGlobalAndUpdateObserver(SchedulePermutationSolution originalSolution,
                                                                 List<GeneratedNeighbor> neighborsList,
                                                                 LocalsearchEvaluator evaluator,
                                                                 TerminationCriterion terminationCriterion,
                                                                 Observer observer){
 
         SchedulePermutationSolution bestSolution = selectBestNeighborGlobal(originalSolution, neighborsList, evaluator,
-                terminationCriterion);
+                terminationCriterion, observer);
 
         updateObserverMetrics(observer);
 
@@ -68,7 +68,8 @@ public class NeighborSelectorImpl implements NeighborSelector {
     public SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution,
                                                                 List<GeneratedNeighbor> neighborsList,
                                                                 LocalsearchEvaluator evaluator,
-                                                                TerminationCriterion terminationCriterion){
+                                                                TerminationCriterion terminationCriterion,
+                                                                Observer observer){
         SchedulePermutationSolution bestSolution = originalSolution;
         double originalMakespan = originalSolution.getFitnessInfo().fitness().get("makespan");
         double bestMakespan = originalMakespan;
@@ -80,6 +81,9 @@ public class NeighborSelectorImpl implements NeighborSelector {
         this.numberOfGeneratedNeighbors += neighborsList.size();
 
         for(GeneratedNeighbor neighbor : neighborsList){
+
+            //update evolution
+            observer.updateMakespanEvolution(bestMakespan, this.numberOfGeneratedNeighbors);
 
             neighborSolution = neighbor.generatedSolution();
             evaluator.evaluate(originalSolution, neighborSolution, neighbor.movements().get(neighbor.movements().size() - 1));
@@ -97,6 +101,9 @@ public class NeighborSelectorImpl implements NeighborSelector {
                     bestSolution = neighborSolution;
                 }
             }
+
+            //update evolution
+            observer.updateMakespanEvolution(bestMakespan, this.numberOfGeneratedNeighbors);
 
             if(terminationCriterion.hasTimeExceeded())
                 break;
