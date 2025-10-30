@@ -19,15 +19,15 @@ import java.util.List;
 
 public class LocalSearchRunnable {
 
-    public static final String WORFLOW_FILE = "src/test/resources/1000genome.json";
+    public static final String WORFLOW_FILE = "src/test/resources/localsearch/montage-chameleon-dss-125d-001.json";
     public static final String HOSTS_FILE = "src/test/resources/extreme/hosts-16.json";
     public static final long TIME_LIMIT = 1000L;
     public static final long PERIODIC_TIME = 100;
     public static final boolean CREATE_FILE = true;
-    public static final String STRATEGY_NAME = "HC";
-    public static final String OPERATOR_CONFIG = "N1";
+    public static final String STRATEGY_NAME = "GD";
+    public static final String OPERATOR_CONFIG = "N1uN2uN3";
 
-    public static final String FILE_NAME = "prueba";
+    public static final String FILE_NAME = "update_exacto";
 
 
     public static void main(String[] args) {
@@ -107,60 +107,60 @@ public class LocalSearchRunnable {
 
                 List<NeighborhoodOperatorGlobal> globalOperatorList =
                         switch (operatorConfigName.toLowerCase()) {
-                            case "n1" -> List.of(new NeighborhoodChangeHostGlobal(problem.getInstanceData()));
-                            case "n2" -> List.of(new NeighborhoodInsertionGlobal());
-                            case "n3" -> List.of(new NeighborhoodSwapGlobal());
-                            case "n4" -> List.of(new NeighborhoodSwapHostGlobal());
-                            case "n1un2" -> List.of(
+                            case "n1" -> new ArrayList<>(List.of(new NeighborhoodChangeHostGlobal(problem.getInstanceData())));
+                            case "n2" -> new ArrayList<>(List.of(new NeighborhoodInsertionGlobal()));
+                            case "n3" -> new ArrayList<>(List.of(new NeighborhoodSwapGlobal()));
+                            case "n4" -> new ArrayList<>(List.of(new NeighborhoodSwapHostGlobal()));
+                            case "n1un2" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                                     new NeighborhoodInsertionGlobal()
-                            );
-                            case "n1un3" -> List.of(
+                            ));
+                            case "n1un3" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                                     new NeighborhoodSwapGlobal()
-                            );
-                            case "n1un4" -> List.of(
+                            ));
+                            case "n1un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                                     new NeighborhoodSwapHostGlobal()
-                            );
-                            case "n2un3" -> List.of(
+                            ));
+                            case "n2un3" -> new ArrayList<>(List.of(
                                     new NeighborhoodInsertionGlobal(),
                                     new NeighborhoodSwapGlobal()
-                            );
-                            case "n2un4" -> List.of(
+                            ));
+                            case "n2un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodInsertionGlobal(),
                                     new NeighborhoodSwapHostGlobal()
-                            );
-                            case "n3un4" -> List.of(
+                            ));
+                            case "n3un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodSwapGlobal(),
                                     new NeighborhoodSwapHostGlobal()
-                            );
-                            case "n1un2un3" -> List.of(
+                            ));
+                            case "n1un2un3" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                                     new NeighborhoodInsertionGlobal(),
                                     new NeighborhoodSwapGlobal()
-                            );
-                            case "n1un2un4" -> List.of(
+                            ));
+                            case "n1un2un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                                     new NeighborhoodInsertionGlobal(),
                                     new NeighborhoodSwapHostGlobal()
-                            );
-                            case "n1un3un4" -> List.of(
+                            ));
+                            case "n1un3un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                                     new NeighborhoodSwapGlobal(),
                                     new NeighborhoodSwapHostGlobal()
-                            );
-                            case "n2un3un4" -> List.of(
+                            ));
+                            case "n2un3un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodInsertionGlobal(),
                                     new NeighborhoodSwapGlobal(),
                                     new NeighborhoodSwapHostGlobal()
-                            );
-                            case "n1un2un3un4", "vns" -> List.of(
+                            ));
+                            case "n1un2un3un4", "vns" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostGlobal(problem.getInstanceData()),
                                     new NeighborhoodInsertionGlobal(),
                                     new NeighborhoodSwapGlobal(),
                                     new NeighborhoodSwapHostGlobal()
-                            );
+                            ));
                             default -> new ArrayList<>();
                         };
 
@@ -183,70 +183,70 @@ public class LocalSearchRunnable {
 
                 List<NeighborhoodOperatorLazy> lazyOperatorList =
                         switch (operatorConfigName.toLowerCase()) {
-                            case "n1" -> List.of(
+                            case "n1" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostLazy(problem.getInstanceData())
-                            );
-                            case "n2" -> List.of(
+                            ));
+                            case "n2" -> new ArrayList<>(List.of(
                                     new NeighborhoodInsertionLazy()
-                            );
-                            case "n3" -> List.of(
+                            ));
+                            case "n3" -> new ArrayList<>(List.of(
                                     new NeighborhoodSwapLazy()
-                            );
-                            case "n4" -> List.of(
+                            ));
+                            case "n4" -> new ArrayList<>(List.of(
                                     new NeighborhoodSwapHostLazy()
-                            );
-                            case "n1un2" -> List.of(
+                            ));
+                            case "n1un2" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                                     new NeighborhoodInsertionLazy()
-                            );
+                            ));
 
-                            case "n1un3" -> List.of(
+                            case "n1un3" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                                     new NeighborhoodSwapLazy()
-                            );
-                            case "n1un4" -> List.of(
+                            ));
+                            case "n1un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                                     new NeighborhoodSwapHostLazy()
-                            );
-                            case "n2un3" -> List.of(
+                            ));
+                            case "n2un3" -> new ArrayList<>(List.of(
                                     new NeighborhoodInsertionLazy(),
                                     new NeighborhoodSwapLazy()
-                            );
+                            ));
 
-                            case "n2un4" -> List.of(
+                            case "n2un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodInsertionLazy(),
                                     new NeighborhoodSwapHostLazy()
-                            );
-                            case "n3un4" -> List.of(
+                            ));
+                            case "n3un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodSwapLazy(),
                                     new NeighborhoodSwapHostLazy()
-                            );
-                            case "n1un2un3" -> List.of(
+                            ));
+                            case "n1un2un3" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                                     new NeighborhoodInsertionLazy(),
                                     new NeighborhoodSwapLazy()
-                            );
-                            case "n1un2un4" -> List.of(
+                            ));
+                            case "n1un2un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                                     new NeighborhoodInsertionLazy(),
                                     new NeighborhoodSwapHostLazy()
-                            );
-                            case "n1un3un4" -> List.of(
+                            ));
+                            case "n1un3un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                                     new NeighborhoodSwapLazy(),
                                     new NeighborhoodSwapHostLazy()
-                            );
-                            case "n2un3un4" -> List.of(
+                            ));
+                            case "n2un3un4" -> new ArrayList<>(List.of(
                                     new NeighborhoodInsertionLazy(),
                                     new NeighborhoodSwapLazy(),
                                     new NeighborhoodSwapHostLazy()
-                            );
-                            case "n1un2un3un4", "vns" -> List.of(
+                            ));
+                            case "n1un2un3un4", "vns" -> new ArrayList<>(List.of(
                                     new NeighborhoodChangeHostLazy(problem.getInstanceData()),
                                     new NeighborhoodInsertionLazy(),
                                     new NeighborhoodSwapLazy(),
                                     new NeighborhoodSwapHostLazy()
-                            );
+                            ));
                             default -> new ArrayList<>();
                         };
 
