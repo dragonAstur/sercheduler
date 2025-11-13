@@ -70,7 +70,7 @@ public class NeighborGeneratorAndSelectorImpl implements NeighborGeneratorAndSel
             if(totalBestNeighbor == null || totalBestNeighbor.getFitnessInfo().fitness().get("makespan") > actualBestNeighbor.getFitnessInfo().fitness().get("makespan"))
                     totalBestNeighbor = actualBestNeighbor;
 
-            observer.updateMakespanEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"),
+            observer.updateMakespanEvolution(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"),
                     numberOfGeneratedNeighbors());
 
             if(terminationCriterion.hasTimeExceeded())
