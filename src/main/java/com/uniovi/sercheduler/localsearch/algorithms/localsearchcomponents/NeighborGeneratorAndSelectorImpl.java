@@ -56,7 +56,7 @@ public class NeighborGeneratorAndSelectorImpl implements NeighborGeneratorAndSel
         List<PlanPair> plan = List.copyOf(actualSolution.getPlan());
         List<GeneratedNeighbor> positionalGeneratedNeighbors;
 
-        SchedulePermutationSolution actualBestNeighbor, totalBestNeighbor = null;
+        SchedulePermutationSolution positionalBestNeighbor, totalBestNeighbor = null;
         NeighborhoodOperatorPositional positionalOperator = globalOperator.getNeighborhoodOperatorPositional();
 
         for(int i = 0; i < plan.size(); i++) {
@@ -64,11 +64,11 @@ public class NeighborGeneratorAndSelectorImpl implements NeighborGeneratorAndSel
             positionalGeneratedNeighbors = positionalOperator.execute(actualSolution, i);
 
             //Select the best neighbors from all neighbors generated in that position
-            actualBestNeighbor = this.selector.selectBestNeighborGlobal(actualSolution,
+            positionalBestNeighbor = this.selector.selectBestNeighborGlobal(actualSolution, totalBestNeighbor,
                     positionalGeneratedNeighbors, evaluator, terminationCriterion, observer);
 
-            if(totalBestNeighbor == null || totalBestNeighbor.getFitnessInfo().fitness().get("makespan") > actualBestNeighbor.getFitnessInfo().fitness().get("makespan"))
-                    totalBestNeighbor = actualBestNeighbor;
+            if(totalBestNeighbor == null || totalBestNeighbor.getFitnessInfo().fitness().get("makespan") > positionalBestNeighbor.getFitnessInfo().fitness().get("makespan"))
+                    totalBestNeighbor = positionalBestNeighbor;
 
             observer.updateMakespanEvolution(totalBestNeighbor.getFitnessInfo().fitness().get("makespan"),
                     numberOfGeneratedNeighbors());

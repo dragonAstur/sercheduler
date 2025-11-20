@@ -22,11 +22,13 @@ public interface NeighborSelector {
                                                        Observer observer);
 
     SchedulePermutationSolution selectBestNeighborGlobalAndUpdateObserver(SchedulePermutationSolution originalSolution,
+                                                                          SchedulePermutationSolution bestSolutionKnown,
                                                          List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator,
                                                          TerminationCriterion terminationCriterion,
                                                          Observer observer);
 
     SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution,
+                                                         SchedulePermutationSolution bestSolutionKnown,
                                                          List<GeneratedNeighbor> neighborsList,
                                                          LocalsearchEvaluator evaluator,
                                                          TerminationCriterion terminationCriterion,

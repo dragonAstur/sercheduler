@@ -45,6 +45,8 @@ public class NeighborSelectorImpl implements NeighborSelector {
      * se evalúan todos y se selecciona al mejor de todos, devolviéndolo.
      *
      * @param originalSolution la solución original sobre la que se han generado todos los vecinos
+     * @param bestSolutionKnown la mejor solución que el algoritmo conozca en general, usada por si hubiese que
+     *                          actualizar la evolución del makespan en esta ejecución
      * @param neighborsList la lista de vecinos de la solución original
      * @param evaluator el evaluador que determina el fitness de cada solución
      * @param observer un observer para registrar métricas del algoritmo
@@ -52,12 +54,13 @@ public class NeighborSelectorImpl implements NeighborSelector {
      * @return el mejor que vecino que mejore a su vez la solución actual
      */
     public SchedulePermutationSolution selectBestNeighborGlobalAndUpdateObserver(SchedulePermutationSolution originalSolution,
+                                                                                 SchedulePermutationSolution bestSolutionKnown,
                                                                 List<GeneratedNeighbor> neighborsList,
                                                                 LocalsearchEvaluator evaluator,
                                                                 TerminationCriterion terminationCriterion,
                                                                 Observer observer){
 
-        SchedulePermutationSolution bestSolution = selectBestNeighborGlobal(originalSolution, neighborsList, evaluator,
+        SchedulePermutationSolution bestSolution = selectBestNeighborGlobal(originalSolution, bestSolutionKnown, neighborsList, evaluator,
                 terminationCriterion, observer);
 
         updateObserverMetrics(observer);
@@ -66,15 +69,19 @@ public class NeighborSelectorImpl implements NeighborSelector {
     }
 
     public SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution,
+                                                                SchedulePermutationSolution bestSolutionKnown,
                                                                 List<GeneratedNeighbor> neighborsList,
                                                                 LocalsearchEvaluator evaluator,
                                                                 TerminationCriterion terminationCriterion,
                                                                 Observer observer){
+
         SchedulePermutationSolution bestSolution = originalSolution;
         double originalMakespan = originalSolution.getFitnessInfo().fitness().get("makespan");
         double bestMakespan = originalMakespan;
         double neighborMakespan;
         SchedulePermutationSolution neighborSolution;
+
+        double bestMakespanKnown = bestSolutionKnown.getFitnessInfo().fitness().get("makespan");
 
         double neighborImprovingRatio;
 
@@ -83,7 +90,7 @@ public class NeighborSelectorImpl implements NeighborSelector {
         for(GeneratedNeighbor neighbor : neighborsList){
 
             //update evolution
-            observer.updateMakespanEvolution(bestMakespan, this.numberOfGeneratedNeighbors);
+            observer.updateMakespanEvolution(Math.min(bestMakespan, bestMakespanKnown), this.numberOfGeneratedNeighbors);
 
             neighborSolution = neighbor.generatedSolution();
             evaluator.evaluate(originalSolution, neighborSolution, neighbor.movements().get(neighbor.movements().size() - 1));
@@ -103,7 +110,7 @@ public class NeighborSelectorImpl implements NeighborSelector {
             }
 
             //update evolution
-            observer.updateMakespanEvolution(bestMakespan, this.numberOfGeneratedNeighbors);
+            observer.updateMakespanEvolution(Math.min(bestMakespan, bestMakespanKnown), this.numberOfGeneratedNeighbors);
 
             if(terminationCriterion.hasTimeExceeded())
                 break;
