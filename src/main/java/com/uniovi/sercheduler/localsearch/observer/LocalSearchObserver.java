@@ -3,43 +3,20 @@ package com.uniovi.sercheduler.localsearch.observer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocalSearchObserver implements Observer {
+public class LocalSearchObserver extends AbstractLocalSearchObserver {
 
     private final List<RunMetrics> runs;
-
-    private final String strategyName;
-
-
-    private List<StartMetrics> starts;
-
-
-    private List<IterationMetrics> iterations;
-
-
-    private double reachedMakespan;
-    private int numberOfGeneratedNeighbors;
-    private double betterNeighborsRatio;
-    private double betterNeighborsImprovingRatio;
-    private double allNeighborsImprovingRatio;
-    private double reachedMakespanImprovingRatioWithRespectLastIteration;
 
     private long timeForFindingBestSolution;
     private int generatedNeighborsForFindingBestSolution;
 
-    public LocalSearchObserver(String strategyName, String instanceName){
-        this.strategyName = strategyName;
+
+    public LocalSearchObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution){
+
+        super(strategyName, operatorsName, periodicTimeForMakespanEvolution);
+
         this.runs = new ArrayList<>();
 
-        starts = new ArrayList<>();
-
-        iterations = new ArrayList<>();
-
-        reachedMakespan = -1;
-        numberOfGeneratedNeighbors = -1;
-        betterNeighborsRatio = -1;
-        betterNeighborsImprovingRatio = -1;
-        allNeighborsImprovingRatio = -1; //This could be possible, be careful
-        reachedMakespanImprovingRatioWithRespectLastIteration = -1;
     }
 
     public List<RunMetrics> getRuns() {
@@ -50,51 +27,56 @@ public class LocalSearchObserver implements Observer {
         return runs.size();
     }
 
-    public void endRun(long executionTime) {
+    @Override
+    public void endRun() {
 
-        if (starts.isEmpty())
+        if (getStarts().isEmpty())
             endStart();
 
+        long executionTime = System.currentTimeMillis() - getRunStartingTime();
+
         runs.add(
-                new RunMetrics(strategyName, starts, executionTime)
+                new RunMetrics(getStrategyName(), getStarts(), executionTime, getEvolutionMetrics())
         );
 
         checkBestSolution();
 
-        starts = new ArrayList<>();
+        setStarts( new ArrayList<>() );
+
+        setRunStartingTime(-1);
     }
 
-    public void endStart(){
-        starts.add(
-                new StartMetrics(iterations)
-        );
 
-        iterations = new ArrayList<>();
+
+
+
+
+
+
+
+    private void checkBestSolution() {
+
+        if(runs.get(numberOfRuns()-1).minStartsReachedMakespan() == getBestMinReachedMakespan()){
+            computeTimeForFindingBestSolution();
+            computeGeneratedNeighborsForFindingBestSolution();
+        }
+
     }
 
-    public void endIteration(){
-        iterations.add(
-                new IterationMetrics(
-                        reachedMakespan,
-                        numberOfGeneratedNeighbors,
-                        betterNeighborsRatio,
-                        betterNeighborsImprovingRatio,
-                        allNeighborsImprovingRatio,
-                        reachedMakespanImprovingRatioWithRespectLastIteration
-                )
-        );
-
-        reachedMakespan = -1;
-        numberOfGeneratedNeighbors = -1;
-        betterNeighborsRatio = -1;
-        betterNeighborsImprovingRatio = -1;
-        allNeighborsImprovingRatio = -1; //This could be possible, be careful
-        reachedMakespanImprovingRatioWithRespectLastIteration = -1;
+    public void computeTimeForFindingBestSolution(){
+        this.timeForFindingBestSolution = runs.stream().mapToLong(RunMetrics::executionTime).sum();
     }
 
-    public String getStrategyName(){
-        return strategyName;
+    public void computeGeneratedNeighborsForFindingBestSolution(){
+        this.generatedNeighborsForFindingBestSolution = runs.stream().mapToInt(RunMetrics::numberOfGeneratedNeighbors).sum();
     }
+
+
+
+
+
+
+
 
     public double getAvgExecutionTime(){
         return runs.stream().mapToDouble(RunMetrics::executionTime).average().orElse(-1);
@@ -142,43 +124,6 @@ public class LocalSearchObserver implements Observer {
                         .mapToDouble(RunMetrics::minStartsReachedMakespan)
                         .map(makespan -> Math.pow(makespan - avgReachedMakespan, 2)).average().orElse(-1)
         );
-    }
-
-    public void setReachedMakespan(double reachedMakespan){
-        this.reachedMakespan = reachedMakespan;
-    }
-
-    public void setBetterNeighborsRatio(double betterNeighborsRatio) {
-        this.betterNeighborsRatio = betterNeighborsRatio;
-    }
-
-    public void setAllNeighborsImprovingRatio(double allNeighborsImprovingRatio) {
-        this.allNeighborsImprovingRatio = allNeighborsImprovingRatio;
-    }
-
-    public void setBetterNeighborsImprovingRatio(double betterNeighborsImprovingRatio) {
-        this.betterNeighborsImprovingRatio = betterNeighborsImprovingRatio;
-    }
-
-    public void setNumberOfGeneratedNeighbors(int numberOfGeneratedNeighbors){
-        this.numberOfGeneratedNeighbors = numberOfGeneratedNeighbors;
-    }
-
-    private void checkBestSolution() {
-
-        if(runs.get(numberOfRuns()-1).minStartsReachedMakespan() == getBestMinReachedMakespan()){
-            computeTimeForFindingBestSolution();
-            computeGeneratedNeighborsForFindingBestSolution();
-        }
-
-    }
-
-    public void computeTimeForFindingBestSolution(){
-        this.timeForFindingBestSolution = runs.stream().mapToLong(RunMetrics::executionTime).sum();
-    }
-
-    public void computeGeneratedNeighborsForFindingBestSolution(){
-        this.generatedNeighborsForFindingBestSolution = runs.stream().mapToInt(RunMetrics::numberOfGeneratedNeighbors).sum();
     }
 
     public long getTimeForFindingBestSolution(){

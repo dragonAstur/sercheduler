@@ -2,7 +2,7 @@ package com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
-import com.uniovi.sercheduler.service.calculator.FitnessCalculator;
+import com.uniovi.sercheduler.service.FitnessCalculator;
 
 public class LocalSearchEvaluatorGeneratorImpl implements LocalSearchEvaluatorGenerator {
 

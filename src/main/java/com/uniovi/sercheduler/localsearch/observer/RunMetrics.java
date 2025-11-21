@@ -5,7 +5,9 @@ import java.util.List;
 public record RunMetrics (
         String strategyName,
         List<StartMetrics> starts,
-        long executionTime
+        long executionTime,
+
+        EvolutionMetrics evolutionMetrics
 ) {
     public int numberOfStarts(){
         return starts.size();

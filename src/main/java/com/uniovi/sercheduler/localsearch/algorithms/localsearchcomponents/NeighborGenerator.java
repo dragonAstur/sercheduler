@@ -1,6 +1,7 @@
 package com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
@@ -10,8 +11,12 @@ import java.util.stream.Stream;
 
 public interface NeighborGenerator {
 
-    Stream<GeneratedNeighbor> generateNeighborsLazy(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList, SchedulePermutationSolution actualSolution);
+    Stream<GeneratedNeighbor> generateNeighborsLazy(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList,
+                                                    SchedulePermutationSolution actualSolution,
+                                                    Observer observer);
 
-    List<GeneratedNeighbor> generateNeighborsGlobal(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList, SchedulePermutationSolution actualSolution);
+    List<GeneratedNeighbor> generateNeighborsGlobal(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
+                                                    SchedulePermutationSolution actualSolution,
+                                                    TerminationCriterion terminationCriterion);
 
 }

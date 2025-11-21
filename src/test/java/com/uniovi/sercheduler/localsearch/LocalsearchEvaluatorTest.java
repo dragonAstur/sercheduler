@@ -4,11 +4,10 @@ import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
 import com.uniovi.sercheduler.localsearch.operator.*;
-import com.uniovi.sercheduler.service.calculator.FitnessCalculator;
-import com.uniovi.sercheduler.service.calculator.FitnessCalculatorSimple;
+import com.uniovi.sercheduler.service.FitnessCalculator;
+import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 import com.uniovi.sercheduler.service.FitnessInfo;
 import com.uniovi.sercheduler.service.PlanPair;
-import com.uniovi.sercheduler.service.core.SchedulingHelper;
 import com.uniovi.sercheduler.util.UnitParser;
 import org.junit.jupiter.api.Test;
 
@@ -46,9 +45,9 @@ public class LocalsearchEvaluatorTest {
 
         FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
-        Map<String, Map<String, Double>> computationMatrix = SchedulingHelper.calculateComputationMatrix(instanceData, UnitParser.parseUnits("1Gf"));
+        Map<String, Map<String, Double>> computationMatrix = fitnessCalculator.calculateComputationMatrix(UnitParser.parseUnits("1Gf"));
 
-        Map<String, Map<String, Long>> networkMatrix = SchedulingHelper.calculateNetworkMatrix(instanceData);
+        Map<String, Map<String, Long>> networkMatrix = fitnessCalculator.calculateNetworkMatrix();
 
         //Evaluate the original solution
 
@@ -110,9 +109,9 @@ public class LocalsearchEvaluatorTest {
 
         FitnessCalculator fitnessCalculator = new FitnessCalculatorSimple(instanceData);
 
-        Map<String, Map<String, Double>> computationMatrix = SchedulingHelper.calculateComputationMatrix(instanceData, UnitParser.parseUnits("1Gf"));
+        Map<String, Map<String, Double>> computationMatrix = fitnessCalculator.calculateComputationMatrix(UnitParser.parseUnits("1Gf"));
 
-        Map<String, Map<String, Long>> networkMatrix = SchedulingHelper.calculateNetworkMatrix(instanceData);
+        Map<String, Map<String, Long>> networkMatrix = fitnessCalculator.calculateNetworkMatrix();
 
         //Evaluate the original solution
 

@@ -1,6 +1,7 @@
 package com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
@@ -12,19 +13,24 @@ import java.util.stream.StreamSupport;
 
 public class NeighborGeneratorImpl implements NeighborGenerator {
 
-    public Stream<GeneratedNeighbor> generateNeighborsLazy(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList, SchedulePermutationSolution actualSolution){
+    public Stream<GeneratedNeighbor> generateNeighborsLazy(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList,
+                                                           SchedulePermutationSolution actualSolution,
+                                                           Observer observer){
 
         List<Supplier<Stream<GeneratedNeighbor>>> operators = new ArrayList<>();
 
-        for(NeighborhoodOperatorLazy neighborhoodLazyOperator : neighborhoodLazyOperatorList)
+        for(NeighborhoodOperatorLazy neighborhoodLazyOperator : neighborhoodLazyOperatorList) {
             operators.add(() -> neighborhoodLazyOperator.execute(actualSolution));
+        }
 
-        return shuffleStreams(operators);
+        return shuffleStreams(operators, observer, actualSolution.getFitnessInfo().fitness().get("makespan"));
     }
 
 
 
-    public List<GeneratedNeighbor> generateNeighborsGlobal(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList, SchedulePermutationSolution actualSolution){
+    public List<GeneratedNeighbor> generateNeighborsGlobal(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
+                                                           SchedulePermutationSolution actualSolution,
+                                                           TerminationCriterion terminationCriterion){
 
         List<GeneratedNeighbor> neighborsList = new ArrayList<>();
 
@@ -32,12 +38,14 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
             neighborsList.addAll(
                     neighborhoodOperator.execute(actualSolution)
             );
+            if(terminationCriterion.hasTimeExceeded()) break;
         }
 
         return neighborsList;
     }
 
-    private <T> Stream<T> shuffleStreams(List<Supplier<Stream<T>>> streamSuppliers) {
+    private <T> Stream<T> shuffleStreams(List<Supplier<Stream<T>>> streamSuppliers, Observer observer,
+                                         double actualSolutionMakespan) {
 
         List<Iterator<T>> iterators = streamSuppliers.stream()
                 .map(Supplier::get)
@@ -63,6 +71,8 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
                     //Just in case there is concurrency
                     if (available.isEmpty())
                         throw new NoSuchElementException();
+
+                    observer.updateMakespanEvolution(actualSolutionMakespan, 0);
 
                     Iterator<T> chosen = available.get(rand.nextInt(available.size()));
 

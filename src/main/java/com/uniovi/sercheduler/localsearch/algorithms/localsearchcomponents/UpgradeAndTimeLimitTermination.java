@@ -27,5 +27,10 @@ public class UpgradeAndTimeLimitTermination implements TerminationCriterion {
         return startingTime;
     }
 
+    @Override
+    public boolean hasTimeExceeded() {
+        return (System.currentTimeMillis() - startingTime) > limitTime;
+    }
+
 
 }

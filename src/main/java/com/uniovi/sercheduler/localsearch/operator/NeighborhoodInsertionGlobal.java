@@ -8,7 +8,7 @@ import java.util.List;
 
 public class NeighborhoodInsertionGlobal implements NeighborhoodOperatorGlobal {
 
-    private NeighborhoodInsertionPositional insertionPositional;
+    private final NeighborhoodInsertionPositional insertionPositional;
 
     public NeighborhoodInsertionGlobal(){
         this.insertionPositional = new NeighborhoodInsertionPositional();
@@ -33,6 +33,11 @@ public class NeighborhoodInsertionGlobal implements NeighborhoodOperatorGlobal {
 
     @Override
     public String getName() {
-        return "insertion";
+        return "N2";
+    }
+
+    @Override
+    public NeighborhoodOperatorPositional getNeighborhoodOperatorPositional() {
+        return insertionPositional;
     }
 }

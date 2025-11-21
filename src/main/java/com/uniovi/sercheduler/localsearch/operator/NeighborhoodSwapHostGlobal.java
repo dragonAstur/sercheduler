@@ -8,7 +8,7 @@ import java.util.List;
 
 public class NeighborhoodSwapHostGlobal implements NeighborhoodOperatorGlobal {
 
-    private NeighborhoodSwapHostPositional swapHostPositional;
+    private final NeighborhoodSwapHostPositional swapHostPositional;
 
     public NeighborhoodSwapHostGlobal(){
         this.swapHostPositional = new NeighborhoodSwapHostPositional();
@@ -35,6 +35,11 @@ public class NeighborhoodSwapHostGlobal implements NeighborhoodOperatorGlobal {
 
     @Override
     public String getName() {
-        return "swap_host";
+        return "N4";
+    }
+
+    @Override
+    public NeighborhoodOperatorPositional getNeighborhoodOperatorPositional() {
+        return swapHostPositional;
     }
 }

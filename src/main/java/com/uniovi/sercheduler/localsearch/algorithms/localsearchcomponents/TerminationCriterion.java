@@ -7,4 +7,6 @@ public interface TerminationCriterion {
     void setUpgradeFound(boolean upgradeFound);
 
     long startTimeCounter();
+
+    boolean hasTimeExceeded();
 }

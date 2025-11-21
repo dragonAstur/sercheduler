@@ -2,7 +2,7 @@ package com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
-import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
+import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 
 import java.util.List;
@@ -12,11 +12,22 @@ import java.util.stream.Stream;
 
 public class NeighborSelectorImpl implements NeighborSelector {
 
-    public Optional<GeneratedNeighbor> selectBestNeighborLazy(SchedulePermutationSolution actualSolution, Stream<GeneratedNeighbor> neighbors, LocalsearchEvaluator evaluator, AtomicInteger counter, AcceptanceCriterion acceptanceCriterion) {
+    private int numberOfBetterNeighbors = 0;
+    private double allNeighborsImprovingRatioSum = 0.0;
+    private double betterNeighborsImprovingRatioSum = 0.0;
+    private int numberOfGeneratedNeighbors = 0;
+
+    public Optional<GeneratedNeighbor> selectBestNeighborLazy(SchedulePermutationSolution actualSolution,
+                                                              Stream<GeneratedNeighbor> neighbors, LocalsearchEvaluator evaluator,
+                                                              AtomicInteger counter, AcceptanceCriterion acceptanceCriterion,
+                                                              TerminationCriterion terminationCriterion, Observer observer) {
         return neighbors
+                .takeWhile(neighbor -> !terminationCriterion.hasTimeExceeded())
                 .filter(neighbor -> {
 
                     counter.incrementAndGet();
+
+                    observer.updateMakespanEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"), counter.get());
 
                     evaluator.evaluate(actualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
 
@@ -25,7 +36,44 @@ public class NeighborSelectorImpl implements NeighborSelector {
                 .findFirst();   //this breaks laziness
     }
 
-    public SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution, List<GeneratedNeighbor> neighborsList, LocalsearchEvaluator evaluator, LocalSearchObserver observer){
+    public int getNumberOfGeneratedNeighbors(){
+        return numberOfGeneratedNeighbors;
+    }
+
+    /**
+     * Dada una solución y todos los vecinos que se han logrado generar aplicándole un esquema de vecindad,
+     * se evalúan todos y se selecciona al mejor de todos, devolviéndolo.
+     *
+     * @param originalSolution la solución original sobre la que se han generado todos los vecinos
+     * @param bestSolutionKnown la mejor solución que el algoritmo conozca en general, usada por si hubiese que
+     *                          actualizar la evolución del makespan en esta ejecución
+     * @param neighborsList la lista de vecinos de la solución original
+     * @param evaluator el evaluador que determina el fitness de cada solución
+     * @param observer un observer para registrar métricas del algoritmo
+     * @param terminationCriterion el criterio de parada
+     * @return el mejor que vecino que mejore a su vez la solución actual
+     */
+    public SchedulePermutationSolution selectBestNeighborGlobalAndUpdateObserver(SchedulePermutationSolution originalSolution,
+                                                                                 SchedulePermutationSolution bestSolutionKnown,
+                                                                List<GeneratedNeighbor> neighborsList,
+                                                                LocalsearchEvaluator evaluator,
+                                                                TerminationCriterion terminationCriterion,
+                                                                Observer observer){
+
+        SchedulePermutationSolution bestSolution = selectBestNeighborGlobal(originalSolution, bestSolutionKnown, neighborsList, evaluator,
+                terminationCriterion, observer);
+
+        updateObserverMetrics(observer);
+
+        return bestSolution;
+    }
+
+    public SchedulePermutationSolution selectBestNeighborGlobal(SchedulePermutationSolution originalSolution,
+                                                                SchedulePermutationSolution bestSolutionKnown,
+                                                                List<GeneratedNeighbor> neighborsList,
+                                                                LocalsearchEvaluator evaluator,
+                                                                TerminationCriterion terminationCriterion,
+                                                                Observer observer){
 
         SchedulePermutationSolution bestSolution = originalSolution;
         double originalMakespan = originalSolution.getFitnessInfo().fitness().get("makespan");
@@ -33,23 +81,27 @@ public class NeighborSelectorImpl implements NeighborSelector {
         double neighborMakespan;
         SchedulePermutationSolution neighborSolution;
 
-        int numberOfBetterNeighbors = 0;
-        double neighborImprovingRatio = 0.0;
-        double allNeighborsImprovingRatioSum = 0.0;
-        double betterNeighborsImprovingRatioSum = 0.0;
+        double bestMakespanKnown = bestSolutionKnown.getFitnessInfo().fitness().get("makespan");
+
+        double neighborImprovingRatio;
+
+        this.numberOfGeneratedNeighbors += neighborsList.size();
 
         for(GeneratedNeighbor neighbor : neighborsList){
+
+            //update evolution
+            observer.updateMakespanEvolution(Math.min(bestMakespan, bestMakespanKnown), this.numberOfGeneratedNeighbors);
 
             neighborSolution = neighbor.generatedSolution();
             evaluator.evaluate(originalSolution, neighborSolution, neighbor.movements().get(neighbor.movements().size() - 1));
             neighborMakespan = neighborSolution.getFitnessInfo().fitness().get("makespan");
 
             neighborImprovingRatio = (originalMakespan - neighborMakespan) / originalMakespan * 100;
-            allNeighborsImprovingRatioSum += neighborImprovingRatio;
+            this.allNeighborsImprovingRatioSum += neighborImprovingRatio;
 
             if(neighborMakespan < originalMakespan){
-                numberOfBetterNeighbors++;
-                betterNeighborsImprovingRatioSum += neighborImprovingRatio;
+                this.numberOfBetterNeighbors++;
+                this.betterNeighborsImprovingRatioSum += neighborImprovingRatio;
 
                 if(bestMakespan > neighborMakespan){
                     bestMakespan = neighborMakespan;
@@ -57,17 +109,27 @@ public class NeighborSelectorImpl implements NeighborSelector {
                 }
             }
 
+            //update evolution
+            observer.updateMakespanEvolution(Math.min(bestMakespan, bestMakespanKnown), this.numberOfGeneratedNeighbors);
+
+            if(terminationCriterion.hasTimeExceeded())
+                break;
+
         }
 
-        observer.setBetterNeighborsRatio(numberOfBetterNeighbors * 1.00 / neighborsList.size() );
-        observer.setAllNeighborsImprovingRatio(allNeighborsImprovingRatioSum / neighborsList.size() );
+        return bestSolution;
+    }
 
-        if(numberOfBetterNeighbors > 0)
-            observer.setBetterNeighborsImprovingRatio( betterNeighborsImprovingRatioSum / numberOfBetterNeighbors );
+    public void updateObserverMetrics(Observer observer){
+        observer.setBetterNeighborsRatio(this.numberOfBetterNeighbors * 1.00 / this.numberOfGeneratedNeighbors);
+        observer.setAllNeighborsImprovingRatio(allNeighborsImprovingRatioSum / this.numberOfGeneratedNeighbors );
+
+        if(this.numberOfBetterNeighbors > 0)
+            observer.setBetterNeighborsImprovingRatio( this.betterNeighborsImprovingRatioSum / this.numberOfBetterNeighbors );
         else
             observer.setBetterNeighborsImprovingRatio( 0.0 );
 
-        return bestSolution;
+        observer.setNumberOfGeneratedNeighbors(this.numberOfGeneratedNeighbors);
     }
 
 

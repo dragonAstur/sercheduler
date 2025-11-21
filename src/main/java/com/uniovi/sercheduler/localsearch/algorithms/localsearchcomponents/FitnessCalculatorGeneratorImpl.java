@@ -1,8 +1,8 @@
 package com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
-import com.uniovi.sercheduler.service.calculator.FitnessCalculator;
-import com.uniovi.sercheduler.service.calculator.FitnessCalculatorSimple;
+import com.uniovi.sercheduler.service.FitnessCalculator;
+import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 
 public class FitnessCalculatorGeneratorImpl implements FitnessCalculatorGenerator{
 

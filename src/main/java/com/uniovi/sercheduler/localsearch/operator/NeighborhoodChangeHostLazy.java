@@ -51,7 +51,7 @@ public class NeighborhoodChangeHostLazy implements NeighborhoodOperatorLazy {
 
     @Override
     public String getName() {
-        return "change_host";
+        return "N1";
     }
 
     private List<List<PlanPair>> changeOneElementHost(List<PlanPair> plan, int position) {
