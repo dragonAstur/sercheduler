@@ -1,0 +1,18 @@
+{
+  "fitness": [
+
+    "simple"
+  ],
+  "workflows": [
+    "cycles-chameleon-2l-1c-9p-001"
+  ],
+  "minHosts": 16,
+  "maxHosts": 16,
+  "hostIncrement": 2,
+  "referenceSpeed": "93.6Gf",
+  "independentRuns": 1,
+  "objectives": [
+    "energy", "makespan"
+  ],
+  "jmetalAnalysis": false
+}

@@ -1,0 +1,26 @@
+{
+  "fitness": [
+    "simple-smpso",
+    "min-energy-UM-active-smpso",
+    "fvlt-me-active-smpso",
+    "rank-smpso",
+    "heft-smpso",
+    "multi-energy-smpso",
+    "multi-makespan-smpso",
+    "multi-smpso"
+  ],
+  "workflows": [
+    "montage-chameleon-2mass-005d-001",
+    "montage-chameleon-2mass-01d-001"
+  ],
+  "minHosts": 8,
+  "maxHosts": 16,
+  "hostIncrement": 2,
+  "referenceSpeed": "121.6Gf",
+  "independentRuns": 10,
+  "objectives": [
+    "energy",
+    "makespan"
+  ],
+  "jmetalAnalysis": true
+}

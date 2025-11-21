@@ -88,7 +88,8 @@ public class EvaluateCommand {
             fitness,
             seed,
             objectives,
-            Objective.MAKESPAN.objectiveName);
+            Objective.MAKESPAN.objectiveName,
+                executions);
 
     Operators operators = new Operators(problem.getInstanceData(), new Random(seed));
     CrossoverOperator<SchedulePermutationSolution> crossover = new ScheduleCrossover(1, operators);

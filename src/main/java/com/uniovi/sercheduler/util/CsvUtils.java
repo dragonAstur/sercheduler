@@ -47,7 +47,7 @@ public class CsvUtils {
   public static void exportToCsv(String fileName, List<MultiResult> results) {
     try (FileWriter writer = new FileWriter(fileName)) {
       // Write the header
-      writer.append("Eval,Simple,Heft,Rank,Makespan\n");
+      writer.append("Eval,Energy,Makespan,Fitness,Objective\n");
 
       // Write the data rows
       int evalCounter = 1; // Starting eval number
@@ -55,13 +55,13 @@ public class CsvUtils {
         writer
             .append(Integer.toString(evalCounter++))
             .append(',')
-            .append(Short.toString(result.getSimple()))
+            .append(Double.toString(result.energy()))
             .append(',')
-            .append(Short.toString(result.getHeft()))
+            .append(Double.toString(result.makespan()))
             .append(',')
-            .append(Short.toString(result.getRank()))
+            .append(result.fitness())
             .append(',')
-            .append(Double.toString(result.getMakespan()))
+            .append(result.objective())
             .append('\n');
       }
 

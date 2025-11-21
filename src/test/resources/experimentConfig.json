@@ -1,21 +1,25 @@
 {
   "fitness": [
+    "simple-moheft",
+    "multi",
+    "simple-moaco",
     "simple",
-    "multi-energy"
-
+    "multi-moaco",
+    "multi-energy-moaco",
+    "multi-makespan-moaco"
   ],
   "workflows": [
-
     "montage-chameleon-2mass-005d-001",
-    "soykb-chameleon-10fastq-10ch-001"
+    "montage-chameleon-2mass-01d-001"
   ],
-  "minHosts": 2,
+  "minHosts": 8,
   "maxHosts": 16,
   "hostIncrement": 2,
   "referenceSpeed": "121.6Gf",
-  "independentRuns": 5,
+  "independentRuns": 10,
   "objectives": [
-    "energy", "makespan"
+    "energy",
+    "makespan"
   ],
   "jmetalAnalysis": true
 }

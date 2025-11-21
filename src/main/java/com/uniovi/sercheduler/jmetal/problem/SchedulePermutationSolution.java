@@ -1,6 +1,7 @@
 package com.uniovi.sercheduler.jmetal.problem;
 
 import com.uniovi.sercheduler.dao.Objective;
+import com.uniovi.sercheduler.dto.analysis.MultiResult;
 import com.uniovi.sercheduler.service.FitnessInfo;
 import com.uniovi.sercheduler.service.PlanPair;
 import java.util.List;
@@ -17,6 +18,15 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
 
   String arbiter;
   List<PlanPair> plan;
+ private  MultiResult multiResult;
+
+  public MultiResult getMultiResult() {
+    return multiResult;
+  }
+
+  public void setMultiResult(MultiResult multiResult) {
+    this.multiResult = multiResult;
+  }
 
   /**
    * Default constructor.

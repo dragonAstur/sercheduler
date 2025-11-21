@@ -1,0 +1,30 @@
+{
+  "fitness": [
+    "simple-spea2",
+    "min-energy-UM-active-spea2",
+    "fvlt-me-active-spea2",
+    "rank-spea2",
+    "heft-spea2",
+    "multi-energy-spea2",
+    "multi-makespan-spea2",
+    "multi-spea2"
+  ],
+  "workflows": [
+    "1000genome-chameleon-18ch-250k-001",
+    "cycles-chameleon-5l-1c-12p-001",
+    "epigenomics-chameleon-ilmn-6seq-100k-001",
+    "montage-chameleon-dss-125d-001",
+    "seismology-chameleon-1000p-001",
+    "soykb-chameleon-40fastq-20ch-001",
+    "srasearch-chameleon-50a-003"
+  ],
+  "minHosts": 16,
+  "maxHosts": 16,
+  "hostIncrement": 2,
+  "referenceSpeed": "93.6Gf",
+  "independentRuns": 10,
+  "objectives": [
+    "energy", "makespan"
+  ],
+  "jmetalAnalysis": true
+}
