@@ -55,7 +55,8 @@ public class LocalSearchRunnable {
                             "simple",
                             seed,
                             objectives,
-                            Objective.MAKESPAN.objectiveName);
+                            Objective.MAKESPAN.objectiveName,
+                            0);
         } catch(HostLoadException e) {
             System.out.println("The hosts file could not be found. Please review that the path is correctly written " +
                     "and make sure that the desired file is there.");

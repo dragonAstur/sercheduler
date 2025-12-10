@@ -2,9 +2,9 @@ package com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
-import com.uniovi.sercheduler.service.FitnessCalculator;
-import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
+
 import com.uniovi.sercheduler.service.FitnessInfo;
+import com.uniovi.sercheduler.service.calculator.FitnessCalculator;
 
 public class InitialSolutionGeneratorImpl implements InitialSolutionGenerator {
 

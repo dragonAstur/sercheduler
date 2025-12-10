@@ -4,10 +4,10 @@ import com.uniovi.sercheduler.dto.InstanceData;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.evaluator.LocalsearchEvaluator;
 import com.uniovi.sercheduler.localsearch.operator.*;
-import com.uniovi.sercheduler.service.FitnessCalculator;
-import com.uniovi.sercheduler.service.FitnessCalculatorSimple;
 import com.uniovi.sercheduler.service.FitnessInfo;
 import com.uniovi.sercheduler.service.PlanPair;
+import com.uniovi.sercheduler.service.calculator.FitnessCalculator;
+import com.uniovi.sercheduler.service.calculator.FitnessCalculatorSimple;
 import com.uniovi.sercheduler.util.UnitParser;
 import org.junit.jupiter.api.Test;
 
