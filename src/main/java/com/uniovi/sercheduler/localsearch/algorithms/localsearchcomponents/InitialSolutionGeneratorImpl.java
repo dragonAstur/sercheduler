@@ -14,7 +14,13 @@ public class InitialSolutionGeneratorImpl implements InitialSolutionGenerator {
         this.problem = problem;
     }
 
-    public SchedulePermutationSolution createInitialSolution(FitnessCalculator fitnessCalculator){
+    @Override
+    public SchedulePermutationSolution createInitialSolution() {
+        return problem.createSolution();
+    }
+
+    @Override
+    public SchedulePermutationSolution createInitialEvaluatedSolution(FitnessCalculator fitnessCalculator){
 
         SchedulePermutationSolution actualSolution = problem.createSolution();
 
@@ -24,5 +30,4 @@ public class InitialSolutionGeneratorImpl implements InitialSolutionGenerator {
 
         return actualSolution;
     }
-
 }

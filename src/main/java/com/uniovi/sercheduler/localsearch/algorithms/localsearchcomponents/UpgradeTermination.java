@@ -10,8 +10,8 @@ public class UpgradeTermination implements TerminationCriterion {
 
 
     @Override
-    public boolean checkTerminationCondition() {
-        return upgradeFound;
+    public boolean isMet() {
+        return !upgradeFound;
     }
 
     @Override
@@ -27,6 +27,11 @@ public class UpgradeTermination implements TerminationCriterion {
     @Override
     public boolean hasTimeExceeded() {
         return false;
+    }
+
+    @Override
+    public void setActualIteration(long actualIteration) {
+
     }
 
 

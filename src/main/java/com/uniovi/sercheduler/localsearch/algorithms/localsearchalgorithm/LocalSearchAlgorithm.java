@@ -109,7 +109,7 @@ public class LocalSearchAlgorithm {
             Observer observer
     ) {
         FitnessCalculator fitnessCalculator = fitnessCalculatorGenerator.createFitnessCalculator();
-        SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialSolution(fitnessCalculator);
+        SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialEvaluatedSolution(fitnessCalculator);
         LocalsearchEvaluator evaluator = localSearchEvaluatorGenerator.createLocalSearchEvaluator(fitnessCalculator);
 
         List<GeneratedNeighbor> neighbors;
@@ -140,7 +140,7 @@ public class LocalSearchAlgorithm {
             observer.updateMakespanEvolution(actualSolutionMakespan, neighborGeneratorAndSelector.numberOfGeneratedNeighbors());
             observer.endIteration();
 
-        } while(terminationCriterion.checkTerminationCondition());
+        } while(!terminationCriterion.isMet());
 
         return actualSolution;
     }
@@ -150,7 +150,7 @@ public class LocalSearchAlgorithm {
             Observer observer
     ) {
         FitnessCalculator fitnessCalculator = fitnessCalculatorGenerator.createFitnessCalculator();
-        SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialSolution(fitnessCalculator);
+        SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialEvaluatedSolution(fitnessCalculator);
         LocalsearchEvaluator evaluator = localSearchEvaluatorGenerator.createLocalSearchEvaluator(fitnessCalculator);
 
         Stream<GeneratedNeighbor> neighbors;
@@ -180,7 +180,7 @@ public class LocalSearchAlgorithm {
             observer.updateMakespanEvolution(actualSolutionMakespan, counter.get());
             observer.endIteration();
 
-        } while (terminationCriterion.checkTerminationCondition());
+        } while (!terminationCriterion.isMet());
 
         return actualSolution;
     }
