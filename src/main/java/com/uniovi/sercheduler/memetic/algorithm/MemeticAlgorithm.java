@@ -8,6 +8,9 @@ import java.util.stream.IntStream;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalSearchAlgorithm;
+import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGenerator;
+import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
+import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.TerminationCriterion;
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import org.uma.jmetal.algorithm.Algorithm;
@@ -38,6 +41,8 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
     private int evaluations;
     private final Observable<Map<String, Object>> observable;
     private final String name;
+    private final TerminationCriterion terminationCriterion;
+    private final InitialSolutionGeneratorSpecified initialSolutionGenerator;
 
     private LocalSearchAlgorithm lsa;
 
@@ -46,7 +51,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
     public MemeticAlgorithm(String name, SolutionsCreation<SchedulePermutationSolution> initialPopulationCreation, Evaluation<SchedulePermutationSolution> evaluation,
                             Termination termination, Selection<SchedulePermutationSolution> selection, Variation<SchedulePermutationSolution> variation, Replacement<SchedulePermutationSolution> replacement,
-                            LocalSearchAlgorithm lsa) {
+                            LocalSearchAlgorithm lsa, TerminationCriterion terminationCriterion, InitialSolutionGeneratorSpecified initialSolutionGenerator) {
         this.name = name;
         this.createInitialPopulation = initialPopulationCreation;
         this.evaluation = evaluation;
@@ -58,15 +63,23 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         this.attributes = new HashMap<>();
 
         this.lsa = lsa;
+        this.terminationCriterion = terminationCriterion;
+        this.initialSolutionGenerator = initialSolutionGenerator;
     }
 
     public void run() {
-        this.initTime = System.currentTimeMillis();
+        this.initTime = lsa.startTimeCounter();
+
         this.population = this.createInitialPopulation.create();
         this.population = this.evaluation.evaluate(this.population);
         initProgress();
 
+        int actualIteration = 0;
+
         while(!this.termination.isMet(this.attributes)) {
+
+            this.terminationCriterion.setActualIteration(actualIteration++);
+
             List<SchedulePermutationSolution> matingPopulation = this.selection.select(this.population);
             List<SchedulePermutationSolution> offspringPopulation = this.variation.variate(this.population, matingPopulation);
             offspringPopulation = this.evaluation.evaluate(offspringPopulation);
@@ -81,23 +94,30 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
     private List<SchedulePermutationSolution> applyLSAToBest(List<SchedulePermutationSolution> offspringPopulation) {
 
         int bestIndex =
-                IntStream.range(0, offspringPopulation.size())
-                        .boxed()
-                        .max(Comparator.comparingDouble(
-                                i -> offspringPopulation.get(i)
-                                        .getFitnessInfo().fitness().get("makespan")
-                        ))
-                        .orElseThrow(() ->
-                                new IllegalStateException("There was no element in the offspring population"));
+                getBestSolutionPos(offspringPopulation);
 
         //Usar el initial solution generator
+        SchedulePermutationSolution bestOffspringSolution = offspringPopulation.get(bestIndex);
+        initialSolutionGenerator.setSpecifiedSolution(bestOffspringSolution);
 
-        SchedulePermutationSolution enhancedOffspringSolution = lsa.runLocalSearchLazy(operatorList, new LocalSearchObserver("HC", "jsaudhdsid", -1));
+        SchedulePermutationSolution enhancedOffspringSolution = lsa.runLocalSearchLazy(operatorList,
+                new LocalSearchObserver("HC", "jsaudhdsid", -1));
 
         offspringPopulation.set(bestIndex, enhancedOffspringSolution);
 
         return offspringPopulation;
 
+    }
+
+    private static Integer getBestSolutionPos(List<SchedulePermutationSolution> offspringPopulation) {
+        return IntStream.range(0, offspringPopulation.size())
+                .boxed()
+                .max(Comparator.comparingDouble(
+                        i -> offspringPopulation.get(i)
+                                .getFitnessInfo().fitness().get("makespan")
+                ))
+                .orElseThrow(() ->
+                        new IllegalStateException("There was no element in the offspring population"));
     }
 
     protected void initProgress() {

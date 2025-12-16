@@ -8,13 +8,8 @@ public class InitialSolutionGeneratorSpecified implements InitialSolutionGenerat
     private SchedulePermutationSolution specifiedSolution;
 
     @Override
-    public SchedulePermutationSolution createInitialSolution() {
-        return specifiedSolution;
-    }
-
-    @Override
-    public SchedulePermutationSolution createInitialEvaluatedSolution(FitnessCalculator fitnessCalculator) {
-        if(specifiedSolution != null)
+    public SchedulePermutationSolution createInitialSolution(FitnessCalculator fitnessCalculator) {
+        if(specifiedSolution != null && specifiedSolution.getFitnessInfo() == null)
             specifiedSolution.setFitnessInfo(fitnessCalculator.calculateFitness(specifiedSolution));
         return specifiedSolution;
     }

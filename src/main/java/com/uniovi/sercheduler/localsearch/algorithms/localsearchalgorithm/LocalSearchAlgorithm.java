@@ -109,7 +109,7 @@ public class LocalSearchAlgorithm {
             Observer observer
     ) {
         FitnessCalculator fitnessCalculator = fitnessCalculatorGenerator.createFitnessCalculator();
-        SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialEvaluatedSolution(fitnessCalculator);
+        SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialSolution(fitnessCalculator);
         LocalsearchEvaluator evaluator = localSearchEvaluatorGenerator.createLocalSearchEvaluator(fitnessCalculator);
 
         List<GeneratedNeighbor> neighbors;
@@ -150,7 +150,7 @@ public class LocalSearchAlgorithm {
             Observer observer
     ) {
         FitnessCalculator fitnessCalculator = fitnessCalculatorGenerator.createFitnessCalculator();
-        SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialEvaluatedSolution(fitnessCalculator);
+        SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialSolution(fitnessCalculator);
         LocalsearchEvaluator evaluator = localSearchEvaluatorGenerator.createLocalSearchEvaluator(fitnessCalculator);
 
         Stream<GeneratedNeighbor> neighbors;

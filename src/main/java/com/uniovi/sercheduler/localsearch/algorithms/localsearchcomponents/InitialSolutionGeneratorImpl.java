@@ -15,12 +15,7 @@ public class InitialSolutionGeneratorImpl implements InitialSolutionGenerator {
     }
 
     @Override
-    public SchedulePermutationSolution createInitialSolution() {
-        return problem.createSolution();
-    }
-
-    @Override
-    public SchedulePermutationSolution createInitialEvaluatedSolution(FitnessCalculator fitnessCalculator){
+    public SchedulePermutationSolution createInitialSolution(FitnessCalculator fitnessCalculator){
 
         SchedulePermutationSolution actualSolution = problem.createSolution();
 
