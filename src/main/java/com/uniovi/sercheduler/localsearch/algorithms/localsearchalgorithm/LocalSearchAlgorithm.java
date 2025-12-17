@@ -156,9 +156,12 @@ public class LocalSearchAlgorithm {
         Stream<GeneratedNeighbor> neighbors;
         Optional<GeneratedNeighbor> maybeBetterNeighbor;
 
+        int iterationNumber = 0;
+
         do {
 
             terminationCriterion.setUpgradeFound(false);
+            terminationCriterion.setActualIteration(iterationNumber++);
 
             neighbors = neighborGenerator.generateNeighborsLazy(neighborhoodLazyOperatorList, actualSolution, observer);
 
@@ -187,6 +190,10 @@ public class LocalSearchAlgorithm {
 
     public long startTimeCounter(){
         return terminationCriterion.startTimeCounter();
+    }
+
+    public void setInitialSolution(SchedulePermutationSolution initialSolution){
+        this.initialSolutionGenerator.setInitialSolution(initialSolution);
     }
 
 

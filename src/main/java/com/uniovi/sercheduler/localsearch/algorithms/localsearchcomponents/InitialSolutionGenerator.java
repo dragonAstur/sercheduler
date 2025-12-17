@@ -5,6 +5,8 @@ import com.uniovi.sercheduler.service.calculator.FitnessCalculator;
 
 public interface InitialSolutionGenerator {
 
-    public SchedulePermutationSolution createInitialSolution(FitnessCalculator fitnessCalculator);
+    SchedulePermutationSolution createInitialSolution(FitnessCalculator fitnessCalculator);
+
+    void setInitialSolution(SchedulePermutationSolution initialSolution);
 
 }

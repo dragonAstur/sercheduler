@@ -41,8 +41,6 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
     private int evaluations;
     private final Observable<Map<String, Object>> observable;
     private final String name;
-    private final TerminationCriterion terminationCriterion;
-    private final InitialSolutionGeneratorSpecified initialSolutionGenerator;
 
     private LocalSearchAlgorithm lsa;
 
@@ -51,7 +49,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
     public MemeticAlgorithm(String name, SolutionsCreation<SchedulePermutationSolution> initialPopulationCreation, Evaluation<SchedulePermutationSolution> evaluation,
                             Termination termination, Selection<SchedulePermutationSolution> selection, Variation<SchedulePermutationSolution> variation, Replacement<SchedulePermutationSolution> replacement,
-                            LocalSearchAlgorithm lsa, TerminationCriterion terminationCriterion, InitialSolutionGeneratorSpecified initialSolutionGenerator) {
+                            LocalSearchAlgorithm lsa, List<NeighborhoodOperatorLazy> operatorList) {
         this.name = name;
         this.createInitialPopulation = initialPopulationCreation;
         this.evaluation = evaluation;
@@ -63,8 +61,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         this.attributes = new HashMap<>();
 
         this.lsa = lsa;
-        this.terminationCriterion = terminationCriterion;
-        this.initialSolutionGenerator = initialSolutionGenerator;
+        this.operatorList = operatorList;
     }
 
     public void run() {
@@ -74,11 +71,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         this.population = this.evaluation.evaluate(this.population);
         initProgress();
 
-        int actualIteration = 0;
-
         while(!this.termination.isMet(this.attributes)) {
-
-            this.terminationCriterion.setActualIteration(actualIteration++);
 
             List<SchedulePermutationSolution> matingPopulation = this.selection.select(this.population);
             List<SchedulePermutationSolution> offspringPopulation = this.variation.variate(this.population, matingPopulation);
@@ -89,6 +82,8 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         }
 
         this.totalComputingTime = System.currentTimeMillis() - this.initTime;
+        System.out.println("Final population size: " + result().size());
+
     }
 
     private List<SchedulePermutationSolution> applyLSAToBest(List<SchedulePermutationSolution> offspringPopulation) {
@@ -98,9 +93,10 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
         //Usar el initial solution generator
         SchedulePermutationSolution bestOffspringSolution = offspringPopulation.get(bestIndex);
-        initialSolutionGenerator.setSpecifiedSolution(bestOffspringSolution);
 
-        SchedulePermutationSolution enhancedOffspringSolution = lsa.runLocalSearchLazy(operatorList,
+        this.lsa.setInitialSolution(bestOffspringSolution);
+
+        SchedulePermutationSolution enhancedOffspringSolution = this.lsa.runLocalSearchLazy(this.operatorList,
                 new LocalSearchObserver("HC", "jsaudhdsid", -1));
 
         offspringPopulation.set(bestIndex, enhancedOffspringSolution);

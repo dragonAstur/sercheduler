@@ -6,6 +6,8 @@ import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalS
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.TerminationCriterion;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.UpgradeAndTimeLimitTermination;
+import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.UpgradeIterationAndTimeLimitTermination;
+import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.SequentialEvaluation;
 import org.uma.jmetal.component.catalogue.common.solutionscreation.SolutionsCreation;
@@ -24,25 +26,27 @@ import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.util.comparator.ObjectiveComparator;
 
+import java.util.List;
+
 public class MemeticAlgorithmBuilder {
 
-    private String name;
+    private final String name;
     private Evaluation<SchedulePermutationSolution> evaluation;
-    private SolutionsCreation<SchedulePermutationSolution> createInitialPopulation;
+    private final SolutionsCreation<SchedulePermutationSolution> createInitialPopulation;
     private Termination termination;
     private Selection<SchedulePermutationSolution> selection;
     private Variation<SchedulePermutationSolution> variation;
     private Replacement<SchedulePermutationSolution> replacement;
 
-    private TerminationCriterion terminationCriterion;
     private InitialSolutionGeneratorSpecified initialSolutionGenerator;
-    private LocalSearchAlgorithm lsa;
+    private final LocalSearchAlgorithm lsa;
+    private final List<NeighborhoodOperatorLazy> operatorList;
 
     public MemeticAlgorithmBuilder(String name, SchedulingProblem problem, int populationSize,
                                    int offspringPopulationSize,
                                    CrossoverOperator<SchedulePermutationSolution> crossover,
                                    MutationOperator<SchedulePermutationSolution> mutation,
-                                   Long limitTime){
+                                   Long limitTime, List<NeighborhoodOperatorLazy> operatorList){
 
         this.name = name;
         this.createInitialPopulation = new RandomSolutionsCreation<>(problem, populationSize);
@@ -52,14 +56,21 @@ public class MemeticAlgorithmBuilder {
         this.termination = new TerminationByEvaluations(25000);
         this.evaluation = new SequentialEvaluation<>(problem);
 
-        this.terminationCriterion = new UpgradeAndTimeLimitTermination(limitTime);
+        TerminationCriterion terminationCriterion = new UpgradeIterationAndTimeLimitTermination(limitTime, 2);
         this.initialSolutionGenerator = new InitialSolutionGeneratorSpecified();
+
+        this.operatorList = operatorList;
 
         this.lsa = new LocalSearchAlgorithm.Builder(problem)
                 .terminationCriterion(terminationCriterion)
                 .initialSolutionGenerator(initialSolutionGenerator)
                 .build();
 
+    }
+
+    public MemeticAlgorithmBuilder setInitialSolutionGenerator(InitialSolutionGeneratorSpecified initialSolutionGenerator) {
+        this.initialSolutionGenerator = initialSolutionGenerator;
+        return this;
     }
 
     public MemeticAlgorithmBuilder setTermination(Termination termination) {
@@ -89,7 +100,7 @@ public class MemeticAlgorithmBuilder {
 
     public MemeticAlgorithm build() {
         return new MemeticAlgorithm(this.name, this.createInitialPopulation, this.evaluation, this.termination,
-                this.selection, this.variation, this.replacement, this.lsa, this.terminationCriterion, this.initialSolutionGenerator) {
+                this.selection, this.variation, this.replacement, this.lsa, this.operatorList) {
             @Override
             public void updateProgress() {
                 SchedulePermutationSolution bestFitnessSolution = this.population().stream().min(new ObjectiveComparator<>(0)).get();

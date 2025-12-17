@@ -1,40 +1,15 @@
 package com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents;
 
-public class UpgradeAndTimeLimitTermination implements TerminationCriterion {
+public class UpgradeAndTimeLimitTermination extends AbstractTerminationCriterion {
 
-    private boolean upgradeFound;
-    private long startingTime;
-    private final long limitTime;
 
-    public UpgradeAndTimeLimitTermination(long limitTime){
-        this.upgradeFound = false;
-        this.limitTime = limitTime;
+    public UpgradeAndTimeLimitTermination(long limitTime, long limitIteration) {
+        super(limitTime, limitIteration);
     }
 
     @Override
     public boolean isMet(){
         return !upgradeFound || (System.currentTimeMillis() - startingTime) > limitTime;
-    }
-
-    @Override
-    public void setUpgradeFound(boolean upgradeFound) {
-        this.upgradeFound = upgradeFound;
-    }
-
-    @Override
-    public long startTimeCounter() {
-        this.startingTime = System.currentTimeMillis();
-        return startingTime;
-    }
-
-    @Override
-    public boolean hasTimeExceeded() {
-        return (System.currentTimeMillis() - startingTime) > limitTime;
-    }
-
-    @Override
-    public void setActualIteration(long actualIteration) {
-
     }
 
 

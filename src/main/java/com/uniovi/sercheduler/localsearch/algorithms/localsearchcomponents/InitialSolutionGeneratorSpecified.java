@@ -5,16 +5,17 @@ import com.uniovi.sercheduler.service.calculator.FitnessCalculator;
 
 public class InitialSolutionGeneratorSpecified implements InitialSolutionGenerator {
 
-    private SchedulePermutationSolution specifiedSolution;
+    private SchedulePermutationSolution initialSolution;
 
     @Override
     public SchedulePermutationSolution createInitialSolution(FitnessCalculator fitnessCalculator) {
-        if(specifiedSolution != null && specifiedSolution.getFitnessInfo() == null)
-            specifiedSolution.setFitnessInfo(fitnessCalculator.calculateFitness(specifiedSolution));
-        return specifiedSolution;
+        if(initialSolution != null && initialSolution.getFitnessInfo() == null)
+            initialSolution.setFitnessInfo(fitnessCalculator.calculateFitness(initialSolution));
+        return initialSolution;
     }
 
-    public void setSpecifiedSolution(SchedulePermutationSolution specifiedSolution) {
-        this.specifiedSolution = specifiedSolution;
+    @Override
+    public void setInitialSolution(SchedulePermutationSolution initialSolution) {
+        this.initialSolution = initialSolution;
     }
 }

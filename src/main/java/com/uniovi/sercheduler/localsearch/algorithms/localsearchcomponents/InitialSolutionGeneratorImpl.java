@@ -25,4 +25,9 @@ public class InitialSolutionGeneratorImpl implements InitialSolutionGenerator {
 
         return actualSolution;
     }
+
+    @Override
+    public void setInitialSolution(SchedulePermutationSolution initialSolution) {
+
+    }
 }

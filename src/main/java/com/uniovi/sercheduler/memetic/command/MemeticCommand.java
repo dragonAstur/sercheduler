@@ -1,9 +1,35 @@
 package com.uniovi.sercheduler.memetic.command;
 
+import com.uniovi.sercheduler.dao.Objective;
+import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
+import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
+import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
+import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
+import com.uniovi.sercheduler.parser.experiment.ExperimentConfigLoader;
+import com.uniovi.sercheduler.service.Operators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.shell.command.annotation.Command;
 import org.springframework.shell.command.annotation.Option;
+import org.uma.jmetal.algorithm.Algorithm;
+import org.uma.jmetal.component.catalogue.common.termination.Termination;
+import org.uma.jmetal.component.catalogue.common.termination.impl.TerminationByComputingTime;
+import org.uma.jmetal.lab.experiment.Experiment;
+import org.uma.jmetal.lab.experiment.component.impl.ExecuteAlgorithms;
+import org.uma.jmetal.lab.experiment.util.ExperimentAlgorithm;
+import org.uma.jmetal.lab.experiment.util.ExperimentProblem;
+import org.uma.jmetal.operator.crossover.CrossoverOperator;
+import org.uma.jmetal.operator.mutation.MutationOperator;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static com.uniovi.sercheduler.memetic.command.CommandUtils.*;
 
 public class MemeticCommand {
 
@@ -30,6 +56,102 @@ public class MemeticCommand {
     public static String executeMemetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
                                         String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
                                         String instanceName, String operatorConfig) {
-        return "";
+
+        var experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
+
+        var benchmarks = experimentConfig.workflows();
+
+        Random random = new Random(seed);
+
+        var fitness = experimentConfig.fitness();
+
+        var experimentBaseDirectory = experimentPath + "/executions";
+        double mutationProbability = 0.1;
+        int populationSize = 100;
+        int offspringPopulationSize = 100;
+        Termination termination = new TerminationByComputingTime(limitTime);
+        List<ExperimentProblem<SchedulePermutationSolution>> problemList = new ArrayList<>();
+        List<ExperimentAlgorithm<SchedulePermutationSolution, List<SchedulePermutationSolution>>>
+                algorithmList = new ArrayList<>();
+        List<SchedulingProblem> schedulingProblemList = new ArrayList<>();
+
+        var objectives = experimentConfig.objectives().stream().map(Objective::of).toList();
+
+
+        for (var benchmark : benchmarks) {
+
+            for (int i = experimentConfig.minHosts();
+                 i <= experimentConfig.maxHosts();
+                 i = i * experimentConfig.hostIncrement()) {
+
+                var baseProblem =
+                        createBaseProblem(workflowsPath, hostsPath, type, seed, benchmark, i, objectives);
+
+                var experimentProblem = new ExperimentProblem<>(baseProblem);
+                problemList.add(experimentProblem);
+
+                for (var f : fitness) {
+
+                    var problem =
+                            createSpecificProblem(workflowsPath, hostsPath, type, seed, benchmark, f, i, experimentConfig, objectives);
+                    schedulingProblemList.add(problem);
+
+
+                    Operators operators = new Operators(problem.getInstanceData(), random);
+
+                    CrossoverOperator<SchedulePermutationSolution> crossover =
+                            new ScheduleCrossover(1, operators);
+
+                    MutationOperator<SchedulePermutationSolution> mutation =
+                            new ScheduleMutation(mutationProbability, operators);
+
+                    InitialSolutionGeneratorSpecified initialSolutionGenerator;
+
+                    for (int run = 0; run < experimentConfig.independentRuns(); run++) {
+
+                        Algorithm<List<SchedulePermutationSolution>> algorithm;
+
+                        initialSolutionGenerator = new InitialSolutionGeneratorSpecified();
+                        List<NeighborhoodOperatorLazy> operatorList = getOperatorsList(operatorConfig, problem);
+
+                        algorithm =
+                                createMA(problem, populationSize, offspringPopulationSize, crossover, mutation,
+                                        termination, random, objectives, limitTime, initialSolutionGenerator,
+                                        operatorList);
+
+
+                        algorithmList.add(new ExperimentAlgorithm<>(algorithm, f, experimentProblem, run));
+                    }
+
+                    LOG.info("Done benchmark {} with {} hosts and fitness {}", benchmark, i, f);
+                }
+            }
+        }
+
+        Experiment<SchedulePermutationSolution, List<SchedulePermutationSolution>> experiment =
+                createExperiment(algorithmList, problemList, experimentBaseDirectory, experimentConfig);
+
+
+        long start = System.currentTimeMillis();
+
+        new ExecuteAlgorithms<>(experiment).run();
+
+        long end = System.currentTimeMillis();
+
+        try {
+
+            doJmetalAnalysis(experimentConfig, experiment);
+
+            CommandUtils.computeStatistics(experiment, objectives);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String result = "All experiments done Execution time: " + (end - start) + " ms";
+
+        System.out.println( result );
+
+        return result;
     }
 }
