@@ -227,7 +227,8 @@ public class CommandUtils {
                                                CrossoverOperator<SchedulePermutationSolution> crossover,
                                                MutationOperator<SchedulePermutationSolution> mutation, Termination termination,
                                                Random random, List<Objective> objectives, long limitTime,
-                                               List<NeighborhoodOperatorLazy> operatorList) {
+                                               List<NeighborhoodOperatorLazy> operatorList,
+                                               int lsaIterationsLimit) {
         return new MemeticAlgorithmBuilder(
                 "Memetic",
                 problem,
@@ -236,7 +237,8 @@ public class CommandUtils {
                 crossover,
                 mutation,
                 limitTime,
-                operatorList)
+                operatorList,
+                lsaIterationsLimit)
                 .setTermination(termination)
                 .setEvaluation(new SequentialEvaluation<>(problem)) //TODO: aquí había una llamada al método privado "getEvaluator()"
                 .setSelection(new ScheduleSelection(random))

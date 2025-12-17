@@ -41,7 +41,8 @@ public class MemeticCommand {
             @Option(shortNames = 'W') String workflowsPath,
             @Option(shortNames = 'H') String hostsPath,
             @Option(shortNames = 'T') String type,
-            @Option(shortNames = 'L', defaultValue = "10000") Long limitTime,
+            @Option(shortNames = 'L', defaultValue = "100000") Long limitTime,
+            @Option(defaultValue = "3") int lsaIterationsLimit,
             @Option(shortNames = 'S', defaultValue = "1") Long seed,
             @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
             @Option(shortNames = 'C') String experimentConfigFile,
@@ -50,12 +51,12 @@ public class MemeticCommand {
             @Option(shortNames = 'O', defaultValue = "null") String operatorConfig) {
 
         return executeMemetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
-                periodicTimeForMakespanEvolution, instanceName, operatorConfig);
+                periodicTimeForMakespanEvolution, instanceName, operatorConfig, lsaIterationsLimit);
     }
 
     public static String executeMemetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
                                         String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
-                                        String instanceName, String operatorConfig) {
+                                        String instanceName, String operatorConfig, int lsaIterationsLimit) {
 
         var experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
@@ -113,7 +114,7 @@ public class MemeticCommand {
 
                         algorithm =
                                 createMA(problem, populationSize, offspringPopulationSize, crossover, mutation,
-                                        termination, random, objectives, limitTime, operatorList);
+                                        termination, random, objectives, limitTime, operatorList, lsaIterationsLimit);
 
 
                         algorithmList.add(new ExperimentAlgorithm<>(algorithm, f, experimentProblem, run));

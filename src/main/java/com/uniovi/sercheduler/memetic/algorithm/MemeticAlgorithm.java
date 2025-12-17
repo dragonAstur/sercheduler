@@ -73,8 +73,6 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
         while(!this.termination.isMet(this.attributes)) {
 
-            System.out.println("Nueva iteración del memetic");
-
             List<SchedulePermutationSolution> matingPopulation = this.selection.select(this.population);
             List<SchedulePermutationSolution> offspringPopulation = this.variation.variate(this.population, matingPopulation);
             offspringPopulation = this.evaluation.evaluate(offspringPopulation);
@@ -84,7 +82,6 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         }
 
         this.totalComputingTime = System.currentTimeMillis() - this.initTime;
-        System.out.println("Final population size: " + result().size());
 
     }
 

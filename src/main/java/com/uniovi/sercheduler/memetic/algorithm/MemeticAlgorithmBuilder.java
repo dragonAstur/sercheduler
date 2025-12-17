@@ -5,7 +5,6 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalSearchAlgorithm;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.TerminationCriterion;
-import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.UpgradeAndTimeLimitTermination;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.UpgradeIterationAndTimeLimitTermination;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
@@ -22,13 +21,12 @@ import org.uma.jmetal.component.catalogue.ea.variation.Variation;
 import org.uma.jmetal.component.catalogue.ea.variation.impl.CrossoverAndMutationVariation;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
 import org.uma.jmetal.operator.mutation.MutationOperator;
-import org.uma.jmetal.problem.Problem;
-import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.util.comparator.ObjectiveComparator;
 
 import java.util.List;
 
 public class MemeticAlgorithmBuilder {
+
 
     private final String name;
     private Evaluation<SchedulePermutationSolution> evaluation;
@@ -46,7 +44,8 @@ public class MemeticAlgorithmBuilder {
                                    int offspringPopulationSize,
                                    CrossoverOperator<SchedulePermutationSolution> crossover,
                                    MutationOperator<SchedulePermutationSolution> mutation,
-                                   Long limitTime, List<NeighborhoodOperatorLazy> operatorList){
+                                   Long limitTime, List<NeighborhoodOperatorLazy> operatorList,
+                                   int lsaIterationsLimit){
 
         this.name = name;
         this.createInitialPopulation = new RandomSolutionsCreation<>(problem, populationSize);
@@ -56,7 +55,7 @@ public class MemeticAlgorithmBuilder {
         this.termination = new TerminationByEvaluations(25000);
         this.evaluation = new SequentialEvaluation<>(problem);
 
-        TerminationCriterion terminationCriterion = new UpgradeIterationAndTimeLimitTermination(limitTime, 1);
+        TerminationCriterion terminationCriterion = new UpgradeIterationAndTimeLimitTermination(limitTime, lsaIterationsLimit);
         this.initialSolutionGenerator = new InitialSolutionGeneratorSpecified();
 
         this.operatorList = operatorList;
