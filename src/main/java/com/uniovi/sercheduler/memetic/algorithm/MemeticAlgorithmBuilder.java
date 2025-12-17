@@ -56,14 +56,14 @@ public class MemeticAlgorithmBuilder {
         this.termination = new TerminationByEvaluations(25000);
         this.evaluation = new SequentialEvaluation<>(problem);
 
-        TerminationCriterion terminationCriterion = new UpgradeIterationAndTimeLimitTermination(limitTime, 2);
+        TerminationCriterion terminationCriterion = new UpgradeIterationAndTimeLimitTermination(limitTime, 1);
         this.initialSolutionGenerator = new InitialSolutionGeneratorSpecified();
 
         this.operatorList = operatorList;
 
         this.lsa = new LocalSearchAlgorithm.Builder(problem)
                 .terminationCriterion(terminationCriterion)
-                .initialSolutionGenerator(initialSolutionGenerator)
+                .initialSolutionGenerator(this.initialSolutionGenerator)
                 .build();
 
     }

@@ -36,9 +36,15 @@ public class LocalsearchEvaluator {
         if(movement.changedHostPositions().length != 0)
             updateOriginalScheduleDurations(originalSchedule, generatedSolution.getPlan(), movement.changedHostPositions());
 
+        FitnessInfo newFitnessInfo = computeNewFitnessInfo(originalSchedule, generatedSolution.getPlan(), movement.getFirstChangePosition());
+
         generatedSolution.setFitnessInfo(
-                computeNewFitnessInfo(originalSchedule, generatedSolution.getPlan(), movement.getFirstChangePosition())
+                newFitnessInfo
         );
+
+        //TODO: generalizar a más objetivos
+        generatedSolution.objectives()[0] = newFitnessInfo.fitness().get("energy");
+        generatedSolution.objectives()[1] = newFitnessInfo.fitness().get("makespan");
     }
 
 

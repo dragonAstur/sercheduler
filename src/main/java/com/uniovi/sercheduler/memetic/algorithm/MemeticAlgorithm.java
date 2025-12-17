@@ -73,11 +73,13 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
         while(!this.termination.isMet(this.attributes)) {
 
+            System.out.println("Nueva iteración del memetic");
+
             List<SchedulePermutationSolution> matingPopulation = this.selection.select(this.population);
             List<SchedulePermutationSolution> offspringPopulation = this.variation.variate(this.population, matingPopulation);
             offspringPopulation = this.evaluation.evaluate(offspringPopulation);
-            offspringPopulation = applyLSAToBest(offspringPopulation);
             this.population = this.replacement.replace(this.population, offspringPopulation);
+            applyLSAToBest(this.population);
             this.updateProgress();
         }
 
@@ -86,30 +88,28 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
     }
 
-    private List<SchedulePermutationSolution> applyLSAToBest(List<SchedulePermutationSolution> offspringPopulation) {
+    private void applyLSAToBest(List<SchedulePermutationSolution> population) {
 
         int bestIndex =
-                getBestSolutionPos(offspringPopulation);
+                getBestSolutionPos(population);
 
         //Usar el initial solution generator
-        SchedulePermutationSolution bestOffspringSolution = offspringPopulation.get(bestIndex);
+        SchedulePermutationSolution bestSolution = population.get(bestIndex);
 
-        this.lsa.setInitialSolution(bestOffspringSolution);
+        this.lsa.setInitialSolution(bestSolution);
 
         SchedulePermutationSolution enhancedOffspringSolution = this.lsa.runLocalSearchLazy(this.operatorList,
                 new LocalSearchObserver("HC", "jsaudhdsid", -1));
 
-        offspringPopulation.set(bestIndex, enhancedOffspringSolution);
-
-        return offspringPopulation;
+        population.set(bestIndex, enhancedOffspringSolution);
 
     }
 
-    private static Integer getBestSolutionPos(List<SchedulePermutationSolution> offspringPopulation) {
-        return IntStream.range(0, offspringPopulation.size())
+    private static Integer getBestSolutionPos(List<SchedulePermutationSolution> population) {
+        return IntStream.range(0, population.size())
                 .boxed()
-                .max(Comparator.comparingDouble(
-                        i -> offspringPopulation.get(i)
+                .min(Comparator.comparingDouble(
+                        i -> population.get(i)
                                 .getFitnessInfo().fitness().get("makespan")
                 ))
                 .orElseThrow(() ->

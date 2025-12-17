@@ -14,7 +14,7 @@ public class UpgradeIterationAndTimeLimitTermination extends AbstractTermination
      */
     @Override
     public boolean isMet(){
-        return !this.upgradeFound || (System.currentTimeMillis() - startingTime) > limitTime || actualIteration > limitIteration;
+        return !this.upgradeFound || (System.currentTimeMillis() - startingTime) > limitTime || actualIteration >= limitIteration;
     }
 
 

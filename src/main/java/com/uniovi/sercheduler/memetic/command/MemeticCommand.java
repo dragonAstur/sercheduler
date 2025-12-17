@@ -105,19 +105,15 @@ public class MemeticCommand {
                     MutationOperator<SchedulePermutationSolution> mutation =
                             new ScheduleMutation(mutationProbability, operators);
 
-                    InitialSolutionGeneratorSpecified initialSolutionGenerator;
-
                     for (int run = 0; run < experimentConfig.independentRuns(); run++) {
 
                         Algorithm<List<SchedulePermutationSolution>> algorithm;
 
-                        initialSolutionGenerator = new InitialSolutionGeneratorSpecified();
                         List<NeighborhoodOperatorLazy> operatorList = getOperatorsList(operatorConfig, problem);
 
                         algorithm =
                                 createMA(problem, populationSize, offspringPopulationSize, crossover, mutation,
-                                        termination, random, objectives, limitTime, initialSolutionGenerator,
-                                        operatorList);
+                                        termination, random, objectives, limitTime, operatorList);
 
 
                         algorithmList.add(new ExperimentAlgorithm<>(algorithm, f, experimentProblem, run));
@@ -129,7 +125,7 @@ public class MemeticCommand {
         }
 
         Experiment<SchedulePermutationSolution, List<SchedulePermutationSolution>> experiment =
-                createExperiment(algorithmList, problemList, experimentBaseDirectory, experimentConfig);
+                CommandUtils.createExperiment(algorithmList, problemList, experimentBaseDirectory, experimentConfig);
 
 
         long start = System.currentTimeMillis();
@@ -140,7 +136,7 @@ public class MemeticCommand {
 
         try {
 
-            doJmetalAnalysis(experimentConfig, experiment);
+            CommandUtils.doJmetalAnalysis(experimentConfig, experiment);
 
             CommandUtils.computeStatistics(experiment, objectives);
 
