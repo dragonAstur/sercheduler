@@ -72,7 +72,7 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
                     if (available.isEmpty())
                         throw new NoSuchElementException();
 
-                    observer.updateMakespanEvolution(actualSolutionMakespan, 0);
+                    //observer.updateMakespanEvolution(actualSolutionMakespan, 0);
 
                     Iterator<T> chosen = available.get(rand.nextInt(available.size()));
 

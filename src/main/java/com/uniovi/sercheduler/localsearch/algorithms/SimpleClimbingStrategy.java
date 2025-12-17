@@ -51,7 +51,7 @@ public class SimpleClimbingStrategy {
                                                Long limitTime, Observer observer){
 
         LocalSearchAlgorithm localSearchAlgorithm = new LocalSearchAlgorithm.Builder(problem)
-                .terminationCriterion(new UpgradeAndTimeLimitTermination(limitTime))
+                .terminationCriterion(new UpgradeAndTimeLimitTermination(limitTime, 0))
                 .build();
 
         MultiStartLocalSearch multiStartLocalSearch = new MultiStartLocalSearch(new AllStartOperatorSelector());
@@ -64,7 +64,7 @@ public class SimpleClimbingStrategy {
                                                   Long limitTime, Observer observer){
 
         LocalSearchAlgorithm localSearchAlgorithm = new LocalSearchAlgorithm.Builder(problem)
-                .terminationCriterion(new UpgradeAndTimeLimitTermination(limitTime))
+                .terminationCriterion(new UpgradeAndTimeLimitTermination(limitTime, 0))
                 .build();
 
         MultiStartLocalSearch multiStartLocalSearch = new MultiStartLocalSearch(new RandomStartOperatorSelector());

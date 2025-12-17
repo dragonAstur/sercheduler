@@ -16,14 +16,6 @@ public abstract class AbstractTerminationCriterion implements TerminationCriteri
         this.actualIteration = 0;
     }
 
-    public AbstractTerminationCriterion(){
-        this.upgradeFound = false;
-        this.limitTime = -1;
-        this.limitIteration = -1;
-        this.startingTime = -1;
-        this.actualIteration = 0;
-    }
-
     @Override
     public void setUpgradeFound(boolean upgradeFound) {
         this.upgradeFound = upgradeFound;

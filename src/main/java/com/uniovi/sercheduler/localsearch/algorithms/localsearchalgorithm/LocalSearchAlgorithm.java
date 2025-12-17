@@ -48,7 +48,7 @@ public class LocalSearchAlgorithm {
         private NeighborGenerator neighborGenerator = new NeighborGeneratorImpl();
         private NeighborSelector neighborSelector = new NeighborSelectorImpl();
         private AcceptanceCriterion acceptanceCriterion = new AcceptanceCriterionImpl();
-        private TerminationCriterion terminationCriterion = new UpgradeTermination();
+        private TerminationCriterion terminationCriterion = new UpgradeTermination(0, 0);
 
         private NeighborGeneratorAndSelector neighborGeneratorAndSelector = new NeighborGeneratorAndSelectorImpl();
 
@@ -170,7 +170,7 @@ public class LocalSearchAlgorithm {
             maybeBetterNeighbor = neighborSelector.selectBestNeighborLazy(actualSolution, neighbors, evaluator, counter,
                     acceptanceCriterion, terminationCriterion, observer);
 
-            observer.setNumberOfGeneratedNeighbors(counter.get());
+            //observer.setNumberOfGeneratedNeighbors(counter.get());
 
             if (maybeBetterNeighbor.isPresent()) {
                 actualSolution = maybeBetterNeighbor.get().generatedSolution();
@@ -179,9 +179,9 @@ public class LocalSearchAlgorithm {
 
             double actualSolutionMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
 
-            observer.setReachedMakespan(actualSolutionMakespan);
+            /*observer.setReachedMakespan(actualSolutionMakespan);
             observer.updateMakespanEvolution(actualSolutionMakespan, counter.get());
-            observer.endIteration();
+            observer.endIteration();*/
 
         } while (!terminationCriterion.isMet());
 
