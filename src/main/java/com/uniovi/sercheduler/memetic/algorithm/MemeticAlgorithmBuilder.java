@@ -7,6 +7,7 @@ import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.Initi
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.TerminationCriterion;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.UpgradeIterationAndTimeLimitTermination;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.SequentialEvaluation;
 import org.uma.jmetal.component.catalogue.common.solutionscreation.SolutionsCreation;
@@ -39,15 +40,18 @@ public class MemeticAlgorithmBuilder {
     private InitialSolutionGeneratorSpecified initialSolutionGenerator;
     private final LocalSearchAlgorithm lsa;
     private final List<NeighborhoodOperatorLazy> operatorList;
+    private MemeticObserver observer;
+    private final String fileName;
 
     public MemeticAlgorithmBuilder(String name, SchedulingProblem problem, int populationSize,
                                    int offspringPopulationSize,
                                    CrossoverOperator<SchedulePermutationSolution> crossover,
                                    MutationOperator<SchedulePermutationSolution> mutation,
                                    Long limitTime, List<NeighborhoodOperatorLazy> operatorList,
-                                   int lsaIterationsLimit){
+                                   int lsaIterationsLimit, String fileName){
 
         this.name = name;
+        this.fileName = fileName;
         this.createInitialPopulation = new RandomSolutionsCreation<>(problem, populationSize);
         this.replacement = new MuPlusLambdaReplacement<>(new ObjectiveComparator<>(0));
         this.variation = new CrossoverAndMutationVariation<>(offspringPopulationSize, crossover, mutation);
@@ -65,6 +69,11 @@ public class MemeticAlgorithmBuilder {
                 .initialSolutionGenerator(this.initialSolutionGenerator)
                 .build();
 
+    }
+
+    public MemeticAlgorithmBuilder setObserver(MemeticObserver observer){
+        this.observer = observer;
+        return this;
     }
 
     public MemeticAlgorithmBuilder setInitialSolutionGenerator(InitialSolutionGeneratorSpecified initialSolutionGenerator) {
@@ -99,7 +108,7 @@ public class MemeticAlgorithmBuilder {
 
     public MemeticAlgorithm build() {
         return new MemeticAlgorithm(this.name, this.createInitialPopulation, this.evaluation, this.termination,
-                this.selection, this.variation, this.replacement, this.lsa, this.operatorList) {
+                this.selection, this.variation, this.replacement, this.lsa, this.operatorList, this.observer, this.fileName) {
             @Override
             public void updateProgress() {
                 SchedulePermutationSolution bestFitnessSolution = this.population().stream().min(new ObjectiveComparator<>(0)).get();

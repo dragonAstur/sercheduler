@@ -6,7 +6,9 @@ import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
+import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import com.uniovi.sercheduler.parser.experiment.ExperimentConfigLoader;
 import com.uniovi.sercheduler.service.Operators;
 import org.slf4j.Logger;
@@ -47,16 +49,18 @@ public class MemeticCommand {
             @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
             @Option(shortNames = 'C') String experimentConfigFile,
             @Option(shortNames = 'E', defaultValue = "-1") long periodicTimeForMakespanEvolution,
-            @Option(shortNames = 'N', defaultValue = "null") String instanceName,
+            @Option(shortNames = 'N', defaultValue = "null") String fileName,
             @Option(shortNames = 'O', defaultValue = "null") String operatorConfig) {
 
         return executeMemetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
-                periodicTimeForMakespanEvolution, instanceName, operatorConfig, lsaIterationsLimit);
+                periodicTimeForMakespanEvolution, fileName, operatorConfig, lsaIterationsLimit);
     }
 
     public static String executeMemetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
                                         String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
-                                        String instanceName, String operatorConfig, int lsaIterationsLimit) {
+                                        String fileName, String operatorConfig, int lsaIterationsLimit) {
+
+        fileName = "memetic-" + fileName;
 
         var experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
@@ -77,6 +81,10 @@ public class MemeticCommand {
         List<SchedulingProblem> schedulingProblemList = new ArrayList<>();
 
         var objectives = experimentConfig.objectives().stream().map(Objective::of).toList();
+
+        MemeticObserver observer;
+
+        XLSXTableExporter.createMemeticWorkbook(fileName);
 
 
         for (var benchmark : benchmarks) {
@@ -109,12 +117,14 @@ public class MemeticCommand {
                     for (int run = 0; run < experimentConfig.independentRuns(); run++) {
 
                         Algorithm<List<SchedulePermutationSolution>> algorithm;
+                        observer = new MemeticObserver("HC", operatorConfig, periodicTimeForMakespanEvolution);
 
                         List<NeighborhoodOperatorLazy> operatorList = getOperatorsList(operatorConfig, problem);
 
                         algorithm =
                                 createMA(problem, populationSize, offspringPopulationSize, crossover, mutation,
-                                        termination, random, objectives, limitTime, operatorList, lsaIterationsLimit);
+                                        termination, random, objectives, limitTime, operatorList, lsaIterationsLimit,
+                                        observer, fileName);
 
 
                         algorithmList.add(new ExperimentAlgorithm<>(algorithm, f, experimentProblem, run));

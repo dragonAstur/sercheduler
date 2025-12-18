@@ -11,8 +11,10 @@ import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalS
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGenerator;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.TerminationCriterion;
+import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.component.catalogue.common.solutionscreation.SolutionsCreation;
@@ -45,11 +47,15 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
     private LocalSearchAlgorithm lsa;
 
     private List<NeighborhoodOperatorLazy> operatorList;
+    private MemeticObserver observer;
+
+    private final String fileName;
 
 
     public MemeticAlgorithm(String name, SolutionsCreation<SchedulePermutationSolution> initialPopulationCreation, Evaluation<SchedulePermutationSolution> evaluation,
                             Termination termination, Selection<SchedulePermutationSolution> selection, Variation<SchedulePermutationSolution> variation, Replacement<SchedulePermutationSolution> replacement,
-                            LocalSearchAlgorithm lsa, List<NeighborhoodOperatorLazy> operatorList) {
+                            LocalSearchAlgorithm lsa, List<NeighborhoodOperatorLazy> operatorList, MemeticObserver observer,
+                            String fileName) {
         this.name = name;
         this.createInitialPopulation = initialPopulationCreation;
         this.evaluation = evaluation;
@@ -60,12 +66,19 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         this.observable = new DefaultObservable<>("Evolutionary Algorithm");
         this.attributes = new HashMap<>();
 
+        this.observer = observer;
+
         this.lsa = lsa;
         this.operatorList = operatorList;
+
+        this.fileName = fileName;
     }
 
     public void run() {
+
         this.initTime = lsa.startTimeCounter();
+
+        observer.startRun(this.initTime);
 
         this.population = this.createInitialPopulation.create();
         this.population = this.evaluation.evaluate(this.population);
@@ -77,15 +90,28 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
             List<SchedulePermutationSolution> offspringPopulation = this.variation.variate(this.population, matingPopulation);
             offspringPopulation = this.evaluation.evaluate(offspringPopulation);
             this.population = this.replacement.replace(this.population, offspringPopulation);
-            applyLSAToBest(this.population);
+
+            observer.updateMemeticEvolution(
+                    this.population.get( getBestSolutionPos(this.population) ).getFitnessInfo().fitness().get("makespan"),
+                    0,
+                    0
+            );
+
+            applyLSAToBest(this.population, observer);
             this.updateProgress();
+
+            this.observer.endMemeticIteration();
         }
 
         this.totalComputingTime = System.currentTimeMillis() - this.initTime;
 
+        observer.endRun();
+
+        XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);
+
     }
 
-    private void applyLSAToBest(List<SchedulePermutationSolution> population) {
+    private void applyLSAToBest(List<SchedulePermutationSolution> population, MemeticObserver observer) {
 
         int bestIndex =
                 getBestSolutionPos(population);
@@ -93,12 +119,24 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         //Usar el initial solution generator
         SchedulePermutationSolution bestSolution = population.get(bestIndex);
 
+        observer.updateMemeticEvolution(
+                bestSolution.getFitnessInfo().fitness().get("makespan"),
+                0,
+                0
+        );
+
         this.lsa.setInitialSolution(bestSolution);
 
-        SchedulePermutationSolution enhancedOffspringSolution = this.lsa.runLocalSearchLazy(this.operatorList,
-                new LocalSearchObserver("HC", "jsaudhdsid", -1));
+        SchedulePermutationSolution enhancedBestSolution = this.lsa.runLocalSearchLazy(this.operatorList,
+                observer);
 
-        population.set(bestIndex, enhancedOffspringSolution);
+        population.set(bestIndex, enhancedBestSolution);
+
+        observer.updateMemeticEvolution(
+                enhancedBestSolution.getFitnessInfo().fitness().get("makespan"),
+                0,
+                0
+        );
 
     }
 

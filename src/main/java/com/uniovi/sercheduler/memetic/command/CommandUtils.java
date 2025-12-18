@@ -6,13 +6,11 @@ import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleSelection;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
-import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGenerator;
-import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
-import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
-import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
+import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.*;
 import com.uniovi.sercheduler.memetic.algorithm.MemeticAlgorithm;
 import com.uniovi.sercheduler.memetic.algorithm.MemeticAlgorithmBuilder;
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.component.algorithm.EvolutionaryAlgorithm;
 import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.SequentialEvaluation;
@@ -208,7 +206,12 @@ public class CommandUtils {
                 0);
     }
 
-    protected static EvolutionaryAlgorithm<SchedulePermutationSolution> createGga(SchedulingProblem problem, int populationSize, int offspringPopulationSize, CrossoverOperator<SchedulePermutationSolution> crossover, MutationOperator<SchedulePermutationSolution> mutation, Termination termination, Random random, List<Objective> objectives) {
+    protected static EvolutionaryAlgorithm<SchedulePermutationSolution> createGga(SchedulingProblem problem,
+                                                                                  int populationSize, int offspringPopulationSize,
+                                                                                  CrossoverOperator<SchedulePermutationSolution> crossover,
+                                                                                  MutationOperator<SchedulePermutationSolution> mutation,
+                                                                                  Termination termination, Random random,
+                                                                                  List<Objective> objectives) {
         return new GeneticAlgorithmBuilder<>(
                 "GGA",
                 problem,
@@ -228,7 +231,7 @@ public class CommandUtils {
                                                MutationOperator<SchedulePermutationSolution> mutation, Termination termination,
                                                Random random, List<Objective> objectives, long limitTime,
                                                List<NeighborhoodOperatorLazy> operatorList,
-                                               int lsaIterationsLimit) {
+                                               int lsaIterationsLimit, MemeticObserver observer, String fileName) {
         return new MemeticAlgorithmBuilder(
                 "Memetic",
                 problem,
@@ -238,11 +241,13 @@ public class CommandUtils {
                 mutation,
                 limitTime,
                 operatorList,
-                lsaIterationsLimit)
+                lsaIterationsLimit,
+                fileName)
                 .setTermination(termination)
                 .setEvaluation(new SequentialEvaluation<>(problem)) //TODO: aquí había una llamada al método privado "getEvaluator()"
                 .setSelection(new ScheduleSelection(random))
                 .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
+                .setObserver(observer)
                 .build();
     }
 

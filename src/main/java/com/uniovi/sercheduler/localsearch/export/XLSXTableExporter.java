@@ -2,6 +2,7 @@ package com.uniovi.sercheduler.localsearch.export;
 
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.observer.RunMetrics;
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -27,6 +28,73 @@ public class XLSXTableExporter {
                 workbook.write(outputStream);
             }
 
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static void createMemeticWorkbook(String fileName){
+        try (Workbook workbook = new XSSFWorkbook()) {
+
+            createMemeticEvolutionSheet(fileName, workbook);
+
+            // Write the workbook to a file
+            try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
+                workbook.write(outputStream);
+            }
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void createMemeticEvolutionSheet(String fileName, Workbook workbook) {
+
+        Sheet sheet = workbook.createSheet(fileName + "_evol");
+        Row headerRow = sheet.createRow(0);
+
+        headerRow.createCell(0).setCellValue("Strategy");
+
+        headerRow.createCell(1).setCellValue("Operator config");
+
+        headerRow.createCell(2).setCellValue("Memetic iteration");
+
+        headerRow.createCell(3).setCellValue("Periodic time");
+
+        headerRow.createCell(4).setCellValue("Time instant");
+
+        headerRow.createCell(5).setCellValue("Actual makespan");
+
+        headerRow.createCell(6).setCellValue("Best makespan in this run");
+    }
+
+    public static void appendMemeticEvolutionSheet(String fileName, MemeticObserver observer){
+
+        try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
+
+            Sheet sheet = workbook.getSheet(fileName + "_evol");
+
+            for(int i = 0; i < observer.getMemeticEvolutionMetrics().getInstants().size(); i++){
+
+                Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+
+                row.createCell(0).setCellValue(observer.getStrategyName());
+                row.createCell(1).setCellValue(observer.getOperatorsName());
+                row.createCell(2).setCellValue(observer.getMemeticEvolutionMetrics().getMemeticIterationNumberList().get(i));
+                row.createCell(3).setCellValue(observer.getPeriodicTimeForMakespanEvolution() * (i+1));
+                row.createCell(4).setCellValue(observer.getMemeticEvolutionMetrics().getInstants().get(i));
+                row.createCell(5).setCellValue(observer.getMemeticEvolutionMetrics().getActualMakespanEvolution().get(i));
+                row.createCell(6).setCellValue(observer.getMemeticEvolutionMetrics().getBestMakespanEvolution().get(i));
+            }
+
+
+            // Write the workbook to a file
+            try (FileOutputStream outputStream = new FileOutputStream(fileName + ".xlsx")) {
+                workbook.write(outputStream);
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -302,7 +370,7 @@ public class XLSXTableExporter {
             }
 
         }catch(FileNotFoundException e){
-            System.out.println("There is not an 'operators_experiment_results.xlsx' file in this directory. If you want to " +
+            System.out.println("There is not an '" + fileName + ".xlsx' file in this directory. If you want to " +
                     "create one from scratch, write '-C' as a parameter when executing the JAR file.\n");
             throw new RuntimeException(e);
         } catch(IllegalArgumentException e){
