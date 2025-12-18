@@ -1,7 +1,5 @@
 package com.uniovi.sercheduler.localsearch.observer;
 
-import java.util.Map;
-
 public interface Observer {
 
     void startRun(long startingTime);
@@ -10,7 +8,11 @@ public interface Observer {
 
     void endStart();
 
-    void endIteration();
+    long getStartingTime();
+
+    void endMemeticIteration();
+
+    void endLSAIteration();
 
     void setNumberOfGeneratedNeighbors(int numberOfGeneratedNeighbors);
 
@@ -22,7 +24,9 @@ public interface Observer {
 
     void setReachedMakespan(double reachedMakespan);
 
-    void updateMakespanEvolution(double actualMakespan, long actualIterationNumberOfNeighbors);
+    void updateLSAEvolution(double actualMakespan, long actualIterationNumberOfNeighbors);
+
+    void updateMemeticEvolution(double actualMakespan, long actualLSAInvocations, long actualLSAImprovements);
 
     long getPeriodicTimeForMakespanEvolution();
 

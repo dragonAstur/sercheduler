@@ -23,7 +23,7 @@ public abstract class AbstractLocalSearchObserver implements Observer{
     private double allNeighborsImprovingRatio;
     private double reachedMakespanImprovingRatioWithRespectLastIteration;
 
-    private EvolutionMetrics evolutionMetrics;
+    private LocalSearchEvolutionMetrics localSearchEvolutionMetrics;
 
 
     public AbstractLocalSearchObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution){
@@ -48,14 +48,20 @@ public abstract class AbstractLocalSearchObserver implements Observer{
     }
 
     @Override
+    public void updateMemeticEvolution(double actualMakespan, long actualLSAInvocations, long actualLSAImprovements){
+
+    }
+
+    @Override
     public void startRun(long startingTime) {
         this.runStartingTime = startingTime;
 
-        this.evolutionMetrics = new EvolutionMetrics(periodicTimeForMakespanEvolution);
+        this.localSearchEvolutionMetrics = new LocalSearchEvolutionMetrics(periodicTimeForMakespanEvolution);
     }
 
-    public long getRunStartingTime() {
-        return runStartingTime;
+    @Override
+    public long getStartingTime() {
+        return this.runStartingTime;
     }
 
     public void setRunStartingTime(long runStartingTime) {
@@ -72,7 +78,12 @@ public abstract class AbstractLocalSearchObserver implements Observer{
     }
 
     @Override
-    public void endIteration() {
+    public void endMemeticIteration(){
+
+    }
+
+    @Override
+    public void endLSAIteration() {
         iterations.add(
                 new IterationMetrics(
                         reachedMakespan,
@@ -118,13 +129,13 @@ public abstract class AbstractLocalSearchObserver implements Observer{
     }
 
     @Override
-    public void updateMakespanEvolution(double actualMakespan, long actualIterationNumberOfNeighbors) {
+    public void updateLSAEvolution(double actualMakespan, long actualIterationNumberOfNeighbors) {
 
         long accNumberOfNeighbors = actualIterationNumberOfNeighbors +
                 starts.stream().mapToInt(StartMetrics::numberOfGeneratedNeighbors).sum() +
                 iterations.stream().mapToInt(IterationMetrics::numberOfGeneratedNeighbors).sum();
 
-        evolutionMetrics.update(
+        localSearchEvolutionMetrics.update(
                 runStartingTime,
                 starts.size()+1,
                 iterations.size() + 1,
@@ -157,7 +168,7 @@ public abstract class AbstractLocalSearchObserver implements Observer{
         this.starts = starts;
     }
 
-    public EvolutionMetrics getEvolutionMetrics() {
-        return evolutionMetrics;
+    public LocalSearchEvolutionMetrics getEvolutionMetrics() {
+        return localSearchEvolutionMetrics;
     }
 }

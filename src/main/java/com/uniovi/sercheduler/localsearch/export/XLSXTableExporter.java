@@ -326,20 +326,20 @@ public class XLSXTableExporter {
 
                 RunMetrics run = observer.getRuns().get(i);
 
-                for(int j = 0; j < run.evolutionMetrics().getInstants().size(); j++){
+                for(int j = 0; j < run.localSearchEvolutionMetrics().getInstants().size(); j++){
 
                     Row row = sheet.createRow(sheet.getLastRowNum() + 1);
 
                     row.createCell(0).setCellValue(observer.getStrategyName());
                     row.createCell(1).setCellValue(observer.getOperatorsName());
                     row.createCell(2).setCellValue(i+1);
-                    row.createCell(3).setCellValue(run.evolutionMetrics().getStartNumberList().get(j));
-                    row.createCell(4).setCellValue(run.evolutionMetrics().getIterationNumberList().get(j));
+                    row.createCell(3).setCellValue(run.localSearchEvolutionMetrics().getStartNumberList().get(j));
+                    row.createCell(4).setCellValue(run.localSearchEvolutionMetrics().getIterationNumberList().get(j));
                     row.createCell(5).setCellValue(observer.getPeriodicTimeForMakespanEvolution() * (j+1));
-                    row.createCell(6).setCellValue(run.evolutionMetrics().getInstants().get(j));
-                    row.createCell(7).setCellValue(run.evolutionMetrics().getActualMakespanEvolution().get(j));
-                    row.createCell(8).setCellValue(run.evolutionMetrics().getBestMakespanEvolution().get(j));
-                    row.createCell(9).setCellValue(run.evolutionMetrics().getAccNumberOfNeighborsList().get(j));
+                    row.createCell(6).setCellValue(run.localSearchEvolutionMetrics().getInstants().get(j));
+                    row.createCell(7).setCellValue(run.localSearchEvolutionMetrics().getActualMakespanEvolution().get(j));
+                    row.createCell(8).setCellValue(run.localSearchEvolutionMetrics().getBestMakespanEvolution().get(j));
+                    row.createCell(9).setCellValue(run.localSearchEvolutionMetrics().getAccNumberOfNeighborsList().get(j));
                 }
 
             }

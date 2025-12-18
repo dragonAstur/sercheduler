@@ -7,7 +7,7 @@ public record RunMetrics (
         List<StartMetrics> starts,
         long executionTime,
 
-        EvolutionMetrics evolutionMetrics
+        LocalSearchEvolutionMetrics localSearchEvolutionMetrics
 ) {
     public int numberOfStarts(){
         return starts.size();

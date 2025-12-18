@@ -2,11 +2,14 @@ package com.uniovi.sercheduler.localsearch.observer;
 
 import java.util.ArrayList;
 
-public class LocalSearchRunObserver extends AbstractLocalSearchObserver {
+/**
+ * This observer just registers metrics for one run, instead of multiple runs like the class "LocalSearchObserver"
+ */
+public class LocalSearchOneRunObserver extends AbstractLocalSearchObserver {
 
     private RunMetrics runMetrics;
 
-    public LocalSearchRunObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution) {
+    public LocalSearchOneRunObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution) {
         super(strategyName, operatorsName, periodicTimeForMakespanEvolution);
     }
 
@@ -15,7 +18,7 @@ public class LocalSearchRunObserver extends AbstractLocalSearchObserver {
         if (getStarts().isEmpty())
             endStart();
 
-        long executionTime = System.currentTimeMillis() - getRunStartingTime();
+        long executionTime = System.currentTimeMillis() - getStartingTime();
 
         this.runMetrics = new RunMetrics(getStrategyName(), getStarts(), executionTime, getEvolutionMetrics());
 

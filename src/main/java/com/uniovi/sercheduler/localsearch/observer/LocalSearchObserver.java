@@ -33,7 +33,7 @@ public class LocalSearchObserver extends AbstractLocalSearchObserver {
         if (getStarts().isEmpty())
             endStart();
 
-        long executionTime = System.currentTimeMillis() - getRunStartingTime();
+        long executionTime = System.currentTimeMillis() - getStartingTime();
 
         runs.add(
                 new RunMetrics(getStrategyName(), getStarts(), executionTime, getEvolutionMetrics())

@@ -9,7 +9,6 @@ import com.uniovi.sercheduler.localsearch.operator.GeneratedNeighbor;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import com.uniovi.sercheduler.service.calculator.FitnessCalculator;
-import org.jline.terminal.TerminalBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -138,8 +137,8 @@ public class LocalSearchAlgorithm {
 
             double actualSolutionMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
             observer.setReachedMakespan(actualSolutionMakespan);
-            observer.updateMakespanEvolution(actualSolutionMakespan, neighborGeneratorAndSelector.numberOfGeneratedNeighbors());
-            observer.endIteration();
+            observer.updateLSAEvolution(actualSolutionMakespan, neighborGeneratorAndSelector.numberOfGeneratedNeighbors());
+            observer.endLSAIteration();
 
         } while(!terminationCriterion.isMet());
 

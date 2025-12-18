@@ -90,7 +90,7 @@ public class NeighborSelectorImpl implements NeighborSelector {
         for(GeneratedNeighbor neighbor : neighborsList){
 
             //update evolution
-            observer.updateMakespanEvolution(Math.min(bestMakespan, bestMakespanKnown), this.numberOfGeneratedNeighbors);
+            observer.updateLSAEvolution(Math.min(bestMakespan, bestMakespanKnown), this.numberOfGeneratedNeighbors);
 
             neighborSolution = neighbor.generatedSolution();
             evaluator.evaluate(originalSolution, neighborSolution, neighbor.movements().get(neighbor.movements().size() - 1));
@@ -110,7 +110,7 @@ public class NeighborSelectorImpl implements NeighborSelector {
             }
 
             //update evolution
-            observer.updateMakespanEvolution(Math.min(bestMakespan, bestMakespanKnown), this.numberOfGeneratedNeighbors);
+            observer.updateLSAEvolution(Math.min(bestMakespan, bestMakespanKnown), this.numberOfGeneratedNeighbors);
 
             if(terminationCriterion.hasTimeExceeded())
                 break;

@@ -3,7 +3,7 @@ package com.uniovi.sercheduler.localsearch.observer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EvolutionMetrics {
+public class LocalSearchEvolutionMetrics {
 
     private List<Integer> startNumberList;
 
@@ -23,7 +23,7 @@ public class EvolutionMetrics {
     private List<Long> accNumberOfNeighborsList;
 
 
-    public EvolutionMetrics(long periodicTimeForMakespanEvolution){
+    public LocalSearchEvolutionMetrics(long periodicTimeForMakespanEvolution){
 
         this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
 
