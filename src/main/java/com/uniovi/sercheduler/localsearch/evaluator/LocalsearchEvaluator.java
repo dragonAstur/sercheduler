@@ -43,8 +43,8 @@ public class LocalsearchEvaluator {
         );
 
         //TODO: generalizar a más objetivos
-        generatedSolution.objectives()[0] = newFitnessInfo.fitness().get("energy");
-        generatedSolution.objectives()[1] = newFitnessInfo.fitness().get("makespan");
+        generatedSolution.objectives()[0] = newFitnessInfo.fitness().get("makespan");
+        generatedSolution.objectives()[1] = newFitnessInfo.fitness().get("energy");
     }
 
 

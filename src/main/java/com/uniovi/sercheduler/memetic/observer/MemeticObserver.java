@@ -97,9 +97,13 @@ public class MemeticObserver implements Observer {
     @Override
     public void updateLSAEvolution(double actualMakespan, long actualIterationNumberOfNeighbors) {
 
-        int lastMakespanRecordedPos = this.memeticEvolutionMetrics.getActualMakespanEvolution().size()-1;
+        System.out.println("Hello");
 
-        double lastMakespanRecorded = this.memeticEvolutionMetrics.getActualMakespanEvolution().get(lastMakespanRecordedPos);
+        int lastMakespanRecordedPos = this.memeticEvolutionMetrics.getActualMakespanEvolution().size()-1;
+        double lastMakespanRecorded = 0.0;
+
+        if(lastMakespanRecordedPos != -1)
+            lastMakespanRecorded = this.memeticEvolutionMetrics.getActualMakespanEvolution().get(lastMakespanRecordedPos);
 
         //TODO: revisar qué makespan poner aquí
         this.memeticEvolutionMetrics.update(

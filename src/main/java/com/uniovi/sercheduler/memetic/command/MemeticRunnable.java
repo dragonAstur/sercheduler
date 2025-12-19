@@ -7,8 +7,8 @@ public class MemeticRunnable {
     public static final String WORKFLOWS_PATH = "experiments/pelayo/1/workflows/";
     public static final String HOSTS_PATH = "experiments/pelayo/1/hosts/";
     public static String TYPE = "scenario1";
-    public static Long LIMIT_TIME = 10000L;
-    public static Long SEED = 121541L;
+    public static Long LIMIT_TIME = 120000L;
+    public static Long SEED = 1L;
     public static String EXPERIMENT_PATH = "experiments/pelayo/1";
     public static String EXPERIMENT_CONFIG = "experiments/pelayo/1/experimentConfig.json";
     public static final String OPERATOR_CONFIG = "N1";

@@ -44,10 +44,10 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
     private final Observable<Map<String, Object>> observable;
     private final String name;
 
-    private LocalSearchAlgorithm lsa;
+    private final LocalSearchAlgorithm lsa;
 
-    private List<NeighborhoodOperatorLazy> operatorList;
-    private MemeticObserver observer;
+    private final List<NeighborhoodOperatorLazy> operatorList;
+    private final MemeticObserver observer;
 
     private final String fileName;
 

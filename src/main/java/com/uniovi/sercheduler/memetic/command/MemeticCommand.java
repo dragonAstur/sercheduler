@@ -5,7 +5,6 @@ import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
-import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
 import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
@@ -33,10 +32,12 @@ import java.util.Random;
 
 import static com.uniovi.sercheduler.memetic.command.CommandUtils.*;
 
+@Command
 public class MemeticCommand {
 
     static final Logger LOG = LoggerFactory.getLogger(GeneticCommand.class);
 
+    //java -jar sercheduler-0.0.1-SNAPSHOT.jar memetic -W workflows/ -H hosts/ -T scenario1 -S 1 -L 120000 -C experimentConfig.json -E 100 -N pelayo -O n1
 
     @Command(command = "memetic")
     public String experiment(
@@ -49,8 +50,8 @@ public class MemeticCommand {
             @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
             @Option(shortNames = 'C') String experimentConfigFile,
             @Option(shortNames = 'E', defaultValue = "-1") long periodicTimeForMakespanEvolution,
-            @Option(shortNames = 'N', defaultValue = "null") String fileName,
-            @Option(shortNames = 'O', defaultValue = "null") String operatorConfig) {
+            @Option(shortNames = 'N', defaultValue = "experiment") String fileName,
+            @Option(shortNames = 'O', defaultValue = "n1") String operatorConfig) {
 
         return executeMemetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
                 periodicTimeForMakespanEvolution, fileName, operatorConfig, lsaIterationsLimit);
