@@ -8,6 +8,10 @@ import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleSelection;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
+import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
+import com.uniovi.sercheduler.memetic.algorithm.components.MemeticTermination;
+import com.uniovi.sercheduler.memetic.algorithm.components.MemeticTerminationByComputingTime;
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import com.uniovi.sercheduler.parser.experiment.ExperimentConfigLoader;
 import com.uniovi.sercheduler.service.Operators;
 import org.slf4j.Logger;
@@ -55,13 +59,19 @@ public class GeneticCommand {
       @Option(shortNames = 'L', defaultValue = "10000") Long limitTime,
       @Option(shortNames = 'S', defaultValue = "1") Long seed,
       @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
-      @Option(shortNames = 'C') String experimentConfigFile) {
+      @Option(shortNames = 'C') String experimentConfigFile,
+      @Option(shortNames = 'E', defaultValue = "-1") long periodicTimeForMakespanEvolution,
+      @Option(shortNames = 'N', defaultValue = "experiment") String fileName) {
 
-    return executeGenetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile);
+    return executeGenetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
+            periodicTimeForMakespanEvolution, fileName);
   }
 
   public static String executeGenetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
-                                      String experimentPath, String experimentConfigFile) {
+                                      String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
+                                      String fileName) {
+
+    fileName = "genetic-" + fileName;
 
     var experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
@@ -75,13 +85,17 @@ public class GeneticCommand {
     double mutationProbability = 0.1;
     int populationSize = 100;
     int offspringPopulationSize = 100;
-    Termination termination = new TerminationByComputingTime(limitTime);
+    MemeticTermination termination = new MemeticTerminationByComputingTime(limitTime);
     List<ExperimentProblem<SchedulePermutationSolution>> problemList = new ArrayList<>();
     List<ExperimentAlgorithm<SchedulePermutationSolution, List<SchedulePermutationSolution>>>
         algorithmList = new ArrayList<>();
     List<SchedulingProblem> schedulingProblemList = new ArrayList<>();
 
     var objectives = experimentConfig.objectives().stream().map(Objective::of).toList();
+
+    MemeticObserver observer;
+
+    XLSXTableExporter.createMemeticWorkbook(fileName);
 
     for (var benchmark : benchmarks) {
 
@@ -113,11 +127,13 @@ public class GeneticCommand {
           for (int run = 0; run < experimentConfig.independentRuns(); run++) {
 
             Algorithm<List<SchedulePermutationSolution>> algorithm;
+            observer = new MemeticObserver("N/A", "N/A", periodicTimeForMakespanEvolution);
 
             //AlgoFlag flag = AlgoFlag.MONO;
             //TODO: aquí se examinaba la flag concreta especificada
             algorithm =
-                    createGga(problem, populationSize, offspringPopulationSize, crossover, mutation, termination, random, objectives);
+                    createGga(problem, populationSize, offspringPopulationSize, crossover, mutation, termination, random,
+                            objectives, observer, fileName);
 
 
             algorithmList.add(new ExperimentAlgorithm<>(algorithm, f, experimentProblem, run));

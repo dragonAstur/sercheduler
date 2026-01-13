@@ -8,11 +8,16 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.*;
+import com.uniovi.sercheduler.memetic.algorithm.EvolutionaryAlgorithm;
+import com.uniovi.sercheduler.memetic.algorithm.GeneticAlgorithmBuilder;
 import com.uniovi.sercheduler.memetic.algorithm.MemeticAlgorithm;
 import com.uniovi.sercheduler.memetic.algorithm.MemeticAlgorithmBuilder;
+import com.uniovi.sercheduler.memetic.algorithm.components.MemeticScheduleReplacement;
+import com.uniovi.sercheduler.memetic.algorithm.components.MemeticScheduleSelection;
+import com.uniovi.sercheduler.memetic.algorithm.components.MemeticSequentialEvaluation;
+import com.uniovi.sercheduler.memetic.algorithm.components.MemeticTermination;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
-import org.uma.jmetal.component.algorithm.EvolutionaryAlgorithm;
-import org.uma.jmetal.component.algorithm.singleobjective.GeneticAlgorithmBuilder;
+
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.SequentialEvaluation;
 import org.uma.jmetal.component.catalogue.common.termination.Termination;
 import org.uma.jmetal.lab.experiment.Experiment;
@@ -210,19 +215,21 @@ public class CommandUtils {
                                                                                   int populationSize, int offspringPopulationSize,
                                                                                   CrossoverOperator<SchedulePermutationSolution> crossover,
                                                                                   MutationOperator<SchedulePermutationSolution> mutation,
-                                                                                  Termination termination, Random random,
-                                                                                  List<Objective> objectives) {
+                                                                                  MemeticTermination termination, Random random,
+                                                                                  List<Objective> objectives, MemeticObserver observer, String fileName) {
         return new GeneticAlgorithmBuilder<>(
                 "GGA",
                 problem,
                 populationSize,
                 offspringPopulationSize,
                 crossover,
-                mutation)
+                mutation,
+                fileName)
                 .setTermination(termination)
-                .setEvaluation(new SequentialEvaluation<>(problem)) //TODO: aquí había una llamada al método privado "getEvaluator()"
-                .setSelection(new ScheduleSelection(random))
-                .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
+                .setEvaluation(new MemeticSequentialEvaluation<>(problem)) //TODO: aquí había una llamada al método privado "getEvaluator()"
+                .setSelection(new MemeticScheduleSelection(random))
+                .setReplacement(new MemeticScheduleReplacement(random, objectives.get(0)))
+                .setObserver(observer)
                 .build();
     }
 

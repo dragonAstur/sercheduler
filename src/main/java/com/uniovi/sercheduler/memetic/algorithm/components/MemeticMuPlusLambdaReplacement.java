@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class MemeticMuPlusLambdaReplacement<S extends Solution<?>> implements Replacement<S> {
+public class MemeticMuPlusLambdaReplacement<S extends Solution<?>> implements MemeticReplacement<S> {
     protected Comparator<S> comparator;
 
     public MemeticMuPlusLambdaReplacement(Comparator<S> comparator) {

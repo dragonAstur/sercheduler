@@ -3,6 +3,11 @@ package com.uniovi.sercheduler.memetic.algorithm;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
+import com.uniovi.sercheduler.memetic.algorithm.components.*;
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.component.catalogue.common.solutionscreation.SolutionsCreation;
@@ -17,12 +22,12 @@ import org.uma.jmetal.util.observable.impl.DefaultObservable;
 
 public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<List<S>>, ObservableEntity<Map<String, Object>> {
     private List<S> population;
-    private Evaluation<S> evaluation;
-    private SolutionsCreation<S> createInitialPopulation;
-    private Termination termination;
-    private Selection<S> selection;
-    private Variation<S> variation;
-    private Replacement<S> replacement;
+    private MemeticEvaluation<S> evaluation;
+    private MemeticSolutionsCreation<S> createInitialPopulation;
+    private MemeticTermination termination;
+    private MemeticSelection<S> selection;
+    private MemeticVariation<S> variation;
+    private MemeticReplacement<S> replacement;
     private final Map<String, Object> attributes;
     private long initTime;
     private long totalComputingTime;
@@ -30,7 +35,12 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
     private final Observable<Map<String, Object>> observable;
     private final String name;
 
-    public EvolutionaryAlgorithm(String name, SolutionsCreation<S> initialPopulationCreation, Evaluation<S> evaluation, Termination termination, Selection<S> selection, Variation<S> variation, Replacement<S> replacement) {
+    private MemeticObserver observer;
+    private final String fileName;
+
+    public EvolutionaryAlgorithm(String name, MemeticSolutionsCreation<S> initialPopulationCreation, MemeticEvaluation<S> evaluation,
+                                 MemeticTermination termination, MemeticSelection<S> selection, MemeticVariation<S> variation,
+                                 MemeticReplacement<S> replacement, MemeticObserver observer, String fileName) {
         this.name = name;
         this.createInitialPopulation = initialPopulationCreation;
         this.evaluation = evaluation;
@@ -40,9 +50,15 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
         this.replacement = replacement;
         this.observable = new DefaultObservable<>("Evolutionary Algorithm");
         this.attributes = new HashMap<>();
+
+        this.observer = observer;
+        this.fileName = fileName;
     }
 
     public void run() {
+
+        this.observer.startRun(System.currentTimeMillis());
+
         this.initTime = System.currentTimeMillis();
         this.population = this.createInitialPopulation.create();
         this.population = this.evaluation.evaluate(this.population);
@@ -53,10 +69,23 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
             List<S> offspringPopulation = this.variation.variate(this.population, matingPopulation);
             offspringPopulation = this.evaluation.evaluate(offspringPopulation);
             this.population = this.replacement.replace(this.population, offspringPopulation);
+
+            observer.updateMemeticEvolution(
+                    this.population.stream().mapToDouble(x -> x.objectives()[0]).min().orElse(-1),
+                    0,
+                    0
+            );
+
             this.updateProgress();
+
+            this.observer.endMemeticIteration();
         }
 
         this.totalComputingTime = System.currentTimeMillis() - this.initTime;
+
+        observer.endRun();
+
+        XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);
     }
 
     protected void initProgress() {
@@ -116,19 +145,19 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
         return this.observable;
     }
 
-    public void termination(Termination termination) {
+    public void termination(MemeticTermination termination) {
         this.termination = termination;
     }
 
-    public Termination termination() {
+    public MemeticTermination termination() {
         return this.termination;
     }
 
-    public void evaluation(Evaluation<S> evaluation) {
+    public void evaluation(MemeticEvaluation<S> evaluation) {
         this.evaluation = evaluation;
     }
 
-    public Evaluation<S> evaluation() {
+    public MemeticEvaluation<S> evaluation() {
         return this.evaluation;
     }
 }

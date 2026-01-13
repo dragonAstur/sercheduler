@@ -12,10 +12,12 @@ public class GeneticRunnable {
     public static Long SEED = 1L;
     public static String EXPERIMENT_PATH = "experiments/pelayo/1";
     public static String EXPERIMENT_CONFIG = "experiments/pelayo/1/experimentConfig.json";
+    public static final long PERIODIC_TIME = 100;
+    public static final String FILE_NAME = "pelayo_genetic";
 
     public static void main(String[] args) {
 
-        executeGenetic(WORKFLOWS_PATH, HOSTS_PATH, TYPE, LIMIT_TIME, SEED, EXPERIMENT_PATH, EXPERIMENT_CONFIG);
+        executeGenetic(WORKFLOWS_PATH, HOSTS_PATH, TYPE, LIMIT_TIME, SEED, EXPERIMENT_PATH, EXPERIMENT_CONFIG, PERIODIC_TIME, FILE_NAME);
 
     }
 }
