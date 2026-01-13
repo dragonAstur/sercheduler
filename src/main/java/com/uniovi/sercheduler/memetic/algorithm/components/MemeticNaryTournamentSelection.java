@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.memetic.algorithm.components;
 
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.component.catalogue.ea.selection.Selection;
 import org.uma.jmetal.component.util.RankingAndDensityEstimatorPreference;
 import org.uma.jmetal.solution.Solution;
@@ -30,7 +31,7 @@ public class MemeticNaryTournamentSelection<S extends Solution<?>> implements Me
         this.matingPoolSize = matingPoolSize;
     }
 
-    public List<S> select(List<S> solutionList) {
+    public List<S> select(List<S> solutionList, MemeticObserver observer) {
         if (null != this.preference) {
             this.preference.recompute(solutionList);
         }

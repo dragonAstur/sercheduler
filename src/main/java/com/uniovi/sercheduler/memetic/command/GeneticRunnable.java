@@ -13,7 +13,7 @@ public class GeneticRunnable {
     public static String EXPERIMENT_PATH = "experiments/pelayo/1";
     public static String EXPERIMENT_CONFIG = "experiments/pelayo/1/experimentConfig.json";
     public static final long PERIODIC_TIME = 100;
-    public static final String FILE_NAME = "pelayo_genetic";
+    public static final String FILE_NAME = "pelayo";
 
     public static void main(String[] args) {
 

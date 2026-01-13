@@ -61,14 +61,14 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
 
         this.initTime = System.currentTimeMillis();
         this.population = this.createInitialPopulation.create();
-        this.population = this.evaluation.evaluate(this.population);
+        this.population = this.evaluation.evaluate(this.population, observer);
         this.initProgress();
 
         while(!this.termination.isMet(this.attributes)) {
-            List<S> matingPopulation = this.selection.select(this.population);
-            List<S> offspringPopulation = this.variation.variate(this.population, matingPopulation);
-            offspringPopulation = this.evaluation.evaluate(offspringPopulation);
-            this.population = this.replacement.replace(this.population, offspringPopulation);
+            List<S> matingPopulation = this.selection.select(this.population, observer);
+            List<S> offspringPopulation = this.variation.variate(this.population, matingPopulation, observer);
+            offspringPopulation = this.evaluation.evaluate(offspringPopulation, observer);
+            this.population = this.replacement.replace(this.population, offspringPopulation, observer);
 
             observer.updateMemeticEvolution(
                     this.population.stream().mapToDouble(x -> x.objectives()[0]).min().orElse(-1),

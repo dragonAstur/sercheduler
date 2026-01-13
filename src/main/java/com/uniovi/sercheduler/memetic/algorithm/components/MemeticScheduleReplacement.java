@@ -2,6 +2,7 @@ package com.uniovi.sercheduler.memetic.algorithm.components;
 
 import com.uniovi.sercheduler.dao.Objective;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.component.catalogue.ea.replacement.Replacement;
 
 import java.util.*;
@@ -30,7 +31,7 @@ public class MemeticScheduleReplacement implements MemeticReplacement<SchedulePe
      */
     @Override
     public List<SchedulePermutationSolution> replace(
-            List<SchedulePermutationSolution> parents, List<SchedulePermutationSolution> children) {
+            List<SchedulePermutationSolution> parents, List<SchedulePermutationSolution> children, MemeticObserver observer) {
         var replacement = new ArrayList<SchedulePermutationSolution>();
         for (int i = 0; i < parents.size(); i = i + 2) {
             var parent1 = parents.get(i);

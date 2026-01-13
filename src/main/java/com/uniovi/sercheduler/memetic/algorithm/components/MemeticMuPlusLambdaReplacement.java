@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.memetic.algorithm.components;
 
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.component.catalogue.ea.replacement.Replacement;
 import org.uma.jmetal.solution.Solution;
 
@@ -14,7 +15,7 @@ public class MemeticMuPlusLambdaReplacement<S extends Solution<?>> implements Me
         this.comparator = comparator;
     }
 
-    public List<S> replace(List<S> population, List<S> offspringPopulation) {
+    public List<S> replace(List<S> population, List<S> offspringPopulation, MemeticObserver observer) {
         List<S> jointPopulation = new ArrayList();
         jointPopulation.addAll(population);
         jointPopulation.addAll(offspringPopulation);

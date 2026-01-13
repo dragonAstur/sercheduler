@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.memetic.algorithm.components;
 
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
 import org.uma.jmetal.operator.mutation.MutationOperator;
 import org.uma.jmetal.solution.Solution;
@@ -28,7 +29,7 @@ public class MemeticCrossoverAndMutationVariation<S extends Solution<?>> impleme
 
     }
 
-    public List<S> variate(List<S> population, List<S> matingPopulation) {
+    public List<S> variate(List<S> population, List<S> matingPopulation, MemeticObserver observer) {
         int numberOfParents = this.crossover.numberOfRequiredParents();
         this.checkNumberOfParents(matingPopulation, numberOfParents);
         List<S> offspringPopulation = new ArrayList(this.offspringPopulationSize);

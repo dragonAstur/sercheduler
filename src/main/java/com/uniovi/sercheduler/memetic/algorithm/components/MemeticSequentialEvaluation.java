@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.memetic.algorithm.components;
 
+import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.Solution;
@@ -18,7 +19,7 @@ public class MemeticSequentialEvaluation<S extends Solution<?>> implements Memet
         this.computedEvaluations = 0;
     }
 
-    public List<S> evaluate(List<S> solutionList) {
+    public List<S> evaluate(List<S> solutionList, MemeticObserver observer) {
         Check.notNull(solutionList);
         Problem var10001 = this.problem;
         Objects.requireNonNull(var10001);
