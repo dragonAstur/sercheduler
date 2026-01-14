@@ -14,6 +14,7 @@ import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.Termi
 import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
+import com.uniovi.sercheduler.memetic.algorithm.components.MemeticEvaluation;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
@@ -31,7 +32,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
 
     private List<SchedulePermutationSolution> population;
-    private Evaluation<SchedulePermutationSolution> evaluation;
+    private MemeticEvaluation<SchedulePermutationSolution> evaluation;
     private SolutionsCreation<SchedulePermutationSolution> createInitialPopulation;
     private Termination termination;
     private Selection<SchedulePermutationSolution> selection;
@@ -52,7 +53,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
     private final String fileName;
 
 
-    public MemeticAlgorithm(String name, SolutionsCreation<SchedulePermutationSolution> initialPopulationCreation, Evaluation<SchedulePermutationSolution> evaluation,
+    public MemeticAlgorithm(String name, SolutionsCreation<SchedulePermutationSolution> initialPopulationCreation, MemeticEvaluation<SchedulePermutationSolution> evaluation,
                             Termination termination, Selection<SchedulePermutationSolution> selection, Variation<SchedulePermutationSolution> variation, Replacement<SchedulePermutationSolution> replacement,
                             LocalSearchAlgorithm lsa, List<NeighborhoodOperatorLazy> operatorList, MemeticObserver observer,
                             String fileName) {
@@ -81,14 +82,14 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         observer.startRun(this.initTime);
 
         this.population = this.createInitialPopulation.create();
-        this.population = this.evaluation.evaluate(this.population);
+        this.population = this.evaluation.evaluate(this.population, observer);
         initProgress();
 
         while(!this.termination.isMet(this.attributes)) {
 
             List<SchedulePermutationSolution> matingPopulation = this.selection.select(this.population);
             List<SchedulePermutationSolution> offspringPopulation = this.variation.variate(this.population, matingPopulation);
-            offspringPopulation = this.evaluation.evaluate(offspringPopulation);
+            offspringPopulation = this.evaluation.evaluate(offspringPopulation, observer);
             this.population = this.replacement.replace(this.population, offspringPopulation);
 
             observer.updateMemeticEvolution(
@@ -216,11 +217,11 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         return this.termination;
     }
 
-    public void evaluation(Evaluation<SchedulePermutationSolution> evaluation) {
+    public void evaluation(MemeticEvaluation<SchedulePermutationSolution> evaluation) {
         this.evaluation = evaluation;
     }
 
-    public Evaluation<SchedulePermutationSolution> evaluation() {
+    public MemeticEvaluation<SchedulePermutationSolution> evaluation() {
         return this.evaluation;
     }
 }

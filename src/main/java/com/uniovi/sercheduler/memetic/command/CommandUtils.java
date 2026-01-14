@@ -251,7 +251,7 @@ public class CommandUtils {
                 lsaIterationsLimit,
                 fileName)
                 .setTermination(termination)
-                .setEvaluation(new SequentialEvaluation<>(problem)) //TODO: aquí había una llamada al método privado "getEvaluator()"
+                .setEvaluation(new MemeticSequentialEvaluation<>(problem)) //TODO: aquí había una llamada al método privado "getEvaluator()"
                 .setSelection(new ScheduleSelection(random))
                 .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
                 .setObserver(observer)

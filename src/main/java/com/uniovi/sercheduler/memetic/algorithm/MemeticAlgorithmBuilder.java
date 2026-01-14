@@ -7,6 +7,8 @@ import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.Initi
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.TerminationCriterion;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.UpgradeIterationAndTimeLimitTermination;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
+import com.uniovi.sercheduler.memetic.algorithm.components.MemeticEvaluation;
+import com.uniovi.sercheduler.memetic.algorithm.components.MemeticSequentialEvaluation;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.SequentialEvaluation;
@@ -30,7 +32,7 @@ public class MemeticAlgorithmBuilder {
 
 
     private final String name;
-    private Evaluation<SchedulePermutationSolution> evaluation;
+    private MemeticEvaluation<SchedulePermutationSolution> evaluation;
     private final SolutionsCreation<SchedulePermutationSolution> createInitialPopulation;
     private Termination termination;
     private Selection<SchedulePermutationSolution> selection;
@@ -57,7 +59,7 @@ public class MemeticAlgorithmBuilder {
         this.variation = new CrossoverAndMutationVariation<>(offspringPopulationSize, crossover, mutation);
         this.selection = new NaryTournamentSelection<>(2, this.variation.getMatingPoolSize(), new ObjectiveComparator<>(0));
         this.termination = new TerminationByEvaluations(25000);
-        this.evaluation = new SequentialEvaluation<>(problem);
+        this.evaluation = new MemeticSequentialEvaluation<>(problem);
 
         TerminationCriterion terminationCriterion = new UpgradeIterationAndTimeLimitTermination(limitTime, lsaIterationsLimit);
         this.initialSolutionGenerator = new InitialSolutionGeneratorSpecified();
@@ -86,7 +88,7 @@ public class MemeticAlgorithmBuilder {
         return this;
     }
 
-    public MemeticAlgorithmBuilder setEvaluation(Evaluation<SchedulePermutationSolution> evaluation) {
+    public MemeticAlgorithmBuilder setEvaluation(MemeticEvaluation<SchedulePermutationSolution> evaluation) {
         this.evaluation = evaluation;
         return this;
     }
