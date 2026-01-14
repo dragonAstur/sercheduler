@@ -23,7 +23,17 @@ public class MemeticSequentialEvaluation<S extends Solution<?>> implements Memet
         Check.notNull(solutionList);
         Problem var10001 = this.problem;
         Objects.requireNonNull(var10001);
-        solutionList.forEach(var10001::evaluate);
+        //solutionList.forEach(var10001::evaluate);
+
+        for(S s : solutionList){
+            var10001.evaluate(s);
+            observer.updateMemeticEvolution(
+                    observer.lastRecordedMakespan(),
+                    0,
+                    0
+            );
+        }
+
         this.computedEvaluations = solutionList.size();
         return solutionList;
     }
