@@ -67,7 +67,7 @@ public class MemeticCommand {
         ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
         fileName = CommandUtils.createFileName(fileName, "memetic", limitTime, periodicTimeForMakespanEvolution,
-                experimentConfig, operatorConfig, String.valueOf(lsaIterationsLimit));
+                experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit));
 
         var benchmarks = experimentConfig.workflows();
 

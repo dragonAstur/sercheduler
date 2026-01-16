@@ -370,7 +370,7 @@ public class CommandUtils {
     }
 
     public static String createFileName(String originalFileName, String algorithmName, Long limitTime, long periodicTimeForMakespanEvolution,
-                                        ExperimentConfig experimentConfig, String operatorConfig, String lsaIterationsLimit){
+                                        ExperimentConfig experimentConfig, String operatorConfig, String strategy, String lsaIterationsLimit){
 
         if(!originalFileName.equals(CommandUtils.DEFAULT_FILE_NAME)){
             return originalFileName;
@@ -383,7 +383,7 @@ public class CommandUtils {
 
 
         return algorithmName + "_" + limitTime / 1000 + "(s)_" + periodicTimeForMakespanEvolution + "(ms)_"
-                + experimentConfig.maxHosts() + "_" + operatorConfig + "_HC_" + lsaIterationsLimit + "_" + experimentConfig.workflows().get(0)
+                + experimentConfig.maxHosts() + "_" + operatorConfig + "_" + strategy + "_" + lsaIterationsLimit + "_" + experimentConfig.workflows().get(0)
                 + "_" + date + "_" + time + "_" + id;
 
     }

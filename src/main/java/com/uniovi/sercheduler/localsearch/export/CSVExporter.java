@@ -242,7 +242,7 @@ public class CSVExporter {
                     ";" +
                     "Operator config" +
                     ";" +
-                    "Memetic iteration" +
+                    "Algorithm iteration" +
                     ";" +
                     "Periodic time" +
                     ";" +

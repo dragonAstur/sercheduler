@@ -75,7 +75,7 @@ public class GeneticCommand {
     ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
     fileName = CommandUtils.createFileName(fileName, "genetic", limitTime, periodicTimeForMakespanEvolution,
-            experimentConfig, "none", "none");
+            experimentConfig, "none", "none", "none");
 
     var benchmarks = experimentConfig.workflows();
 
