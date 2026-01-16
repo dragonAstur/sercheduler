@@ -372,12 +372,12 @@ public class CommandUtils {
     public static String createFileName(String originalFileName, String algorithmName, Long limitTime, long periodicTimeForMakespanEvolution,
                                         ExperimentConfig experimentConfig, String operatorConfig, int lsaIterationsLimit){
 
-        if(originalFileName.equals(CommandUtils.DEFAULT_FILE_NAME)){
+        if(!originalFileName.equals(CommandUtils.DEFAULT_FILE_NAME)){
             return originalFileName;
         }
 
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yy"));
-        String time  = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String time  = LocalTime.now().format(DateTimeFormatter.ofPattern("HH-mm"));
 
         int id = new Random().nextInt(100000) + 1;
 

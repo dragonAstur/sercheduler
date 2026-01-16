@@ -250,7 +250,7 @@ public class CSVExporter {
                     ";" +
                     "Actual makespan" +
                     ";" +
-                    "Best makespan in this run";
+                    "Best makespan in this run\n";
 
             writer.write(newLine);
 
