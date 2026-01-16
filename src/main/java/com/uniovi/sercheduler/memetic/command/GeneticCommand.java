@@ -72,9 +72,10 @@ public class GeneticCommand {
                                       String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
                                       String fileName) {
 
-    fileName = "genetic-" + fileName;
+    ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
-    var experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
+    fileName = CommandUtils.createFileName(fileName, "genetic", limitTime, periodicTimeForMakespanEvolution,
+            experimentConfig, "none", "none");
 
     var benchmarks = experimentConfig.workflows();
 

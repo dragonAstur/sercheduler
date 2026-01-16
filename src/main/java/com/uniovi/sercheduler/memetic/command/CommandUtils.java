@@ -370,7 +370,7 @@ public class CommandUtils {
     }
 
     public static String createFileName(String originalFileName, String algorithmName, Long limitTime, long periodicTimeForMakespanEvolution,
-                                        ExperimentConfig experimentConfig, String operatorConfig, int lsaIterationsLimit){
+                                        ExperimentConfig experimentConfig, String operatorConfig, String lsaIterationsLimit){
 
         if(!originalFileName.equals(CommandUtils.DEFAULT_FILE_NAME)){
             return originalFileName;
