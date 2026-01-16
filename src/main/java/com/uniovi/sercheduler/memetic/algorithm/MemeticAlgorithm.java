@@ -11,6 +11,7 @@ import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalS
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGenerator;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.TerminationCriterion;
+import com.uniovi.sercheduler.localsearch.export.CSVExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
@@ -108,7 +109,8 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
         observer.endRun();
 
-        XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);
+        //XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);
+        CSVExporter.appendMemeticCSV(fileName, observer);
 
     }
 

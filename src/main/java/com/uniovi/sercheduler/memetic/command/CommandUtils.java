@@ -33,12 +33,17 @@ import org.uma.jmetal.qualityindicator.impl.hypervolume.impl.PISAHypervolume;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CommandUtils {
+
+    public static final String DEFAULT_FILE_NAME = "experiment";
 
     protected static void computeStatistics(
             Experiment<SchedulePermutationSolution, List<SchedulePermutationSolution>> experiment,
@@ -362,6 +367,25 @@ public class CommandUtils {
                     ));
                     default -> new ArrayList<>();
                 };
+    }
+
+    public static String createFileName(String originalFileName, String algorithmName, Long limitTime, long periodicTimeForMakespanEvolution,
+                                        ExperimentConfig experimentConfig, String operatorConfig, int lsaIterationsLimit){
+
+        if(originalFileName.equals(CommandUtils.DEFAULT_FILE_NAME)){
+            return originalFileName;
+        }
+
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yy"));
+        String time  = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        int id = new Random().nextInt(100000) + 1;
+
+
+        return algorithmName + "_" + limitTime / 1000 + "(s)_" + periodicTimeForMakespanEvolution + "(ms)_"
+                + experimentConfig.maxHosts() + "_" + operatorConfig + "_HC_" + lsaIterationsLimit + "_" + experimentConfig.workflows().get(0)
+                + "_" + date + "_" + time + "_" + id;
+
     }
 
 }

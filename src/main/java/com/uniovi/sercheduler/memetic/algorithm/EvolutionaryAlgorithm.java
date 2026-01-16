@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.localsearch.export.CSVExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.memetic.algorithm.components.*;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
@@ -85,7 +86,8 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
 
         observer.endRun();
 
-        XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);
+        //XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);
+        CSVExporter.appendMemeticCSV(fileName, observer);
     }
 
     protected void initProgress() {

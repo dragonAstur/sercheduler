@@ -1,10 +1,12 @@
 package com.uniovi.sercheduler.memetic.command;
 
 import com.uniovi.sercheduler.dao.Objective;
+import com.uniovi.sercheduler.dao.experiment.ExperimentConfig;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleCrossover;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
+import com.uniovi.sercheduler.localsearch.export.CSVExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
@@ -50,7 +52,7 @@ public class MemeticCommand {
             @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
             @Option(shortNames = 'C') String experimentConfigFile,
             @Option(shortNames = 'E', defaultValue = "-1") long periodicTimeForMakespanEvolution,
-            @Option(shortNames = 'N', defaultValue = "experiment") String fileName,
+            @Option(shortNames = 'N', defaultValue = CommandUtils.DEFAULT_FILE_NAME) String fileName,
             @Option(shortNames = 'O', defaultValue = "n1") String operatorConfig) {
 
         return executeMemetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
@@ -61,9 +63,11 @@ public class MemeticCommand {
                                         String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
                                         String fileName, String operatorConfig, int lsaIterationsLimit) {
 
-        fileName = "memetic-" + fileName;
 
-        var experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
+        ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
+
+        fileName = CommandUtils.createFileName(fileName, "genetic", limitTime, periodicTimeForMakespanEvolution,
+                experimentConfig, operatorConfig, lsaIterationsLimit);
 
         var benchmarks = experimentConfig.workflows();
 
@@ -85,7 +89,8 @@ public class MemeticCommand {
 
         MemeticObserver observer;
 
-        XLSXTableExporter.createMemeticWorkbook(fileName);
+        //XLSXTableExporter.createMemeticWorkbook(fileName);
+        CSVExporter.createMemeticCSV(fileName);
 
 
         for (var benchmark : benchmarks) {

@@ -8,6 +8,7 @@ import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleSelection;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
+import com.uniovi.sercheduler.localsearch.export.CSVExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.memetic.algorithm.components.MemeticTermination;
 import com.uniovi.sercheduler.memetic.algorithm.components.MemeticTerminationByComputingTime;
@@ -95,7 +96,8 @@ public class GeneticCommand {
 
     MemeticObserver observer;
 
-    XLSXTableExporter.createMemeticWorkbook(fileName);
+    //XLSXTableExporter.createMemeticWorkbook(fileName);
+    CSVExporter.createMemeticCSV(fileName);
 
     for (var benchmark : benchmarks) {
 
