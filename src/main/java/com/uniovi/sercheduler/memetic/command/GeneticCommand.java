@@ -74,8 +74,10 @@ public class GeneticCommand {
 
     ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
+    int id = CommandUtils.generateRunId();
+
     fileName = CommandUtils.createFileName(fileName, "genetic", limitTime, periodicTimeForMakespanEvolution,
-            experimentConfig, "none", "none", "none");
+            experimentConfig, "none", "none", "none", id);
 
     var benchmarks = experimentConfig.workflows();
 
@@ -83,7 +85,7 @@ public class GeneticCommand {
 
     var fitness = experimentConfig.fitness();
 
-    var experimentBaseDirectory = experimentPath + "/executions";
+    var experimentBaseDirectory = experimentPath + "/executions-" + id;
     double mutationProbability = 0.1;
     int populationSize = 100;
     int offspringPopulationSize = 100;

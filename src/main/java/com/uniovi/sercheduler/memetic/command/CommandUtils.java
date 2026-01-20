@@ -369,8 +369,13 @@ public class CommandUtils {
                 };
     }
 
+    public static int generateRunId(){
+        return new Random().nextInt(100000) + 1;
+    }
+
     public static String createFileName(String originalFileName, String algorithmName, Long limitTime, long periodicTimeForMakespanEvolution,
-                                        ExperimentConfig experimentConfig, String operatorConfig, String strategy, String lsaIterationsLimit){
+                                        ExperimentConfig experimentConfig, String operatorConfig, String strategy,
+                                        String lsaIterationsLimit, int id){
 
         if(!originalFileName.equals(CommandUtils.DEFAULT_FILE_NAME)){
             return originalFileName;
@@ -378,8 +383,6 @@ public class CommandUtils {
 
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yy"));
         String time  = LocalTime.now().format(DateTimeFormatter.ofPattern("HH-mm"));
-
-        int id = new Random().nextInt(100000) + 1;
 
 
         return algorithmName + "_" + limitTime / 1000 + "(s)_" + periodicTimeForMakespanEvolution + "(ms)_"

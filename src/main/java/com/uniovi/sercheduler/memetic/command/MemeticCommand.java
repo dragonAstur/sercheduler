@@ -66,8 +66,10 @@ public class MemeticCommand {
 
         ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
+        int id = CommandUtils.generateRunId();
+
         fileName = CommandUtils.createFileName(fileName, "memetic", limitTime, periodicTimeForMakespanEvolution,
-                experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit));
+                experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit), id);
 
         var benchmarks = experimentConfig.workflows();
 
@@ -75,7 +77,7 @@ public class MemeticCommand {
 
         var fitness = experimentConfig.fitness();
 
-        var experimentBaseDirectory = experimentPath + "/executions";
+        var experimentBaseDirectory = experimentPath + "/executions-" + id;
         double mutationProbability = 0.1;
         int populationSize = 100;
         int offspringPopulationSize = 100;
