@@ -50,6 +50,12 @@ public class MemeticCrossoverAndMutationVariation<S extends Solution<?>> impleme
                     break;
                 }
             }
+
+            observer.updateMemeticEvolution(
+                    observer.lastRecordedMakespan(),
+                    0,
+                    0
+            );
         }
 
         boolean var10000 = offspringPopulation.size() == this.offspringPopulationSize;
