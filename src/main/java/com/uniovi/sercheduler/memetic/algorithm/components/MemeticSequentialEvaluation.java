@@ -1,7 +1,6 @@
 package com.uniovi.sercheduler.memetic.algorithm.components;
 
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
-import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.util.errorchecking.Check;
@@ -21,14 +20,19 @@ public class MemeticSequentialEvaluation<S extends Solution<?>> implements Memet
 
     public List<S> evaluate(List<S> solutionList, MemeticObserver observer) {
         Check.notNull(solutionList);
-        Problem var10001 = this.problem;
+        Problem<S> var10001 = this.problem;
         Objects.requireNonNull(var10001);
         //solutionList.forEach(var10001::evaluate);
 
+        double bestMakespan = observer.lastRecordedMakespan();
+
         for(S s : solutionList){
             var10001.evaluate(s);
+
+            bestMakespan = Math.min(s.objectives()[0], bestMakespan);
+
             observer.updateMemeticEvolution(
-                    observer.lastRecordedMakespan(),
+                    bestMakespan,
                     0,
                     0
             );
