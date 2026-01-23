@@ -7,6 +7,8 @@ import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.Initi
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.TerminationCriterion;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.UpgradeIterationAndTimeLimitTermination;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
+import com.uniovi.sercheduler.memetic.algorithm.components.ElitistLsaApplier;
+import com.uniovi.sercheduler.memetic.algorithm.components.LsaApplier;
 import com.uniovi.sercheduler.memetic.algorithm.components.MemeticEvaluation;
 import com.uniovi.sercheduler.memetic.algorithm.components.MemeticSequentialEvaluation;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
@@ -45,6 +47,8 @@ public class MemeticAlgorithmBuilder {
     private MemeticObserver observer;
     private final String fileName;
 
+    private LsaApplier lsaApplier;
+
     public MemeticAlgorithmBuilder(String name, SchedulingProblem problem, int populationSize,
                                    int offspringPopulationSize,
                                    CrossoverOperator<SchedulePermutationSolution> crossover,
@@ -70,6 +74,8 @@ public class MemeticAlgorithmBuilder {
                 .terminationCriterion(terminationCriterion)
                 .initialSolutionGenerator(this.initialSolutionGenerator)
                 .build();
+
+        this.lsaApplier = new ElitistLsaApplier();
 
     }
 
@@ -108,9 +114,15 @@ public class MemeticAlgorithmBuilder {
         return this;
     }
 
+    public MemeticAlgorithmBuilder setLsaApplier(LsaApplier lsaApplier){
+        this.lsaApplier = lsaApplier;
+        return this;
+    }
+
     public MemeticAlgorithm build() {
         return new MemeticAlgorithm(this.name, this.createInitialPopulation, this.evaluation, this.termination,
-                this.selection, this.variation, this.replacement, this.lsa, this.operatorList, this.observer, this.fileName) {
+                this.selection, this.variation, this.replacement, this.lsa, this.operatorList, this.observer,
+                this.fileName, this.lsaApplier) {
             @Override
             public void updateProgress() {
                 SchedulePermutationSolution bestFitnessSolution = this.population().stream().min(new ObjectiveComparator<>(0)).get();

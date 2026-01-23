@@ -15,6 +15,7 @@ import com.uniovi.sercheduler.localsearch.export.CSVExporter;
 import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.observer.LocalSearchObserver;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
+import com.uniovi.sercheduler.memetic.algorithm.components.LsaApplier;
 import com.uniovi.sercheduler.memetic.algorithm.components.MemeticEvaluation;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.algorithm.Algorithm;
@@ -53,11 +54,13 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
     private final String fileName;
 
+    private final LsaApplier lsaApplier;
+
 
     public MemeticAlgorithm(String name, SolutionsCreation<SchedulePermutationSolution> initialPopulationCreation, MemeticEvaluation<SchedulePermutationSolution> evaluation,
                             Termination termination, Selection<SchedulePermutationSolution> selection, Variation<SchedulePermutationSolution> variation, Replacement<SchedulePermutationSolution> replacement,
                             LocalSearchAlgorithm lsa, List<NeighborhoodOperatorLazy> operatorList, MemeticObserver observer,
-                            String fileName) {
+                            String fileName, LsaApplier lsaApplier) {
         this.name = name;
         this.createInitialPopulation = initialPopulationCreation;
         this.evaluation = evaluation;
@@ -74,6 +77,8 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         this.operatorList = operatorList;
 
         this.fileName = fileName;
+
+        this. lsaApplier = lsaApplier;
     }
 
     public void run() {
@@ -99,7 +104,8 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
                     0
             );
 
-            applyLSAToBest(this.population, observer);
+            lsaApplier.applyLSA(this.population, this.lsa, this.operatorList, this.observer);
+
             this.updateProgress();
 
             this.observer.endMemeticIteration();
@@ -114,36 +120,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
     }
 
-    private void applyLSAToBest(List<SchedulePermutationSolution> population, MemeticObserver observer) {
-
-        int bestIndex =
-                getBestSolutionPos(population);
-
-        //Usar el initial solution generator
-        SchedulePermutationSolution bestSolution = population.get(bestIndex);
-
-        observer.updateMemeticEvolution(
-                bestSolution.getFitnessInfo().fitness().get("makespan"),
-                0,
-                0
-        );
-
-        this.lsa.setInitialSolution(bestSolution);
-
-        SchedulePermutationSolution enhancedBestSolution = this.lsa.runLocalSearchLazy(this.operatorList,
-                observer);
-
-        population.set(bestIndex, enhancedBestSolution);
-
-        observer.updateMemeticEvolution(
-                enhancedBestSolution.getFitnessInfo().fitness().get("makespan"),
-                0,
-                0
-        );
-
-    }
-
-    private static Integer getBestSolutionPos(List<SchedulePermutationSolution> population) {
+    public static Integer getBestSolutionPos(List<SchedulePermutationSolution> population) {
         return IntStream.range(0, population.size())
                 .boxed()
                 .min(Comparator.comparingDouble(
@@ -226,4 +203,5 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
     public MemeticEvaluation<SchedulePermutationSolution> evaluation() {
         return this.evaluation;
     }
+
 }
