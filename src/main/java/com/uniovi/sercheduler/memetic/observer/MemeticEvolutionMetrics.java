@@ -31,6 +31,8 @@ public class MemeticEvolutionMetrics {
 
     public void update(long memeticStartingTime, int memeticIterationNumber, double actualMakespan){
 
+        updateBestMakespan(actualMakespan);
+
         if(this.periodicTimeForMakespanEvolution > 0L) {
 
             long actualTime = System.currentTimeMillis();
@@ -53,12 +55,14 @@ public class MemeticEvolutionMetrics {
         }
     }
 
+    private void updateBestMakespan(double actualMakespan){
+        this.bestMakespan = Math.min(actualMakespan, this.bestMakespan);
+    }
+
     private void saveMetrics(int memeticIterationNumber, long instant, double actualMakespan){
 
         this.memeticIterationNumberList.add(memeticIterationNumber);
         this.instants.add(instant);
-
-        this.bestMakespan = Math.min(actualMakespan, this.bestMakespan);
 
         this.bestMakespanEvolution.add(this.bestMakespan);
         this.actualMakespanEvolution.add(actualMakespan);

@@ -7,7 +7,6 @@ import com.uniovi.sercheduler.jmetal.operator.ScheduleMutation;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.export.CSVExporter;
-import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import com.uniovi.sercheduler.parser.experiment.ExperimentConfigLoader;
@@ -48,32 +47,33 @@ public class MemeticCommand {
             @Option(shortNames = 'T') String type,
             @Option(shortNames = 'L', defaultValue = "100000") Long limitTime,
             @Option(defaultValue = "3") int lsaIterationsLimit,
-            @Option(shortNames = 'S', defaultValue = "1") Long seed,
+            @Option(shortNames = 'S', defaultValue = "0") Long seed,
             @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
             @Option(shortNames = 'C') String experimentConfigFile,
             @Option(shortNames = 'E', defaultValue = "-1") long periodicTimeForMakespanEvolution,
             @Option(shortNames = 'N', defaultValue = CommandUtils.DEFAULT_FILE_NAME) String fileName,
-            @Option(shortNames = 'O', defaultValue = "n1") String operatorConfig) {
+            @Option(shortNames = 'O', defaultValue = "n1") String operatorConfig,
+            @Option(shortNames = 'A', defaultValue = "e") String lsaApplierName) {
 
         return executeMemetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
-                periodicTimeForMakespanEvolution, fileName, operatorConfig, lsaIterationsLimit);
+                periodicTimeForMakespanEvolution, fileName, operatorConfig, lsaIterationsLimit, lsaApplierName);
     }
 
     public static String executeMemetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
                                         String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
-                                        String fileName, String operatorConfig, int lsaIterationsLimit) {
+                                        String fileName, String operatorConfig, int lsaIterationsLimit, String lsaApplierName) {
 
 
         ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
         int id = CommandUtils.generateRunId();
 
-        fileName = CommandUtils.createFileName(fileName, "memetic", limitTime, periodicTimeForMakespanEvolution,
+        fileName = CommandUtils.createFileName(fileName, CommandUtils.generateMAName(lsaApplierName), limitTime, periodicTimeForMakespanEvolution,
                 experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit), id);
 
         var benchmarks = experimentConfig.workflows();
 
-        Random random = new Random(seed);
+        Random random = CommandUtils.generateRandom(seed);
 
         var fitness = experimentConfig.fitness();
 

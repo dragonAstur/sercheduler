@@ -16,11 +16,13 @@ public class MemeticRunnable {
     public static final String FILE_NAME = "experiment";
     public static final int LSA_ITERATIONS_LIMIT = 3;
 
+    public static final String LSA_APPLIER_NAME = "5";
+
 
     public static void main(String[] args) {
 
         executeMemetic(WORKFLOWS_PATH, HOSTS_PATH, TYPE, LIMIT_TIME, SEED, EXPERIMENT_PATH, EXPERIMENT_CONFIG,
-                PERIODIC_TIME, FILE_NAME, OPERATOR_CONFIG, LSA_ITERATIONS_LIMIT);
+                PERIODIC_TIME, FILE_NAME, OPERATOR_CONFIG, LSA_ITERATIONS_LIMIT, LSA_APPLIER_NAME);
 
     }
 }

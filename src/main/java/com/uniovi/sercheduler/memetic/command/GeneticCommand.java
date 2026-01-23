@@ -58,7 +58,7 @@ public class GeneticCommand {
       @Option(shortNames = 'H') String hostsPath,
       @Option(shortNames = 'T') String type,
       @Option(shortNames = 'L', defaultValue = "10000") Long limitTime,
-      @Option(shortNames = 'S', defaultValue = "1") Long seed,
+      @Option(shortNames = 'S', defaultValue = "0") long seed,
       @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
       @Option(shortNames = 'C') String experimentConfigFile,
       @Option(shortNames = 'E', defaultValue = "-1") long periodicTimeForMakespanEvolution,
@@ -68,7 +68,7 @@ public class GeneticCommand {
             periodicTimeForMakespanEvolution, fileName);
   }
 
-  public static String executeGenetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
+  public static String executeGenetic(String workflowsPath, String hostsPath, String type, Long limitTime, long seed,
                                       String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
                                       String fileName) {
 
@@ -76,12 +76,12 @@ public class GeneticCommand {
 
     int id = CommandUtils.generateRunId();
 
-    fileName = CommandUtils.createFileName(fileName, "genetic", limitTime, periodicTimeForMakespanEvolution,
+    fileName = CommandUtils.createFileName(fileName, "GA", limitTime, periodicTimeForMakespanEvolution,
             experimentConfig, "none", "none", "none", id);
 
     var benchmarks = experimentConfig.workflows();
 
-    Random random = new Random(seed);
+    Random random = CommandUtils.generateRandom(seed);
 
     var fitness = experimentConfig.fitness();
 

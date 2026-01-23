@@ -8,8 +8,8 @@ public class GeneticRunnable {
     public static final String WORKFLOWS_PATH = "experiments/pelayo/1/workflows/";
     public static final String HOSTS_PATH = "experiments/pelayo/1/hosts/";
     public static String TYPE = "scenario1";
-    public static Long LIMIT_TIME = 10000L;
-    public static Long SEED = 1L;
+    public static Long LIMIT_TIME = 60000L;
+    public static Long SEED = 0L;
     public static String EXPERIMENT_PATH = "experiments/pelayo/1";
     public static String EXPERIMENT_CONFIG = "experiments/pelayo/1/experimentConfig.json";
     public static final long PERIODIC_TIME = 100;

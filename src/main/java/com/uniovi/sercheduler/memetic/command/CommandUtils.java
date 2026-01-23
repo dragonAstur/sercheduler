@@ -391,4 +391,16 @@ public class CommandUtils {
 
     }
 
+    public static Random generateRandom(Long seed){
+        return seed == 0 ? new Random() : new Random(seed);
+    }
+
+    public static String generateMAName(String lsaApplierName){
+        return switch (lsaApplierName.toLowerCase()) {
+            case "elitist", "e" -> "MAe";
+            case "5percent", "5" -> "MA5";
+            default -> throw new IllegalArgumentException("Could not find any LSA applier name that matches with " + lsaApplierName);
+        };
+    }
+
 }
