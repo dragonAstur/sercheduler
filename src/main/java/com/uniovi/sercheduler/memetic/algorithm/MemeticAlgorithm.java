@@ -113,6 +113,12 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
         this.totalComputingTime = System.currentTimeMillis() - this.initTime;
 
+        observer.updateMemeticEvolution(
+                this.population.get( getBestSolutionPos(this.population) ).getFitnessInfo().fitness().get("makespan"),
+                0,
+                0
+        );
+
         observer.endRun();
 
         //XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);

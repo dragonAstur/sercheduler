@@ -86,6 +86,12 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
 
         observer.endRun();
 
+        observer.updateMemeticEvolution(
+                this.population.stream().mapToDouble(x -> x.objectives()[0]).min().orElse(-1),
+                0,
+                0
+        );
+
         //XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);
         CSVExporter.appendMemeticCSV(fileName, observer);
     }
