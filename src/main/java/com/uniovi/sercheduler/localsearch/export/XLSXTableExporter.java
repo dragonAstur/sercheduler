@@ -77,7 +77,7 @@ public class XLSXTableExporter {
 
             Sheet sheet = workbook.getSheet(fileName + "_evol");
 
-            for(int i = 0; i < observer.getMemeticEvolutionMetrics().getInstants().size(); i++){
+            for(int i = 0; i < observer.getMemeticEvolutionMetrics().getRealInstants().size(); i++){
 
                 Row row = sheet.createRow(sheet.getLastRowNum() + 1);
 
@@ -85,7 +85,7 @@ public class XLSXTableExporter {
                 row.createCell(1).setCellValue(observer.getOperatorsName());
                 row.createCell(2).setCellValue(observer.getMemeticEvolutionMetrics().getMemeticIterationNumberList().get(i));
                 row.createCell(3).setCellValue(observer.getPeriodicTimeForMakespanEvolution() * (i+1));
-                row.createCell(4).setCellValue(observer.getMemeticEvolutionMetrics().getInstants().get(i));
+                row.createCell(4).setCellValue(observer.getMemeticEvolutionMetrics().getRealInstants().get(i));
                 row.createCell(5).setCellValue(observer.getMemeticEvolutionMetrics().getActualMakespanEvolution().get(i));
                 row.createCell(6).setCellValue(observer.getMemeticEvolutionMetrics().getBestMakespanEvolution().get(i));
             }

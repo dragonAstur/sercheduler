@@ -242,16 +242,14 @@ public class CommandUtils {
                                                List<NeighborhoodOperatorLazy> operatorList,
                                                int lsaIterationsLimit, MemeticObserver observer, String fileName,
                                                String memeticAlgorithmName) {
-        switch(memeticAlgorithmName.toLowerCase()){
-            case "mae":
-                return createMAe(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
-                        random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName);
-            case "ma5":
-                return createMA5(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
-                        random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName);
-            default:
-                throw new IllegalArgumentException("Could not identify this type of memetic algorithm: "  + memeticAlgorithmName);
-        }
+        return switch (memeticAlgorithmName.toLowerCase()) {
+            case "mae" -> createMAe(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
+                    random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName);
+            case "ma5" -> createMA5(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
+                    random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName);
+            default ->
+                    throw new IllegalArgumentException("Could not identify this type of memetic algorithm: " + memeticAlgorithmName);
+        };
     }
 
     private static MemeticAlgorithm createMA5(SchedulingProblem problem, int populationSize, int offspringPopulationSize,
@@ -275,6 +273,7 @@ public class CommandUtils {
                 .setEvaluation(new MemeticSequentialEvaluation<>(problem))
                 .setSelection(new ScheduleSelection(random))
                 .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
+                .setLsaApplier(new PercentageLsaApplier())
                 .setObserver(observer)
                 .build();
     }
@@ -300,7 +299,6 @@ public class CommandUtils {
                 .setEvaluation(new MemeticSequentialEvaluation<>(problem)) //TODO: aquí había una llamada al método privado "getEvaluator()"
                 .setSelection(new ScheduleSelection(random))
                 .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
-                .setLsaApplier(new PercentageLsaApplier())
                 .setObserver(observer)
                 .build();
     }

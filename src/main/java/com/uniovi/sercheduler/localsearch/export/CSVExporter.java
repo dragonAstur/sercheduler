@@ -1,8 +1,6 @@
 package com.uniovi.sercheduler.localsearch.export;
 
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -42,7 +40,7 @@ public class CSVExporter {
 
             StringBuilder newLine = new StringBuilder();
 
-            for(int i = 0; i < observer.getMemeticEvolutionMetrics().getInstants().size(); i++){
+            for(int i = 0; i < observer.getMemeticEvolutionMetrics().getRealInstants().size(); i++){
 
                 newLine.append(observer.getStrategyName())
                         .append(";")
@@ -52,7 +50,7 @@ public class CSVExporter {
                         .append(";")
                         .append(observer.getPeriodicTimeForMakespanEvolution() * (i+1))
                         .append(";")
-                        .append(observer.getMemeticEvolutionMetrics().getInstants().get(i))
+                        .append(observer.getMemeticEvolutionMetrics().getRealInstants().get(i))
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getActualMakespanEvolution().get(i))
                         .append(";")

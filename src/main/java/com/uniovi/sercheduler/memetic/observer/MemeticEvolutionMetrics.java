@@ -7,7 +7,8 @@ public class MemeticEvolutionMetrics {
 
     private final List<Integer> memeticIterationNumberList;
     private final long periodicTimeForMakespanEvolution;
-    private final List<Long> instants;
+    private final List<Long> realInstants;
+    private final List<Long> theoreticalInstants;
     private long lastRecordedTime;
     private double bestMakespan;
     private final List<Double> actualMakespanEvolution;
@@ -21,7 +22,8 @@ public class MemeticEvolutionMetrics {
         this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
 
         this.memeticIterationNumberList = new ArrayList<>();
-        this.instants = new ArrayList<>();
+        this.realInstants = new ArrayList<>();
+        this.theoreticalInstants = new ArrayList<>();
         this.lastRecordedTime = -1;
         this.bestMakespan = Double.MAX_VALUE;
         this.bestMakespanEvolution = new ArrayList<>();
@@ -33,36 +35,59 @@ public class MemeticEvolutionMetrics {
 
         updateBestMakespan(actualMakespan);
 
-        if(this.periodicTimeForMakespanEvolution > 0L) {
+//        if(this.periodicTimeForMakespanEvolution > 0L) {
+//
+//            long actualTime = System.currentTimeMillis();
+//
+//            this.lastRecordedTime = this.lastRecordedTime <= 0 ? memeticStartingTime : this.lastRecordedTime;
+//
+//            long elapsedTime = actualTime - this.lastRecordedTime;
+//
+//            if (elapsedTime >= this.periodicTimeForMakespanEvolution) {
+//
+//                saveMetrics(
+//                        memeticIterationNumber,
+//                        actualTime - memeticStartingTime,
+//                        actualMakespan
+//                );
+//
+//                this.lastRecordedTime = actualTime;
+//            }
+//
+//        }
 
-            long actualTime = System.currentTimeMillis();
+        if(periodicTimeForMakespanEvolution <= 0L)
+            return;
 
-            this.lastRecordedTime = this.lastRecordedTime <= 0 ? memeticStartingTime : this.lastRecordedTime;
+        long actualTime = System.currentTimeMillis();
 
-            long elapsedTime = actualTime - this.lastRecordedTime;
+        long elapsedFromStart = actualTime - memeticStartingTime;
 
-            if (elapsedTime >= this.periodicTimeForMakespanEvolution) {
+        long lastTheoreticalInstant =
+                theoreticalInstants.isEmpty()
+                        ? 0
+                        : theoreticalInstants.get(theoreticalInstants.size() - 1);
 
-                saveMetrics(
-                        memeticIterationNumber,
-                        actualTime - memeticStartingTime,
-                        actualMakespan
-                );
+        long nextTheoreticalInstant = lastTheoreticalInstant + periodicTimeForMakespanEvolution;
 
-                this.lastRecordedTime = actualTime;
-            }
-
-        }
+        if (elapsedFromStart >= nextTheoreticalInstant)
+            saveMetrics(
+                    memeticIterationNumber,
+                    elapsedFromStart,
+                    nextTheoreticalInstant,
+                    actualMakespan
+            );
     }
 
     private void updateBestMakespan(double actualMakespan){
         this.bestMakespan = Math.min(actualMakespan, this.bestMakespan);
     }
 
-    private void saveMetrics(int memeticIterationNumber, long instant, double actualMakespan){
+    private void saveMetrics(int memeticIterationNumber, long realInstant, long theoreticalInstant, double actualMakespan){
 
         this.memeticIterationNumberList.add(memeticIterationNumber);
-        this.instants.add(instant);
+        this.realInstants.add(realInstant);
+        this.theoreticalInstants.add(theoreticalInstant);
 
         this.bestMakespanEvolution.add(this.bestMakespan);
         this.actualMakespanEvolution.add(actualMakespan);
@@ -73,8 +98,11 @@ public class MemeticEvolutionMetrics {
         return memeticIterationNumberList;
     }
 
-    public List<Long> getInstants() {
-        return instants;
+    public List<Long> getRealInstants() {
+        return realInstants;
+    }
+    public List<Long> getTheoreticalInstants() {
+        return theoreticalInstants;
     }
 
     public List<Double> getActualMakespanEvolution() {

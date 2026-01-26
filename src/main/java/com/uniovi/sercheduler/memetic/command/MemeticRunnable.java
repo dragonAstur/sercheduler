@@ -16,7 +16,7 @@ public class MemeticRunnable {
     public static final String FILE_NAME = "experiment";
     public static final int LSA_ITERATIONS_LIMIT = 3;
 
-    public static final String LSA_APPLIER_NAME = "5";
+    public static final String LSA_APPLIER_NAME = "e";
 
 
     public static void main(String[] args) {

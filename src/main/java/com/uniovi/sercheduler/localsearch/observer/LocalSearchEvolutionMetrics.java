@@ -59,20 +59,17 @@ public class LocalSearchEvolutionMetrics {
                         ? 0
                         : theoreticalInstants.get(theoreticalInstants.size() - 1);
 
-        long actualTheoreticalInstant = lastTheoreticalInstant + periodicTimeForMakespanEvolution;
+        long nextTheoreticalInstant = lastTheoreticalInstant + periodicTimeForMakespanEvolution;
 
-        if (elapsedFromStart >= actualTheoreticalInstant) {
-
+        if (elapsedFromStart >= nextTheoreticalInstant)
             saveMetrics(
                     startNumber,
                     iterationNumber,
                     elapsedFromStart,
-                    actualTheoreticalInstant,
+                    nextTheoreticalInstant,
                     actualMakespan,
                     accNumberOfNeighbors
             );
-
-        }
 
     }
 
@@ -81,6 +78,7 @@ public class LocalSearchEvolutionMetrics {
 
         startNumberList.add(startNumber);
         iterationNumberList.add(iterationNumber);
+
         realInstants.add(realInstant);
         theoreticalInstants.add(theoreticalInstant);
 
