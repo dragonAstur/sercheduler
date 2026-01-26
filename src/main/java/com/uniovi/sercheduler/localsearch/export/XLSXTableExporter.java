@@ -394,7 +394,7 @@ public class XLSXTableExporter {
 
                 RunMetrics run = observer.getRuns().get(i);
 
-                for(int j = 0; j < run.localSearchEvolutionMetrics().getInstants().size(); j++){
+                for(int j = 0; j < run.localSearchEvolutionMetrics().getRealInstants().size(); j++){
 
                     Row row = sheet.createRow(sheet.getLastRowNum() + 1);
 
@@ -404,7 +404,7 @@ public class XLSXTableExporter {
                     row.createCell(3).setCellValue(run.localSearchEvolutionMetrics().getStartNumberList().get(j));
                     row.createCell(4).setCellValue(run.localSearchEvolutionMetrics().getIterationNumberList().get(j));
                     row.createCell(5).setCellValue(observer.getPeriodicTimeForMakespanEvolution() * (j+1));
-                    row.createCell(6).setCellValue(run.localSearchEvolutionMetrics().getInstants().get(j));
+                    row.createCell(6).setCellValue(run.localSearchEvolutionMetrics().getRealInstants().get(j));
                     row.createCell(7).setCellValue(run.localSearchEvolutionMetrics().getActualMakespanEvolution().get(j));
                     row.createCell(8).setCellValue(run.localSearchEvolutionMetrics().getBestMakespanEvolution().get(j));
                     row.createCell(9).setCellValue(run.localSearchEvolutionMetrics().getAccNumberOfNeighborsList().get(j));

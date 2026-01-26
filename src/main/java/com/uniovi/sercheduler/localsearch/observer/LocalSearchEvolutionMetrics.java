@@ -5,22 +5,24 @@ import java.util.List;
 
 public class LocalSearchEvolutionMetrics {
 
-    private List<Integer> startNumberList;
+    private final List<Integer> startNumberList;
 
-    private List<Integer> iterationNumberList;
+    private final List<Integer> iterationNumberList;
 
     private final long periodicTimeForMakespanEvolution;
 
-    private List<Long> instants;
+    private final List<Long> realInstants;
 
-    private List<Double> bestMakespanEvolution;
+    private final List<Long> theoreticalInstants;
 
-    private List<Double> actualMakespanEvolution;
+    private final List<Double> bestMakespanEvolution;
+
+    private final List<Double> actualMakespanEvolution;
 
     private long lastRecordedTime;
     private double bestMakespan;
 
-    private List<Long> accNumberOfNeighborsList;
+    private final List<Long> accNumberOfNeighborsList;
 
 
     public LocalSearchEvolutionMetrics(long periodicTimeForMakespanEvolution){
@@ -29,7 +31,8 @@ public class LocalSearchEvolutionMetrics {
 
         this.startNumberList = new ArrayList<>();
         this.iterationNumberList = new ArrayList<>();
-        this.instants = new ArrayList<>();
+        this.realInstants = new ArrayList<>();
+        this.theoreticalInstants = new ArrayList<>();
         this.bestMakespanEvolution = new ArrayList<>();
         this.actualMakespanEvolution = new ArrayList<>();
         this.accNumberOfNeighborsList = new ArrayList<>();
@@ -41,35 +44,45 @@ public class LocalSearchEvolutionMetrics {
     public void update(long runStartingTime,
                        int startNumber, int iterationNumber, double actualMakespan, long accNumberOfNeighbors){
 
-        if(periodicTimeForMakespanEvolution > 0L) {
+        //TODO: se podrían perder ticks, es decir, si se llama con elapsedTimeFromStart = 5032 (por ejemplo),
+        // y el último registrado es 2000, se almacenaría como 3000
 
-            long actualTime = System.currentTimeMillis();
+        if(periodicTimeForMakespanEvolution <= 0L)
+            return;
 
-            lastRecordedTime = lastRecordedTime <= 0 ? runStartingTime : lastRecordedTime;
+        long actualTime = System.currentTimeMillis();
 
-            long elapsedTime = actualTime - lastRecordedTime;
+        long elapsedFromStart = actualTime - runStartingTime;
 
-            if (elapsedTime >= periodicTimeForMakespanEvolution) {
+        long lastTheoreticalInstant =
+                theoreticalInstants.isEmpty()
+                        ? 0
+                        : theoreticalInstants.get(theoreticalInstants.size() - 1);
 
-                saveMetrics(
-                        startNumber, iterationNumber,
-                        actualTime - runStartingTime,
-                        actualMakespan,
-                        accNumberOfNeighbors
-                );
+        long actualTheoreticalInstant = lastTheoreticalInstant + periodicTimeForMakespanEvolution;
 
-                lastRecordedTime = actualTime;
-            }
+        if (elapsedFromStart >= actualTheoreticalInstant) {
+
+            saveMetrics(
+                    startNumber,
+                    iterationNumber,
+                    elapsedFromStart,
+                    actualTheoreticalInstant,
+                    actualMakespan,
+                    accNumberOfNeighbors
+            );
 
         }
 
     }
 
-    private void saveMetrics(int startNumber, int iterationNumber, long instant, double actualMakespan, long accNumberOfNeighbors){
+    private void saveMetrics(int startNumber, int iterationNumber, long realInstant, long theoreticalInstant,
+                             double actualMakespan, long accNumberOfNeighbors){
 
         startNumberList.add(startNumber);
         iterationNumberList.add(iterationNumber);
-        instants.add(instant);
+        realInstants.add(realInstant);
+        theoreticalInstants.add(theoreticalInstant);
 
         bestMakespan = Math.min(actualMakespan, bestMakespan);
 
@@ -83,8 +96,12 @@ public class LocalSearchEvolutionMetrics {
         return bestMakespanEvolution;
     }
 
-    public List<Long> getInstants() {
-        return instants;
+    public List<Long> getRealInstants() {
+        return realInstants;
+    }
+
+    public List<Long> getTheoreticalInstants() {
+        return theoreticalInstants;
     }
 
     public List<Integer> getStartNumberList() {
