@@ -61,14 +61,16 @@ public class MemeticCommand {
 
     public static String executeMemetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
                                         String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
-                                        String fileName, String operatorConfig, int lsaIterationsLimit, String lsaApplierName) {
+                                        String fileName, String operatorConfig, int lsaIterationsLimit, String lsaApplier) {
 
 
         ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
         int id = CommandUtils.generateRunId();
 
-        fileName = CommandUtils.createFileName(fileName, CommandUtils.generateMAName(lsaApplierName), limitTime, periodicTimeForMakespanEvolution,
+        String memeticAlgorithmName = CommandUtils.generateMAName(lsaApplier);
+
+        fileName = CommandUtils.createFileName(fileName, memeticAlgorithmName, limitTime, periodicTimeForMakespanEvolution,
                 experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit), id);
 
         var benchmarks = experimentConfig.workflows();
@@ -132,7 +134,7 @@ public class MemeticCommand {
                         algorithm =
                                 createMA(problem, populationSize, offspringPopulationSize, crossover, mutation,
                                         termination, random, objectives, limitTime, operatorList, lsaIterationsLimit,
-                                        observer, fileName);
+                                        observer, fileName, memeticAlgorithmName);
 
 
                         algorithmList.add(new ExperimentAlgorithm<>(algorithm, f, experimentProblem, run));

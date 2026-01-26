@@ -12,10 +12,7 @@ import com.uniovi.sercheduler.memetic.algorithm.EvolutionaryAlgorithm;
 import com.uniovi.sercheduler.memetic.algorithm.GeneticAlgorithmBuilder;
 import com.uniovi.sercheduler.memetic.algorithm.MemeticAlgorithm;
 import com.uniovi.sercheduler.memetic.algorithm.MemeticAlgorithmBuilder;
-import com.uniovi.sercheduler.memetic.algorithm.components.MemeticScheduleReplacement;
-import com.uniovi.sercheduler.memetic.algorithm.components.MemeticScheduleSelection;
-import com.uniovi.sercheduler.memetic.algorithm.components.MemeticSequentialEvaluation;
-import com.uniovi.sercheduler.memetic.algorithm.components.MemeticTermination;
+import com.uniovi.sercheduler.memetic.algorithm.components.*;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 
 import org.uma.jmetal.component.catalogue.common.evaluation.impl.SequentialEvaluation;
@@ -243,7 +240,51 @@ public class CommandUtils {
                                                MutationOperator<SchedulePermutationSolution> mutation, Termination termination,
                                                Random random, List<Objective> objectives, long limitTime,
                                                List<NeighborhoodOperatorLazy> operatorList,
-                                               int lsaIterationsLimit, MemeticObserver observer, String fileName) {
+                                               int lsaIterationsLimit, MemeticObserver observer, String fileName,
+                                               String memeticAlgorithmName) {
+        switch(memeticAlgorithmName.toLowerCase()){
+            case "mae":
+                return createMAe(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
+                        random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName);
+            case "ma5":
+                return createMA5(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
+                        random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName);
+            default:
+                throw new IllegalArgumentException("Could not identify this type of memetic algorithm: "  + memeticAlgorithmName);
+        }
+    }
+
+    private static MemeticAlgorithm createMA5(SchedulingProblem problem, int populationSize, int offspringPopulationSize,
+                                              CrossoverOperator<SchedulePermutationSolution> crossover,
+                                              MutationOperator<SchedulePermutationSolution> mutation, Termination termination,
+                                              Random random, List<Objective> objectives, long limitTime,
+                                              List<NeighborhoodOperatorLazy> operatorList,
+                                              int lsaIterationsLimit, MemeticObserver observer, String fileName){
+        return new MemeticAlgorithmBuilder(
+                "Memetic",
+                problem,
+                populationSize,
+                offspringPopulationSize,
+                crossover,
+                mutation,
+                limitTime,
+                operatorList,
+                lsaIterationsLimit,
+                fileName)
+                .setTermination(termination)
+                .setEvaluation(new MemeticSequentialEvaluation<>(problem))
+                .setSelection(new ScheduleSelection(random))
+                .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
+                .setObserver(observer)
+                .build();
+    }
+
+    private static MemeticAlgorithm createMAe(SchedulingProblem problem, int populationSize, int offspringPopulationSize,
+                                              CrossoverOperator<SchedulePermutationSolution> crossover,
+                                              MutationOperator<SchedulePermutationSolution> mutation, Termination termination,
+                                              Random random, List<Objective> objectives, long limitTime,
+                                              List<NeighborhoodOperatorLazy> operatorList,
+                                              int lsaIterationsLimit, MemeticObserver observer, String fileName){
         return new MemeticAlgorithmBuilder(
                 "Memetic",
                 problem,
@@ -259,6 +300,7 @@ public class CommandUtils {
                 .setEvaluation(new MemeticSequentialEvaluation<>(problem)) //TODO: aquí había una llamada al método privado "getEvaluator()"
                 .setSelection(new ScheduleSelection(random))
                 .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
+                .setLsaApplier(new PercentageLsaApplier())
                 .setObserver(observer)
                 .build();
     }
