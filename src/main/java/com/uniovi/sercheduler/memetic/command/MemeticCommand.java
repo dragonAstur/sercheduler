@@ -79,7 +79,7 @@ public class MemeticCommand {
 
         var fitness = experimentConfig.fitness();
 
-        var experimentBaseDirectory = experimentPath + "/executions-" + id;
+        var experimentBaseDirectory = experimentPath + "/executions-" + memeticAlgorithmName + "-" + id;
         double mutationProbability = 0.1;
         int populationSize = 100;
         int offspringPopulationSize = 100;

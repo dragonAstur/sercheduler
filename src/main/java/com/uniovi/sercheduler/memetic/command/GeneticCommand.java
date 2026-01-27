@@ -85,7 +85,7 @@ public class GeneticCommand {
 
     var fitness = experimentConfig.fitness();
 
-    var experimentBaseDirectory = experimentPath + "/executions-" + id;
+    var experimentBaseDirectory = experimentPath + "/executions-GA-" + id;
     double mutationProbability = 0.1;
     int populationSize = 100;
     int offspringPopulationSize = 100;
