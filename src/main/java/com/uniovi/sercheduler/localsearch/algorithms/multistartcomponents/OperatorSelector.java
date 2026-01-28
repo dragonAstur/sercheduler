@@ -5,7 +5,7 @@ import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 
 import java.util.List;
 
-public interface StartOperatorSelector {
+public interface OperatorSelector {
 
     List<NeighborhoodOperatorLazy> selectOperatorsLazy(List<NeighborhoodOperatorLazy> originalList);
 

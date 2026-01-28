@@ -6,7 +6,7 @@ import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import java.util.List;
 import java.util.Random;
 
-public class RandomStartOperatorSelector implements StartOperatorSelector{
+public class RandomOperatorSelector implements OperatorSelector {
 
     private final Random random = new Random();
 

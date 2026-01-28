@@ -5,7 +5,7 @@ import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 
 import java.util.List;
 
-public class AllStartOperatorSelector implements StartOperatorSelector{
+public class AllOperatorSelector implements OperatorSelector {
 
     @Override
     public List<NeighborhoodOperatorLazy> selectOperatorsLazy(List<NeighborhoodOperatorLazy> originalList) {

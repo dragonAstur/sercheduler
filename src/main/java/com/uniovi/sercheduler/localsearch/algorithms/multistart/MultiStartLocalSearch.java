@@ -2,7 +2,7 @@ package com.uniovi.sercheduler.localsearch.algorithms.multistart;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalSearchAlgorithm;
-import com.uniovi.sercheduler.localsearch.algorithms.multistartcomponents.StartOperatorSelector;
+import com.uniovi.sercheduler.localsearch.algorithms.multistartcomponents.OperatorSelector;
 import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorGlobal;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
@@ -11,11 +11,11 @@ import java.util.List;
 
 public class MultiStartLocalSearch {
 
-    private final StartOperatorSelector startOperatorSelector;
+    private final OperatorSelector operatorSelector;
 
 
-    public MultiStartLocalSearch(StartOperatorSelector startOperatorSelector){
-        this.startOperatorSelector = startOperatorSelector;
+    public MultiStartLocalSearch(OperatorSelector operatorSelector){
+        this.operatorSelector = operatorSelector;
     }
 
     public SchedulePermutationSolution executeGlobal(LocalSearchAlgorithm localSearchAlgorithm,
@@ -34,7 +34,7 @@ public class MultiStartLocalSearch {
 
         do {
 
-            chosenOperators = startOperatorSelector.selectOperatorsGlobal(neighborhoodOperatorList);    //TODO: here it changes from Global to Lazy
+            chosenOperators = operatorSelector.selectOperatorsGlobal(neighborhoodOperatorList);    //TODO: here it changes from Global to Lazy
 
             SchedulePermutationSolution actualSolution =
                     localSearchAlgorithm.runLocalSearchGlobal(chosenOperators, observer);    //TODO: here it changes from Global to Lazy
@@ -71,7 +71,7 @@ public class MultiStartLocalSearch {
 
         do {
 
-            chosenOperators = startOperatorSelector.selectOperatorsLazy(neighborhoodOperatorList);    //TODO: here it changes from Global to Lazy
+            chosenOperators = operatorSelector.selectOperatorsLazy(neighborhoodOperatorList);    //TODO: here it changes from Global to Lazy
 
             SchedulePermutationSolution actualSolution =
                     localSearchAlgorithm.runLocalSearchLazy(chosenOperators, observer);    //TODO: here it changes from Global to Lazy
