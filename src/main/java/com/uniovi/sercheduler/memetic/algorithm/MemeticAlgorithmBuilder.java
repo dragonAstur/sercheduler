@@ -6,6 +6,7 @@ import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalS
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.TerminationCriterion;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.UpgradeIterationAndTimeLimitTermination;
+import com.uniovi.sercheduler.localsearch.algorithms.multistartcomponents.RandomOperatorSelector;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import com.uniovi.sercheduler.memetic.algorithm.components.ElitistLsaApplier;
 import com.uniovi.sercheduler.memetic.algorithm.components.LsaApplier;
@@ -73,6 +74,7 @@ public class MemeticAlgorithmBuilder {
         this.lsa = new LocalSearchAlgorithm.Builder(problem)
                 .terminationCriterion(terminationCriterion)
                 .initialSolutionGenerator(this.initialSolutionGenerator)
+                //.operatorSelector(new RandomOperatorSelector())         //TODO: esto debería venir por comandos
                 .build();
 
         this.lsaApplier = new ElitistLsaApplier();

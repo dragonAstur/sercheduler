@@ -61,14 +61,14 @@ public class MemeticCommand {
 
     public static String executeMemetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
                                         String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
-                                        String fileName, String operatorConfig, int lsaIterationsLimit, String lsaApplier) {
+                                        String fileName, String operatorConfig, int lsaIterationsLimit, String lsaApplierName) {
 
 
         ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
         int id = CommandUtils.generateRunId();
 
-        String memeticAlgorithmName = CommandUtils.generateMAName(lsaApplier);
+        String memeticAlgorithmName = CommandUtils.generateMAName(lsaApplierName);
 
         fileName = CommandUtils.createFileName(fileName, memeticAlgorithmName, limitTime, periodicTimeForMakespanEvolution,
                 experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit), id);
