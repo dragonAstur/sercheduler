@@ -62,22 +62,23 @@ public class GeneticCommand {
       @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
       @Option(shortNames = 'C') String experimentConfigFile,
       @Option(shortNames = 'E', defaultValue = "-1") long periodicTimeForMakespanEvolution,
-      @Option(shortNames = 'N', defaultValue = "experiment") String fileName) {
+      @Option(shortNames = 'N', defaultValue = "experiment") String fileName,
+      @Option(shortNames = 'P', defaultValue = "100") int populationSize) {
 
     return executeGenetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
-            periodicTimeForMakespanEvolution, fileName);
+            periodicTimeForMakespanEvolution, fileName, populationSize);
   }
 
   public static String executeGenetic(String workflowsPath, String hostsPath, String type, Long limitTime, long seed,
                                       String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
-                                      String fileName) {
+                                      String fileName, int populationSize) {
 
     ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
     int id = CommandUtils.generateRunId();
 
     fileName = CommandUtils.createFileName(fileName, "GA", limitTime, periodicTimeForMakespanEvolution,
-            experimentConfig, "none", "none", "none", id);
+            experimentConfig, "none", "none", "none", id, populationSize);
 
     var benchmarks = experimentConfig.workflows();
 
@@ -87,8 +88,7 @@ public class GeneticCommand {
 
     var experimentBaseDirectory = experimentPath + "/executions-GA-" + id;
     double mutationProbability = 0.1;
-    int populationSize = 100;
-    int offspringPopulationSize = 100;
+    int offspringPopulationSize = populationSize;
     MemeticTermination termination = new MemeticTerminationByComputingTime(limitTime);
     List<ExperimentProblem<SchedulePermutationSolution>> problemList = new ArrayList<>();
     List<ExperimentAlgorithm<SchedulePermutationSolution, List<SchedulePermutationSolution>>>

@@ -6,6 +6,7 @@ import com.uniovi.sercheduler.jmetal.operator.ScheduleReplacement;
 import com.uniovi.sercheduler.jmetal.operator.ScheduleSelection;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
+import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.NeighborLimiterImpl;
 import com.uniovi.sercheduler.localsearch.observer.Observer;
 import com.uniovi.sercheduler.localsearch.operator.*;
 import com.uniovi.sercheduler.memetic.algorithm.EvolutionaryAlgorithm;
@@ -241,23 +242,31 @@ public class CommandUtils {
                                                Random random, List<Objective> objectives, long limitTime,
                                                List<NeighborhoodOperatorLazy> operatorList,
                                                int lsaIterationsLimit, MemeticObserver observer, String fileName,
-                                               String memeticAlgorithmName) {
+                                               String memeticAlgorithmName, int neighborsLimit) {
         return switch (memeticAlgorithmName.toLowerCase()) {
             case "mae" -> createMAe(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
-                    random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName);
-            case "ma5" -> createMA5(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
-                    random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName);
+                    random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName, neighborsLimit);
+            case "ma5" -> createMAPercentage(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
+                    random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName, 0.05,
+                    neighborsLimit);
+            case "ma20" -> createMAPercentage(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
+                    random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName, 0.2,
+                    neighborsLimit);
+            case "ma100" -> createMAPercentage(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
+                    random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName, 1,
+                    neighborsLimit);
             default ->
                     throw new IllegalArgumentException("Could not identify this type of memetic algorithm: " + memeticAlgorithmName);
         };
     }
 
-    private static MemeticAlgorithm createMA5(SchedulingProblem problem, int populationSize, int offspringPopulationSize,
+    private static MemeticAlgorithm createMAPercentage(SchedulingProblem problem, int populationSize, int offspringPopulationSize,
                                               CrossoverOperator<SchedulePermutationSolution> crossover,
                                               MutationOperator<SchedulePermutationSolution> mutation, Termination termination,
                                               Random random, List<Objective> objectives, long limitTime,
                                               List<NeighborhoodOperatorLazy> operatorList,
-                                              int lsaIterationsLimit, MemeticObserver observer, String fileName){
+                                              int lsaIterationsLimit, MemeticObserver observer, String fileName,
+                                              double percentage, int neighborsLimit){
         return new MemeticAlgorithmBuilder(
                 "Memetic",
                 problem,
@@ -273,8 +282,9 @@ public class CommandUtils {
                 .setEvaluation(new MemeticSequentialEvaluation<>(problem))
                 .setSelection(new ScheduleSelection(random))
                 .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
-                .setLsaApplier(new PercentageLsaApplier())
+                .setLsaApplier(new PercentageLsaApplier(percentage))
                 .setObserver(observer)
+                .setNeighborLimiter(new NeighborLimiterImpl(neighborsLimit))
                 .build();
     }
 
@@ -283,7 +293,8 @@ public class CommandUtils {
                                               MutationOperator<SchedulePermutationSolution> mutation, Termination termination,
                                               Random random, List<Objective> objectives, long limitTime,
                                               List<NeighborhoodOperatorLazy> operatorList,
-                                              int lsaIterationsLimit, MemeticObserver observer, String fileName){
+                                              int lsaIterationsLimit, MemeticObserver observer, String fileName,
+                                              int neighborLimit){
         return new MemeticAlgorithmBuilder(
                 "Memetic",
                 problem,
@@ -415,20 +426,18 @@ public class CommandUtils {
 
     public static String createFileName(String originalFileName, String algorithmName, Long limitTime, long periodicTimeForMakespanEvolution,
                                         ExperimentConfig experimentConfig, String operatorConfig, String strategy,
-                                        String lsaIterationsLimit, int id){
+                                        String lsaIterationsLimit, int id, int populationSize, int neighborsLimit){
 
-        if(!originalFileName.equals(CommandUtils.DEFAULT_FILE_NAME)){
+        if(!originalFileName.equals(CommandUtils.DEFAULT_FILE_NAME))
             return originalFileName;
-        }
 
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yy"));
         String time  = LocalTime.now().format(DateTimeFormatter.ofPattern("HH-mm"));
 
-
         return algorithmName + "_" + limitTime / 1000 + "(s)_" + periodicTimeForMakespanEvolution + "(ms)_"
-                + experimentConfig.maxHosts() + "_" + operatorConfig + "_" + strategy + "_" + lsaIterationsLimit + "_" + experimentConfig.workflows().get(0)
-                + "_" + date + "_" + time + "_" + id;
-
+                + experimentConfig.maxHosts() + "_" + operatorConfig + "_" + strategy + "_" + lsaIterationsLimit
+                + "it_" + neighborsLimit + "neighbors_" + experimentConfig.workflows().get(0) + "_" + populationSize
+                + "pop_" + date + "_" + time + "_" + id;
     }
 
     public static Random generateRandom(Long seed){
@@ -439,6 +448,8 @@ public class CommandUtils {
         return switch (lsaApplierName.toLowerCase()) {
             case "elitist", "e" -> "MAe";
             case "5percent", "5" -> "MA5";
+            case "20percent", "20" -> "MA20";
+            case "100percent", "100" -> "MA100";
             default -> throw new IllegalArgumentException("Could not find any LSA applier name that matches with " + lsaApplierName);
         };
     }

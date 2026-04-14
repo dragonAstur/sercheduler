@@ -31,6 +31,8 @@ public class LocalSearchAlgorithm {
 
     private final OperatorSelector operatorSelector;
 
+    private final NeighborLimiter neighborLimiter;
+
 
     public LocalSearchAlgorithm(Builder builder){
         this.fitnessCalculatorGenerator = builder.fitnessCalculatorGenerator;
@@ -42,6 +44,7 @@ public class LocalSearchAlgorithm {
         this.terminationCriterion = builder.terminationCriterion;
         this.neighborGeneratorAndSelector = builder.neighborGeneratorAndSelector;
         this.operatorSelector = builder.operatorSelector;
+        this.neighborLimiter = builder.neighborLimiter;
     }
 
 
@@ -58,6 +61,8 @@ public class LocalSearchAlgorithm {
         private NeighborGeneratorAndSelector neighborGeneratorAndSelector = new NeighborGeneratorAndSelectorImpl();
 
         private OperatorSelector operatorSelector = new AllOperatorSelector();
+
+        private NeighborLimiter neighborLimiter = new NeighborLimiterImpl(-1);
 
         public Builder(SchedulingProblem problem){
             this.fitnessCalculatorGenerator = new FitnessCalculatorGeneratorImpl(problem);
@@ -107,6 +112,11 @@ public class LocalSearchAlgorithm {
 
         public Builder operatorSelector(OperatorSelector operatorSelector){
             this.operatorSelector = operatorSelector;
+            return this;
+        }
+
+        public Builder neighborLimiter(NeighborLimiter neighborLimiter){
+            this.neighborLimiter = neighborLimiter;
             return this;
         }
 
@@ -184,6 +194,8 @@ public class LocalSearchAlgorithm {
             chosenOperators = operatorSelector.selectOperatorsLazy(neighborhoodOperatorList);
 
             neighbors = neighborGenerator.generateNeighborsLazy(chosenOperators, actualSolution, observer);
+
+            neighbors = neighborLimiter.limitNeighborsNumber(neighbors);
 
             AtomicInteger counter = new AtomicInteger();
 

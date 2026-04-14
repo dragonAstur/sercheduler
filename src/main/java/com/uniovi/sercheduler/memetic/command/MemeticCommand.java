@@ -53,16 +53,19 @@ public class MemeticCommand {
             @Option(shortNames = 'E', defaultValue = "-1") long periodicTimeForMakespanEvolution,
             @Option(shortNames = 'N', defaultValue = CommandUtils.DEFAULT_FILE_NAME) String fileName,
             @Option(shortNames = 'O', defaultValue = "n1") String operatorConfig,
-            @Option(shortNames = 'A', defaultValue = "e") String lsaApplierName) {
+            @Option(shortNames = 'A', defaultValue = "e") String lsaApplierName,
+            @Option(shortNames = 'P', defaultValue = "100") int populationSize,
+            @Option(shortNames = 'V', defaultValue = "-1") int neighborsLimit) {
 
         return executeMemetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
-                periodicTimeForMakespanEvolution, fileName, operatorConfig, lsaIterationsLimit, lsaApplierName);
+                periodicTimeForMakespanEvolution, fileName, operatorConfig, lsaIterationsLimit, lsaApplierName,
+                populationSize, neighborsLimit);
     }
 
     public static String executeMemetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
                                         String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
-                                        String fileName, String operatorConfig, int lsaIterationsLimit, String lsaApplierName) {
-
+                                        String fileName, String operatorConfig, int lsaIterationsLimit, String lsaApplierName,
+                                        int populationSize, int neighborsLimit) {
 
         ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
@@ -71,7 +74,8 @@ public class MemeticCommand {
         String memeticAlgorithmName = CommandUtils.generateMAName(lsaApplierName);
 
         fileName = CommandUtils.createFileName(fileName, memeticAlgorithmName, limitTime, periodicTimeForMakespanEvolution,
-                experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit), id);
+                experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit), id, populationSize,
+                neighborsLimit);
 
         var benchmarks = experimentConfig.workflows();
 
@@ -81,8 +85,7 @@ public class MemeticCommand {
 
         var experimentBaseDirectory = experimentPath + "/executions-" + memeticAlgorithmName + "-" + id;
         double mutationProbability = 0.1;
-        int populationSize = 100;
-        int offspringPopulationSize = 100;
+        int offspringPopulationSize = populationSize;
         Termination termination = new TerminationByComputingTime(limitTime);
         List<ExperimentProblem<SchedulePermutationSolution>> problemList = new ArrayList<>();
         List<ExperimentAlgorithm<SchedulePermutationSolution, List<SchedulePermutationSolution>>>
@@ -134,7 +137,7 @@ public class MemeticCommand {
                         algorithm =
                                 createMA(problem, populationSize, offspringPopulationSize, crossover, mutation,
                                         termination, random, objectives, limitTime, operatorList, lsaIterationsLimit,
-                                        observer, fileName, memeticAlgorithmName);
+                                        observer, fileName, memeticAlgorithmName, neighborsLimit);
 
 
                         algorithmList.add(new ExperimentAlgorithm<>(algorithm, f, experimentProblem, run));

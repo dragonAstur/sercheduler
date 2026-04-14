@@ -4,17 +4,15 @@ import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SchedulingProblem;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalSearchAlgorithm;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.InitialSolutionGeneratorSpecified;
+import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.NeighborLimiter;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.TerminationCriterion;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchcomponents.UpgradeIterationAndTimeLimitTermination;
-import com.uniovi.sercheduler.localsearch.algorithms.multistartcomponents.RandomOperatorSelector;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
 import com.uniovi.sercheduler.memetic.algorithm.components.ElitistLsaApplier;
 import com.uniovi.sercheduler.memetic.algorithm.components.LsaApplier;
 import com.uniovi.sercheduler.memetic.algorithm.components.MemeticEvaluation;
 import com.uniovi.sercheduler.memetic.algorithm.components.MemeticSequentialEvaluation;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
-import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
-import org.uma.jmetal.component.catalogue.common.evaluation.impl.SequentialEvaluation;
 import org.uma.jmetal.component.catalogue.common.solutionscreation.SolutionsCreation;
 import org.uma.jmetal.component.catalogue.common.solutionscreation.impl.RandomSolutionsCreation;
 import org.uma.jmetal.component.catalogue.common.termination.Termination;
@@ -43,7 +41,7 @@ public class MemeticAlgorithmBuilder {
     private Replacement<SchedulePermutationSolution> replacement;
 
     private InitialSolutionGeneratorSpecified initialSolutionGenerator;
-    private final LocalSearchAlgorithm lsa;
+    private final LocalSearchAlgorithm.Builder lsaBuilder;
     private final List<NeighborhoodOperatorLazy> operatorList;
     private MemeticObserver observer;
     private final String fileName;
@@ -71,11 +69,10 @@ public class MemeticAlgorithmBuilder {
 
         this.operatorList = operatorList;
 
-        this.lsa = new LocalSearchAlgorithm.Builder(problem)
+        this.lsaBuilder = new LocalSearchAlgorithm.Builder(problem)
                 .terminationCriterion(terminationCriterion)
-                .initialSolutionGenerator(this.initialSolutionGenerator)
+                .initialSolutionGenerator(this.initialSolutionGenerator);
                 //.operatorSelector(new RandomOperatorSelector())         //TODO: esto debería venir por comandos
-                .build();
 
         this.lsaApplier = new ElitistLsaApplier();
 
@@ -93,6 +90,11 @@ public class MemeticAlgorithmBuilder {
 
     public MemeticAlgorithmBuilder setTermination(Termination termination) {
         this.termination = termination;
+        return this;
+    }
+
+    public MemeticAlgorithmBuilder setNeighborLimiter(NeighborLimiter neighborLimiter){
+        this.lsaBuilder.neighborLimiter(neighborLimiter);
         return this;
     }
 
@@ -121,9 +123,10 @@ public class MemeticAlgorithmBuilder {
         return this;
     }
 
+
     public MemeticAlgorithm build() {
         return new MemeticAlgorithm(this.name, this.createInitialPopulation, this.evaluation, this.termination,
-                this.selection, this.variation, this.replacement, this.lsa, this.operatorList, this.observer,
+                this.selection, this.variation, this.replacement, this.lsaBuilder.build(), this.operatorList, this.observer,
                 this.fileName, this.lsaApplier) {
             @Override
             public void updateProgress() {

@@ -78,7 +78,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
         this.fileName = fileName;
 
-        this. lsaApplier = lsaApplier;
+        this.lsaApplier = lsaApplier;
     }
 
     public void run() {
