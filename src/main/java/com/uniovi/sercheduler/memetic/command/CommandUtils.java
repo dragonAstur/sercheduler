@@ -282,9 +282,9 @@ public class CommandUtils {
                 .setEvaluation(new MemeticSequentialEvaluation<>(problem))
                 .setSelection(new ScheduleSelection(random))
                 .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
+                .setNeighborLimiter(new NeighborLimiterImpl(neighborsLimit))
                 .setLsaApplier(new PercentageLsaApplier(percentage))
                 .setObserver(observer)
-                .setNeighborLimiter(new NeighborLimiterImpl(neighborsLimit))
                 .build();
     }
 
@@ -294,7 +294,7 @@ public class CommandUtils {
                                               Random random, List<Objective> objectives, long limitTime,
                                               List<NeighborhoodOperatorLazy> operatorList,
                                               int lsaIterationsLimit, MemeticObserver observer, String fileName,
-                                              int neighborLimit){
+                                              int neighborsLimit){
         return new MemeticAlgorithmBuilder(
                 "Memetic",
                 problem,
@@ -310,6 +310,7 @@ public class CommandUtils {
                 .setEvaluation(new MemeticSequentialEvaluation<>(problem)) //TODO: aquí había una llamada al método privado "getEvaluator()"
                 .setSelection(new ScheduleSelection(random))
                 .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
+                .setNeighborLimiter(new NeighborLimiterImpl(neighborsLimit))
                 .setObserver(observer)
                 .build();
     }
