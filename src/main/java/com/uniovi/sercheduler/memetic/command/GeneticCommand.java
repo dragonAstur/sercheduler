@@ -78,7 +78,7 @@ public class GeneticCommand {
     int id = CommandUtils.generateRunId();
 
     fileName = CommandUtils.createFileName(fileName, "GA", limitTime, periodicTimeForMakespanEvolution,
-            experimentConfig, "none", "none", "none", id, populationSize);
+            experimentConfig, "none", "none", "none", id, populationSize, 0);
 
     var benchmarks = experimentConfig.workflows();
 
