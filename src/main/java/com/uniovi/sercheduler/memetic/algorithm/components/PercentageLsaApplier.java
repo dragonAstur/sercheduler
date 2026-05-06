@@ -13,7 +13,7 @@ public class PercentageLsaApplier implements LsaApplier {
 
     public static final double DEFAULT_PERCENTAGE = 0.05;
 
-    private double percentage;
+    private final double percentage;
 
     public PercentageLsaApplier(){
         this.percentage = DEFAULT_PERCENTAGE;

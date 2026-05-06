@@ -46,7 +46,7 @@ public class MemeticCommand {
             @Option(shortNames = 'H') String hostsPath,
             @Option(shortNames = 'T') String type,
             @Option(shortNames = 'L', defaultValue = "100000") Long limitTime,
-            @Option(defaultValue = "3") int lsaIterationsLimit,
+            @Option(shortNames ='J', defaultValue = "3") int lsaIterationsLimit,
             @Option(shortNames = 'S', defaultValue = "0") Long seed,
             @Option(shortNames = 'X', defaultValue = ".") String experimentPath,
             @Option(shortNames = 'C') String experimentConfigFile,

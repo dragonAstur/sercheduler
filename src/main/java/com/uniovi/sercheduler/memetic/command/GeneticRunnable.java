@@ -15,9 +15,11 @@ public class GeneticRunnable {
     public static final long PERIODIC_TIME = 100;
     public static final String FILE_NAME = "experiment";
 
+    public static final int POPULATION_SIZE = 100;
+
     public static void main(String[] args) {
 
-        executeGenetic(WORKFLOWS_PATH, HOSTS_PATH, TYPE, LIMIT_TIME, SEED, EXPERIMENT_PATH, EXPERIMENT_CONFIG, PERIODIC_TIME, FILE_NAME);
+        executeGenetic(WORKFLOWS_PATH, HOSTS_PATH, TYPE, LIMIT_TIME, SEED, EXPERIMENT_PATH, EXPERIMENT_CONFIG, PERIODIC_TIME, FILE_NAME, POPULATION_SIZE);
 
     }
 }
