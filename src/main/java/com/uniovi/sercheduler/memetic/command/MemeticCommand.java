@@ -55,17 +55,18 @@ public class MemeticCommand {
             @Option(shortNames = 'O', defaultValue = "n1") String operatorConfig,
             @Option(shortNames = 'A', defaultValue = "e") String lsaApplierName,
             @Option(shortNames = 'P', defaultValue = "100") int populationSize,
-            @Option(shortNames = 'V', defaultValue = "-1") int neighborsLimit) {
+            @Option(shortNames = 'V', defaultValue = "-1") int neighborsLimit,
+            @Option(defaultValue = "false") boolean tagachi) {
 
         return executeMemetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
                 periodicTimeForMakespanEvolution, fileName, operatorConfig, lsaIterationsLimit, lsaApplierName,
-                populationSize, neighborsLimit);
+                populationSize, neighborsLimit, tagachi);
     }
 
     public static String executeMemetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
                                         String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
                                         String fileName, String operatorConfig, int lsaIterationsLimit, String lsaApplierName,
-                                        int populationSize, int neighborsLimit) {
+                                        int populationSize, int neighborsLimit, boolean isTagachi) {
 
         ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
@@ -75,7 +76,7 @@ public class MemeticCommand {
 
         fileName = CommandUtils.createFileName(fileName, memeticAlgorithmName, limitTime, periodicTimeForMakespanEvolution,
                 experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit), id, populationSize,
-                neighborsLimit);
+                neighborsLimit, isTagachi);
 
         var benchmarks = experimentConfig.workflows();
 

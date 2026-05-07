@@ -427,7 +427,8 @@ public class CommandUtils {
 
     public static String createFileName(String originalFileName, String algorithmName, Long limitTime, long periodicTimeForMakespanEvolution,
                                         ExperimentConfig experimentConfig, String operatorConfig, String strategy,
-                                        String lsaIterationsLimit, int id, int populationSize, int neighborsLimit){
+                                        String lsaIterationsLimit, int id, int populationSize, int neighborsLimit,
+                                        boolean isTagachi){
 
         if(!originalFileName.equals(CommandUtils.DEFAULT_FILE_NAME))
             return originalFileName;
@@ -435,10 +436,12 @@ public class CommandUtils {
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yy"));
         String time  = LocalTime.now().format(DateTimeFormatter.ofPattern("HH-mm"));
 
-        return algorithmName + "_" + limitTime / 1000 + "(s)_" + periodicTimeForMakespanEvolution + "(ms)_"
+        String fileName = algorithmName + "_" + limitTime / 1000 + "(s)_" + periodicTimeForMakespanEvolution + "(ms)_"
                 + experimentConfig.maxHosts() + "_" + operatorConfig + "_" + strategy + "_" + lsaIterationsLimit
                 + "it_" + neighborsLimit + "neighbors_" + experimentConfig.workflows().get(0) + "_" + populationSize
                 + "pop_" + date + "_" + time + "_" + id;
+
+        return isTagachi? "tagachi_" + fileName : fileName;
     }
 
     public static Random generateRandom(Long seed){
