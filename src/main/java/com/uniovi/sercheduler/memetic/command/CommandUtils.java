@@ -428,7 +428,7 @@ public class CommandUtils {
     public static String createFileName(String originalFileName, String algorithmName, Long limitTime, long periodicTimeForMakespanEvolution,
                                         ExperimentConfig experimentConfig, String operatorConfig, String strategy,
                                         String lsaIterationsLimit, int id, int populationSize, int neighborsLimit,
-                                        boolean isTagachi){
+                                        boolean isTaguchi){
 
         if(!originalFileName.equals(CommandUtils.DEFAULT_FILE_NAME))
             return originalFileName;
@@ -441,7 +441,7 @@ public class CommandUtils {
                 + "it_" + neighborsLimit + "neighbors_" + experimentConfig.workflows().get(0) + "_" + populationSize
                 + "pop_" + date + "_" + time + "_" + id;
 
-        return isTagachi? "tagachi_" + fileName : fileName;
+        return isTaguchi? "taguchi_" + fileName : fileName;
     }
 
     public static Random generateRandom(Long seed){

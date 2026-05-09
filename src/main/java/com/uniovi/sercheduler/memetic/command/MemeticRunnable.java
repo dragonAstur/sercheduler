@@ -21,14 +21,14 @@ public class MemeticRunnable {
     public static final int POPULATION_SIZE = 100;
     public static final int NEIGHBOR_LIMIT = -1;
 
-    public static final boolean IS_TAGACHI = false;
+    public static final boolean IS_TAGUCHI = false;
 
 
     public static void main(String[] args) {
 
         executeMemetic(WORKFLOWS_PATH, HOSTS_PATH, TYPE, LIMIT_TIME, SEED, EXPERIMENT_PATH, EXPERIMENT_CONFIG,
                 PERIODIC_TIME, FILE_NAME, OPERATOR_CONFIG, LSA_ITERATIONS_LIMIT, LSA_APPLIER_NAME, POPULATION_SIZE,
-                NEIGHBOR_LIMIT, IS_TAGACHI);
+                NEIGHBOR_LIMIT, IS_TAGUCHI);
 
     }
 }

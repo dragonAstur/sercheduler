@@ -56,17 +56,17 @@ public class MemeticCommand {
             @Option(shortNames = 'A', defaultValue = "e") String lsaApplierName,
             @Option(shortNames = 'P', defaultValue = "100") int populationSize,
             @Option(shortNames = 'V', defaultValue = "-1") int neighborsLimit,
-            @Option(defaultValue = "false") boolean tagachi) {
+            @Option(defaultValue = "false") boolean taguchi) {
 
         return executeMemetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
                 periodicTimeForMakespanEvolution, fileName, operatorConfig, lsaIterationsLimit, lsaApplierName,
-                populationSize, neighborsLimit, tagachi);
+                populationSize, neighborsLimit, taguchi);
     }
 
     public static String executeMemetic(String workflowsPath, String hostsPath, String type, Long limitTime, Long seed,
                                         String experimentPath, String experimentConfigFile, long periodicTimeForMakespanEvolution,
                                         String fileName, String operatorConfig, int lsaIterationsLimit, String lsaApplierName,
-                                        int populationSize, int neighborsLimit, boolean isTagachi) {
+                                        int populationSize, int neighborsLimit, boolean isTaguchi) {
 
         ExperimentConfig experimentConfig = new ExperimentConfigLoader().readFromFile(new File(experimentConfigFile));
 
@@ -76,7 +76,7 @@ public class MemeticCommand {
 
         fileName = CommandUtils.createFileName(fileName, memeticAlgorithmName, limitTime, periodicTimeForMakespanEvolution,
                 experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit), id, populationSize,
-                neighborsLimit, isTagachi);
+                neighborsLimit, isTaguchi);
 
         var benchmarks = experimentConfig.workflows();
 
