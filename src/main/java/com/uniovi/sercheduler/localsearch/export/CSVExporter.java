@@ -28,8 +28,6 @@ public class CSVExporter {
                     ";" +
                     "Pop. average makespan" +
                     ";" +
-                    "Number of generations" +
-                    ";" +
                     "Total makespan before LSA" +
                     ";" +
                     "Total makespan after LSA" +
@@ -41,6 +39,8 @@ public class CSVExporter {
                     "LSA invocations" +
                     ";" +
                     "LSA iterations" +
+                    ";" +
+                    "LSA improvements" +
                     ";" +
                     "Evaluated neighbors" +
                     ";" +
@@ -80,8 +80,6 @@ public class CSVExporter {
                         .append(";")
                         //.append()
                         .append(";")
-                        //.append()
-                        .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getAccMakespanBeforeLSAEvolution().get(i))
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getAccMakespanAfterLSAEvolution().get(i))
@@ -90,9 +88,11 @@ public class CSVExporter {
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getPercentageAccMakespanLSAEvolution().get(i))
                         .append(";")
-                        //.append()
+                        .append(observer.getMemeticEvolutionMetrics().getAccLSAInvocationsEvolution().get(i))
                         .append(";")
-                        //.append()
+                        .append(observer.getMemeticEvolutionMetrics().getAccLSAIterationsEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getAccLSAImprovementsEvolution().get(i))
                         .append(";")
                         //.append()
                         .append(";")

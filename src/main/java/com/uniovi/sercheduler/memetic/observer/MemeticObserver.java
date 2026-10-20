@@ -22,6 +22,8 @@ public class MemeticObserver implements Observer {
 
     private BigDecimal accMakespanBeforeLSA, accMakespanAfterLSA;
 
+    private long accLSAIterations, accLSAImprovements, accLSAInvocations;
+
     public MemeticObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution){
 
         this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
@@ -41,6 +43,10 @@ public class MemeticObserver implements Observer {
 
         this.accMakespanBeforeLSA = BigDecimal.ZERO;
         this.accMakespanAfterLSA = BigDecimal.ZERO;
+
+        this.accLSAImprovements = 0;
+        this.accLSAIterations = 0;
+        this.accLSAInvocations = 0;
     }
 
     @Override
@@ -117,7 +123,10 @@ public class MemeticObserver implements Observer {
                 this.numberOfBestSolutionsCrossMutationOrigin,
                 this.numberOfBestSolutionsLSAOrigin,
                 this.accMakespanBeforeLSA,
-                this.accMakespanAfterLSA
+                this.accMakespanAfterLSA,
+                this.accLSAInvocations,
+                this.accLSAIterations,
+                this.accLSAImprovements
         );
     }
 
@@ -135,11 +144,10 @@ public class MemeticObserver implements Observer {
     @Override
     public void updateMemeticEvolution(double actualMakespan) {
 
-        //TODO: ¿número de individuos usados en búsqueda local? ¿número de individuos mejorados en búsqueda local?
-
         this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber, actualMakespan,
                 this.numberOfBestSolutionsCrossMutationOrigin, this.numberOfBestSolutionsLSAOrigin,
-                this.accMakespanBeforeLSA, this.accMakespanAfterLSA);
+                this.accMakespanBeforeLSA, this.accMakespanAfterLSA,
+                this.accLSAInvocations, this.accLSAIterations, this.accLSAImprovements);
     }
 
     @Override
@@ -172,5 +180,27 @@ public class MemeticObserver implements Observer {
         this.accMakespanAfterLSA = this.accMakespanAfterLSA.add(BigDecimal.valueOf(makespanAfterLSA));
     }
 
+    @Override
+    public void incrementLSAImprovement(){
+        this.accLSAImprovements += 1;
+    }
+
+    @Override
+    public void incrementLSAIteration(){
+        this.accLSAIterations += 1;
+    }
+
+    @Override
+    public void incrementLSAInvocation(){
+
+    }
+
+    public void addLSAImprovements(long numberOfImprovements){
+        this.accLSAImprovements += numberOfImprovements;
+    }
+
+    public void addLSAInvocations(long numberOfIterations){
+        this.accLSAIterations += numberOfIterations;
+    }
 
 }

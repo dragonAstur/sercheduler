@@ -47,13 +47,6 @@ public class LocalSearchObserver extends AbstractLocalSearchObserver {
     }
 
 
-
-
-
-
-
-
-
     private void checkBestSolution() {
 
         if(runs.get(numberOfRuns()-1).minStartsReachedMakespan() == getBestMinReachedMakespan()){

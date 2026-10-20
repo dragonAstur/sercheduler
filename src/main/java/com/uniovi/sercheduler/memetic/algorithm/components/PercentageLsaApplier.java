@@ -39,7 +39,6 @@ public class PercentageLsaApplier implements LsaApplier {
 
 
 
-
         int numberOfApplications = Math.max(1, (int) Math.round(population.size() * this.percentage));
 
         Random random = new Random();

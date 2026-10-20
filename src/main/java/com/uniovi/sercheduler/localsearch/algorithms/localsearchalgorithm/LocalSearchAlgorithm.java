@@ -188,6 +188,8 @@ public class LocalSearchAlgorithm {
 
         do {
 
+            observer.incrementLSAIteration();
+
             terminationCriterion.setUpgradeFound(false);
             terminationCriterion.setActualIteration(iterationNumber++);
 
@@ -207,6 +209,7 @@ public class LocalSearchAlgorithm {
             if (maybeBetterNeighbor.isPresent()) {
                 actualSolution = maybeBetterNeighbor.get().generatedSolution();
                 terminationCriterion.setUpgradeFound(true);
+                observer.incrementLSAImprovement();
             }
 
             double actualSolutionMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");

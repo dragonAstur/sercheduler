@@ -33,4 +33,10 @@ public interface Observer {
     String getStrategyName();
 
     String getOperatorsName();
+
+    void incrementLSAImprovement();
+
+    void incrementLSAIteration();
+
+    void incrementLSAInvocation();
 }

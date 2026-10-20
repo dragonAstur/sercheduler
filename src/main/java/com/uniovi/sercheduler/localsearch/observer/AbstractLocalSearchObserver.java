@@ -171,4 +171,19 @@ public abstract class AbstractLocalSearchObserver implements Observer{
     public LocalSearchEvolutionMetrics getEvolutionMetrics() {
         return localSearchEvolutionMetrics;
     }
+
+    @Override
+    public void incrementLSAImprovement() {
+
+    }
+
+    @Override
+    public void incrementLSAIteration() {
+
+    }
+
+    @Override
+    public void incrementLSAInvocation() {
+
+    }
 }
