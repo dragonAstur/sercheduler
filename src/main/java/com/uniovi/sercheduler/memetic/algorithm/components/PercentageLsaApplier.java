@@ -3,8 +3,10 @@ package com.uniovi.sercheduler.memetic.algorithm.components;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.algorithms.localsearchalgorithm.LocalSearchAlgorithm;
 import com.uniovi.sercheduler.localsearch.operator.NeighborhoodOperatorLazy;
+import com.uniovi.sercheduler.memetic.algorithm.MemeticAlgorithm;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -27,11 +29,23 @@ public class PercentageLsaApplier implements LsaApplier {
     public void applyLSA(List<SchedulePermutationSolution> population, LocalSearchAlgorithm lsa,
                          List<NeighborhoodOperatorLazy> operatorList, MemeticObserver observer) {
 
+        int bestIndex =
+                MemeticAlgorithm.getBestSolutionPos(population);
+
+        //Usar el initial solution generator
+        SchedulePermutationSolution bestSolution = population.get(bestIndex);
+
+        observer.updateBestSolutionsOrigins(bestSolution);
+
+
+
+
         int numberOfApplications = Math.max(1, (int) Math.round(population.size() * this.percentage));
 
         Random random = new Random();
         int pos;
         SchedulePermutationSolution baseSolution, enhancedSolution;
+        double baseSolutionMakespan, enhancedSolutionMakespan;
 
         List<Integer> randomIndexes = IntStream.range(0, population.size())
                 .boxed()
@@ -45,11 +59,15 @@ public class PercentageLsaApplier implements LsaApplier {
 
             baseSolution = population.get(pos);
 
+            baseSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
+
             observer.updateMemeticEvolution(
-                    baseSolution.getFitnessInfo().fitness().get("makespan"),
+                    baseSolutionMakespan,
                     0,
                     0
             );
+
+            observer.addMakespanBeforeLSA(baseSolutionMakespan);
 
             lsa.setInitialSolution(baseSolution);
 
@@ -57,11 +75,15 @@ public class PercentageLsaApplier implements LsaApplier {
 
             population.set(pos, enhancedSolution);
 
+            enhancedSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
+
             observer.updateMemeticEvolution(
-                    enhancedSolution.getFitnessInfo().fitness().get("makespan"),
+                    enhancedSolutionMakespan,
                     0,
                     0
             );
+
+            observer.addMakespanAfterLSA(enhancedSolutionMakespan);
         }
     }
 }

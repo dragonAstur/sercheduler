@@ -16,7 +16,7 @@ public class CSVExporter {
                     ";" +
                     "Operator config" +
                     ";" +
-                    "Algorithm iteration" +
+                    "Algorithm iteration (generations)" +
                     ";" +
                     "Periodic time" +
                     ";" +
@@ -24,7 +24,27 @@ public class CSVExporter {
                     ";" +
                     "Actual makespan" +
                     ";" +
-                    "Best makespan in this run\n";
+                    "Best makespan in this run" +
+                    ";" +
+                    "Pop. average makespan" +
+                    ";" +
+                    "Number of generations" +
+                    ";" +
+                    "Total makespan before LSA" +
+                    ";" +
+                    "Total makespan after LSA" +
+                    ";" +
+                    "Diff before-after LSA" +
+                    ";" +
+                    "LSA invocations" +
+                    ";" +
+                    "LSA iterations" +
+                    ";" +
+                    "Evaluated neighbors" +
+                    ";" +
+                    "Best solution from LSA" +
+                    ";" +
+                    "Best solution from cross-mutation\n";
 
             writer.write(newLine);
 
@@ -55,6 +75,26 @@ public class CSVExporter {
                         .append(observer.getMemeticEvolutionMetrics().getActualMakespanEvolution().get(i))
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getBestMakespanEvolution().get(i))
+                        .append(";")
+                        //.append()
+                        .append(";")
+                        //.append()
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getAccMakespanBeforeLSAEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getAccMakespanAfterLSAEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getDiffAccMakespanLSAEvolution())
+                        .append(";")
+                        //.append()
+                        .append(";")
+                        //.append()
+                        .append(";")
+                        //.append()
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getNumberOfBestSolutionsLSAOrigin().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getNumberOfBestSolutionsCrossMutationOrigin().get(i))
                         .append("\n");
             }
 

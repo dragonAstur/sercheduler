@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.memetic.observer;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,11 @@ public class MemeticEvolutionMetrics {
     private double bestMakespan;
     private final List<Double> actualMakespanEvolution;
     private final List<Double> bestMakespanEvolution;
+
+    private final List<Long> numberOfBestSolutionsLSAOrigin;
+    private final List<Long> numberOfBestSolutionsCrossMutationOrigin;
+
+    private final List<BigDecimal> accMakespanBeforeLSAEvolution, accMakespanAfterLSAEvolution, diffAccMakespanLSAEvolution;
 
     //TODO: ¿número de individuos usados en búsqueda local? ¿número de individuos mejorados en búsqueda local?
 
@@ -29,9 +35,18 @@ public class MemeticEvolutionMetrics {
         this.bestMakespanEvolution = new ArrayList<>();
         this.actualMakespanEvolution = new ArrayList<>();
 
+        this.numberOfBestSolutionsCrossMutationOrigin = new ArrayList<>();
+        this.numberOfBestSolutionsLSAOrigin = new ArrayList<>();
+
+        this.accMakespanBeforeLSAEvolution = new ArrayList<>();
+        this.accMakespanAfterLSAEvolution = new ArrayList<>();
+        this.diffAccMakespanLSAEvolution = new ArrayList<>();
+
     }
 
-    public void update(long memeticStartingTime, int memeticIterationNumber, double actualMakespan){
+    public void update(long memeticStartingTime, int memeticIterationNumber, double actualMakespan,
+                       long numberOfBestSolutionsCrossMutationOrigin, long numberOfBestSolutionsLSAOrigin,
+                       BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA){
 
         updateBestMakespan(actualMakespan);
 
@@ -75,15 +90,28 @@ public class MemeticEvolutionMetrics {
                     memeticIterationNumber,
                     elapsedFromStart,
                     nextTheoreticalInstant,
-                    actualMakespan
+                    actualMakespan,
+                    numberOfBestSolutionsCrossMutationOrigin,
+                    numberOfBestSolutionsLSAOrigin,
+                    accMakespanBeforeLSA,
+                    accMakespanAfterLSA,
+                    calculateDiffAccMakespanLSA(accMakespanBeforeLSA, accMakespanAfterLSA)
             );
+    }
+
+    private BigDecimal calculateDiffAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA){
+        return accMakespanBeforeLSA
+                .subtract(accMakespanAfterLSA)
+                .abs();
     }
 
     private void updateBestMakespan(double actualMakespan){
         this.bestMakespan = Math.min(actualMakespan, this.bestMakespan);
     }
 
-    private void saveMetrics(int memeticIterationNumber, long realInstant, long theoreticalInstant, double actualMakespan){
+    private void saveMetrics(int memeticIterationNumber, long realInstant, long theoreticalInstant, double actualMakespan,
+        long numberOfBestSolutionsCrossMutationOrigin, long numberOfBestSolutionsLSAOrigin,
+        BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA, BigDecimal diffAccMakespanLSA){
 
         this.memeticIterationNumberList.add(memeticIterationNumber);
         this.realInstants.add(realInstant);
@@ -92,6 +120,12 @@ public class MemeticEvolutionMetrics {
         this.bestMakespanEvolution.add(this.bestMakespan);
         this.actualMakespanEvolution.add(actualMakespan);
 
+        this.numberOfBestSolutionsLSAOrigin.add(numberOfBestSolutionsLSAOrigin);
+        this.numberOfBestSolutionsCrossMutationOrigin.add(numberOfBestSolutionsCrossMutationOrigin);
+
+        this.accMakespanBeforeLSAEvolution.add(accMakespanBeforeLSA);
+        this.accMakespanAfterLSAEvolution.add(accMakespanAfterLSA);
+        this.diffAccMakespanLSAEvolution.add(diffAccMakespanLSA);
     }
 
     public List<Integer> getMemeticIterationNumberList() {
@@ -111,5 +145,25 @@ public class MemeticEvolutionMetrics {
 
     public List<Double> getBestMakespanEvolution() {
         return bestMakespanEvolution;
+    }
+
+    public List<Long> getNumberOfBestSolutionsLSAOrigin() {
+        return numberOfBestSolutionsLSAOrigin;
+    }
+
+    public List<Long> getNumberOfBestSolutionsCrossMutationOrigin() {
+        return numberOfBestSolutionsCrossMutationOrigin;
+    }
+
+    public List<BigDecimal> getAccMakespanBeforeLSAEvolution() {
+        return accMakespanBeforeLSAEvolution;
+    }
+
+    public List<BigDecimal> getAccMakespanAfterLSAEvolution() {
+        return accMakespanAfterLSAEvolution;
+    }
+
+    public List<BigDecimal> getDiffAccMakespanLSAEvolution() {
+        return diffAccMakespanLSAEvolution;
     }
 }

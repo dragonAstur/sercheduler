@@ -1,6 +1,7 @@
 package com.uniovi.sercheduler.jmetal.operator;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.jmetal.problem.SolutionOrigin;
 import com.uniovi.sercheduler.service.Operators;
 import org.uma.jmetal.operator.mutation.MutationOperator;
 
@@ -29,7 +30,8 @@ public class ScheduleMutation implements MutationOperator<SchedulePermutationSol
         schedulePermutationSolution.objectives().length,
         null,
         operators.mutate(schedulePermutationSolution.getPlan()),
-        schedulePermutationSolution.getArbiter());
+        schedulePermutationSolution.getArbiter(),
+        SolutionOrigin.CROSS_MUTATION);
   }
 
   /**

@@ -1,6 +1,7 @@
 package com.uniovi.sercheduler.localsearch.operator;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.jmetal.problem.SolutionOrigin;
 import com.uniovi.sercheduler.localsearch.movement.InsertionMovement;
 import com.uniovi.sercheduler.localsearch.movement.Movement;
 import com.uniovi.sercheduler.service.PlanPair;
@@ -34,7 +35,8 @@ public class NeighborhoodInsertionLazy implements NeighborhoodOperatorLazy{
                                         actualSolution.objectives().length,
                                         null,
                                         insertInOneSpecificPosition(plan, position, otherPosition),
-                                        actualSolution.getArbiter()
+                                        actualSolution.getArbiter(),
+                                        SolutionOrigin.LSA
                                 );
 
                                 int[] changedPlanPairs = position < otherPosition ?

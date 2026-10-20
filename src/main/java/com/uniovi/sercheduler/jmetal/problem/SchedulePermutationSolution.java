@@ -20,6 +20,8 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
   List<PlanPair> plan;
  private  MultiResult multiResult;
 
+ private final SolutionOrigin origin;
+
   public MultiResult getMultiResult() {
     return multiResult;
   }
@@ -46,7 +48,22 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
     this.fitnessInfo = fitnessInfo;
     this.plan = plan;
     this.arbiter = arbiter;
+    this.origin = SolutionOrigin.CROSS_MUTATION;
   }
+
+    public SchedulePermutationSolution(
+            int numberOfVariables,
+            int numberOfObjectives,
+            FitnessInfo fitnessInfo,
+            List<PlanPair> plan,
+            String arbiter,
+            SolutionOrigin origin) {
+        super(numberOfVariables, numberOfObjectives);
+        this.fitnessInfo = fitnessInfo;
+        this.plan = plan;
+        this.arbiter = arbiter;
+        this.origin = origin;
+    }
 
   /**
    * Copy method.
@@ -70,7 +87,8 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
         this.objectives().length,
         fitnessInfoCopy,
         List.copyOf(this.plan),
-        this.arbiter);
+        this.arbiter,
+        this.origin);
   }
 
   public List<PlanPair> getPlan() {
@@ -111,4 +129,8 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
   public List<PlanPair> variables() {
     return plan;
   }
+
+    public SolutionOrigin getOrigin() {
+        return origin;
+    }
 }

@@ -1,6 +1,7 @@
 package com.uniovi.sercheduler.jmetal.operator;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.jmetal.problem.SolutionOrigin;
 import com.uniovi.sercheduler.service.Operators;
 import java.util.List;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
@@ -75,12 +76,14 @@ public class ScheduleCrossover implements CrossoverOperator<SchedulePermutationS
             schedule1.objectives().length,
             null,
             newPlan,
-            schedule1.getArbiter()),
+            schedule1.getArbiter(),
+            SolutionOrigin.CROSS_MUTATION),
         new SchedulePermutationSolution(
             schedule1.variables().size(),
             schedule1.objectives().length,
             null,
             newPlan2,
-            schedule1.getArbiter()));
+            schedule1.getArbiter(),
+            SolutionOrigin.CROSS_MUTATION));
   }
 }

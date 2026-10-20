@@ -198,7 +198,8 @@ public class SchedulingProblem implements PermutationProblem<SchedulePermutation
   @Override
   public SchedulePermutationSolution createSolution() {
     var plan = planGenerator.generatePlan();
-    return new SchedulePermutationSolution(numberOfVariables(), numberOfObjectives(), null, plan, defaultArbiter);
+    return new SchedulePermutationSolution(numberOfVariables(), numberOfObjectives(), null, plan, defaultArbiter,
+            SolutionOrigin.RANDOM);
   }
 
   private InstanceData loadData(File workflowFile, File hostsFile, String referenceSpeed) {

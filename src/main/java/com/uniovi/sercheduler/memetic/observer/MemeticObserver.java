@@ -1,8 +1,10 @@
 package com.uniovi.sercheduler.memetic.observer;
 
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.jmetal.problem.SolutionOrigin;
 import com.uniovi.sercheduler.localsearch.observer.Observer;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 
 public class MemeticObserver implements Observer {
 
@@ -14,6 +16,11 @@ public class MemeticObserver implements Observer {
     //private double reachedMakespan;
     private final long periodicTimeForMakespanEvolution;
     private int memeticIterationNumber;
+
+    private long numberOfBestSolutionsLSAOrigin;
+    private long numberOfBestSolutionsCrossMutationOrigin;
+
+    private BigDecimal accMakespanBeforeLSA, accMakespanAfterLSA;
 
     public MemeticObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution){
 
@@ -29,6 +36,11 @@ public class MemeticObserver implements Observer {
 
         this.memeticIterationNumber = 1;
 
+        this.numberOfBestSolutionsCrossMutationOrigin = -1;
+        this.numberOfBestSolutionsLSAOrigin = -1;
+
+        this.accMakespanBeforeLSA = BigDecimal.ZERO;
+        this.accMakespanAfterLSA = BigDecimal.ZERO;
     }
 
     @Override
@@ -101,7 +113,11 @@ public class MemeticObserver implements Observer {
         this.memeticEvolutionMetrics.update(
                 this.memeticStartingTime,
                 this.memeticIterationNumber,
-                lastRecordedMakespan()
+                lastRecordedMakespan(),
+                this.numberOfBestSolutionsCrossMutationOrigin,
+                this.numberOfBestSolutionsLSAOrigin,
+                this.accMakespanBeforeLSA,
+                this.accMakespanAfterLSA
         );
     }
 
@@ -121,7 +137,9 @@ public class MemeticObserver implements Observer {
 
         //TODO: ¿número de individuos usados en búsqueda local? ¿número de individuos mejorados en búsqueda local?
 
-        this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber, actualMakespan);
+        this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber, actualMakespan,
+                this.numberOfBestSolutionsCrossMutationOrigin, this.numberOfBestSolutionsLSAOrigin,
+                this.accMakespanBeforeLSA, this.accMakespanAfterLSA);
     }
 
     @Override
@@ -138,4 +156,21 @@ public class MemeticObserver implements Observer {
     public String getOperatorsName() {
         return this.operatorsName;
     }
+
+    public void updateBestSolutionsOrigins(SchedulePermutationSolution bestSolution){
+        if(bestSolution.getOrigin().equals(SolutionOrigin.LSA))
+            this.numberOfBestSolutionsLSAOrigin += 1;
+        else
+            this.numberOfBestSolutionsCrossMutationOrigin += 1;
+    }
+
+    public void addMakespanBeforeLSA(double makespanBeforeLSA){
+        this.accMakespanBeforeLSA = this.accMakespanBeforeLSA.add(BigDecimal.valueOf(makespanBeforeLSA));
+    }
+
+    public void addMakespanAfterLSA(double makespanAfterLSA){
+        this.accMakespanAfterLSA = this.accMakespanAfterLSA.add(BigDecimal.valueOf(makespanAfterLSA));
+    }
+
+
 }

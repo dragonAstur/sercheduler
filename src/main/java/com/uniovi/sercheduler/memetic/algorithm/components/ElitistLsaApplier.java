@@ -19,23 +19,33 @@ public class ElitistLsaApplier implements LsaApplier {
         //Usar el initial solution generator
         SchedulePermutationSolution bestSolution = population.get(bestIndex);
 
+        double bestSolutionMakespan = bestSolution.getFitnessInfo().fitness().get("makespan");
+
         observer.updateMemeticEvolution(
-                bestSolution.getFitnessInfo().fitness().get("makespan"),
+                bestSolutionMakespan,
                 0,
                 0
         );
+
+        observer.addMakespanBeforeLSA(bestSolutionMakespan);
+
+        observer.updateBestSolutionsOrigins(bestSolution);
 
         lsa.setInitialSolution(bestSolution);
 
         SchedulePermutationSolution enhancedBestSolution = lsa.runLocalSearchLazy(operatorList, observer);
 
+        double enhancedBestSolutionMakespan = enhancedBestSolution.getFitnessInfo().fitness().get("makespan");
+
         population.set(bestIndex, enhancedBestSolution);
 
         observer.updateMemeticEvolution(
-                enhancedBestSolution.getFitnessInfo().fitness().get("makespan"),
+                enhancedBestSolutionMakespan,
                 0,
                 0
         );
+
+        observer.addMakespanAfterLSA(enhancedBestSolutionMakespan);
 
     }
 }

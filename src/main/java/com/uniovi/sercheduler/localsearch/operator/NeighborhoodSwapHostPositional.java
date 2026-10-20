@@ -1,6 +1,7 @@
 package com.uniovi.sercheduler.localsearch.operator;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.jmetal.problem.SolutionOrigin;
 import com.uniovi.sercheduler.localsearch.movement.Movement;
 import com.uniovi.sercheduler.localsearch.movement.SwapHostMovement;
 import com.uniovi.sercheduler.service.PlanPair;
@@ -31,7 +32,8 @@ public class NeighborhoodSwapHostPositional implements NeighborhoodOperatorPosit
                     actualSolution.objectives().length,
                     null,
                     swapHostWithOneSpecificPosition(plan, position, otherPosition),
-                    actualSolution.getArbiter()
+                    actualSolution.getArbiter(),
+                    SolutionOrigin.LSA
             );
 
             List<Movement> movements = new ArrayList<>();

@@ -2,6 +2,7 @@ package com.uniovi.sercheduler.localsearch.operator;
 
 import com.uniovi.sercheduler.dto.Task;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.jmetal.problem.SolutionOrigin;
 import com.uniovi.sercheduler.service.PlanPair;
 
 import java.util.ArrayList;
@@ -25,7 +26,8 @@ public class NeighborUtils {
                             schedulePermutationSolution.objectives().length,
                             null,
                             plan,
-                            schedulePermutationSolution.getArbiter()
+                            schedulePermutationSolution.getArbiter(),
+                            SolutionOrigin.LSA
                     )
             );
         }
