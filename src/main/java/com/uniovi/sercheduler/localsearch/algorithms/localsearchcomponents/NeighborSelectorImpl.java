@@ -28,7 +28,7 @@ public class NeighborSelectorImpl implements NeighborSelector {
                     counter.incrementAndGet();
 
                     //observer.updateMakespanEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"), counter.get());
-                    observer.updateMemeticEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"), 0, 0);
+                    observer.updateMemeticEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"));
 
                     evaluator.evaluate(actualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
 

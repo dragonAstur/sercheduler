@@ -57,9 +57,7 @@ public class MemeticScheduleReplacement implements MemeticReplacement<SchedulePe
                                             ArrayList::new));
 
             observer.updateMemeticEvolution(
-                    observer.lastRecordedMakespan(),
-                    0,
-                    0
+                    observer.lastRecordedMakespan()
             );
 
             if (result.size() == 1) {

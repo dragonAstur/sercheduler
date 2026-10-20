@@ -26,7 +26,7 @@ public interface Observer {
 
     void updateLSAEvolution(double actualMakespan, long actualIterationNumberOfNeighbors);
 
-    void updateMemeticEvolution(double actualMakespan, long actualLSAInvocations, long actualLSAImprovements);
+    void updateMemeticEvolution(double actualMakespan); //, long actualLSAInvocations, long actualLSAImprovements);
 
     long getPeriodicTimeForMakespanEvolution();
 

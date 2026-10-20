@@ -22,9 +22,7 @@ public class ElitistLsaApplier implements LsaApplier {
         double bestSolutionMakespan = bestSolution.getFitnessInfo().fitness().get("makespan");
 
         observer.updateMemeticEvolution(
-                bestSolutionMakespan,
-                0,
-                0
+                bestSolutionMakespan
         );
 
         observer.addMakespanBeforeLSA(bestSolutionMakespan);
@@ -40,9 +38,7 @@ public class ElitistLsaApplier implements LsaApplier {
         population.set(bestIndex, enhancedBestSolution);
 
         observer.updateMemeticEvolution(
-                enhancedBestSolutionMakespan,
-                0,
-                0
+                enhancedBestSolutionMakespan
         );
 
         observer.addMakespanAfterLSA(enhancedBestSolutionMakespan);

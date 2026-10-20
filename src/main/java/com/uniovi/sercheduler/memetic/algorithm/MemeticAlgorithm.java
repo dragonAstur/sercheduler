@@ -99,9 +99,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
             this.population = this.replacement.replace(this.population, offspringPopulation);
 
             observer.updateMemeticEvolution(
-                    this.population.get( getBestSolutionPos(this.population) ).getFitnessInfo().fitness().get("makespan"),
-                    0,
-                    0
+                    this.population.get( getBestSolutionPos(this.population) ).getFitnessInfo().fitness().get("makespan")
             );
 
             lsaApplier.applyLSA(this.population, this.lsa, this.operatorList, this.observer);
@@ -114,9 +112,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         this.totalComputingTime = System.currentTimeMillis() - this.initTime;
 
         observer.updateMemeticEvolution(
-                this.population.get( getBestSolutionPos(this.population) ).getFitnessInfo().fitness().get("makespan"),
-                0,
-                0
+                this.population.get( getBestSolutionPos(this.population) ).getFitnessInfo().fitness().get("makespan")
         );
 
         observer.endRun();

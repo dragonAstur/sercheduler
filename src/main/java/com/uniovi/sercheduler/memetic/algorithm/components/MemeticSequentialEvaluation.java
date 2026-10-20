@@ -32,9 +32,7 @@ public class MemeticSequentialEvaluation<S extends Solution<?>> implements Memet
             bestMakespan = Math.min(s.objectives()[0], bestMakespan);
 
             observer.updateMemeticEvolution(
-                    bestMakespan,
-                    0,
-                    0
+                    bestMakespan
             );
         }
 

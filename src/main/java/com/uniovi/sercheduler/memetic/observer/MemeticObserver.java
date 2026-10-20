@@ -133,7 +133,7 @@ public class MemeticObserver implements Observer {
     }
 
     @Override
-    public void updateMemeticEvolution(double actualMakespan, long actualLSAInvocations, long actualLSAImprovements) {
+    public void updateMemeticEvolution(double actualMakespan) {
 
         //TODO: ¿número de individuos usados en búsqueda local? ¿número de individuos mejorados en búsqueda local?
 

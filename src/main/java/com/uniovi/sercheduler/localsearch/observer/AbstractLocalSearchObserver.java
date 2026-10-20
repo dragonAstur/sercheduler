@@ -48,7 +48,7 @@ public abstract class AbstractLocalSearchObserver implements Observer{
     }
 
     @Override
-    public void updateMemeticEvolution(double actualMakespan, long actualLSAInvocations, long actualLSAImprovements){
+    public void updateMemeticEvolution(double actualMakespan){
 
     }
 

@@ -72,9 +72,7 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
             this.population = this.replacement.replace(this.population, offspringPopulation, observer);
 
             observer.updateMemeticEvolution(
-                    this.population.stream().mapToDouble(x -> x.objectives()[0]).min().orElse(-1),
-                    0,
-                    0
+                    this.population.stream().mapToDouble(x -> x.objectives()[0]).min().orElse(-1)
             );
 
             this.updateProgress();
@@ -87,9 +85,7 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
         observer.endRun();
 
         observer.updateMemeticEvolution(
-                this.population.stream().mapToDouble(x -> x.objectives()[0]).min().orElse(-1),
-                0,
-                0
+                this.population.stream().mapToDouble(x -> x.objectives()[0]).min().orElse(-1)
         );
 
         //XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);

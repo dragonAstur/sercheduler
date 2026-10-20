@@ -62,9 +62,7 @@ public class PercentageLsaApplier implements LsaApplier {
             baseSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
 
             observer.updateMemeticEvolution(
-                    baseSolutionMakespan,
-                    0,
-                    0
+                    baseSolutionMakespan
             );
 
             observer.addMakespanBeforeLSA(baseSolutionMakespan);
@@ -78,9 +76,7 @@ public class PercentageLsaApplier implements LsaApplier {
             enhancedSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
 
             observer.updateMemeticEvolution(
-                    enhancedSolutionMakespan,
-                    0,
-                    0
+                    enhancedSolutionMakespan
             );
 
             observer.addMakespanAfterLSA(enhancedSolutionMakespan);

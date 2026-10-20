@@ -52,9 +52,7 @@ public class MemeticCrossoverAndMutationVariation<S extends Solution<?>> impleme
             }
 
             observer.updateMemeticEvolution(
-                    observer.lastRecordedMakespan(),
-                    0,
-                    0
+                    observer.lastRecordedMakespan()
             );
         }
 
