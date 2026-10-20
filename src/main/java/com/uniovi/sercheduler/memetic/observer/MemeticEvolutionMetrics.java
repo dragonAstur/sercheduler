@@ -3,6 +3,7 @@ package com.uniovi.sercheduler.memetic.observer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.RoundingMode;
 
 public class MemeticEvolutionMetrics {
 
@@ -18,7 +19,8 @@ public class MemeticEvolutionMetrics {
     private final List<Long> numberOfBestSolutionsLSAOrigin;
     private final List<Long> numberOfBestSolutionsCrossMutationOrigin;
 
-    private final List<BigDecimal> accMakespanBeforeLSAEvolution, accMakespanAfterLSAEvolution, diffAccMakespanLSAEvolution;
+    private final List<BigDecimal> accMakespanBeforeLSAEvolution, accMakespanAfterLSAEvolution;
+    private final List<BigDecimal> diffAccMakespanLSAEvolution, percentageAccMakespanLSAEvolution;
 
     //TODO: ¿número de individuos usados en búsqueda local? ¿número de individuos mejorados en búsqueda local?
 
@@ -41,6 +43,7 @@ public class MemeticEvolutionMetrics {
         this.accMakespanBeforeLSAEvolution = new ArrayList<>();
         this.accMakespanAfterLSAEvolution = new ArrayList<>();
         this.diffAccMakespanLSAEvolution = new ArrayList<>();
+        this.percentageAccMakespanLSAEvolution = new ArrayList<>();
 
     }
 
@@ -95,14 +98,21 @@ public class MemeticEvolutionMetrics {
                     numberOfBestSolutionsLSAOrigin,
                     accMakespanBeforeLSA,
                     accMakespanAfterLSA,
-                    calculateDiffAccMakespanLSA(accMakespanBeforeLSA, accMakespanAfterLSA)
+                    calculateDiffAccMakespanLSA(accMakespanBeforeLSA, accMakespanAfterLSA),
+                    calculatePercentageAccMakespanLSA(accMakespanBeforeLSA, accMakespanAfterLSA)
             );
     }
 
     private BigDecimal calculateDiffAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA){
-        return accMakespanBeforeLSA
-                .subtract(accMakespanAfterLSA)
+        return accMakespanAfterLSA
+                .subtract(accMakespanBeforeLSA)
                 .abs();
+    }
+
+    private BigDecimal calculatePercentageAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA){
+        return accMakespanAfterLSA
+                .divide(accMakespanBeforeLSA,
+                        2, RoundingMode.HALF_UP);
     }
 
     private void updateBestMakespan(double actualMakespan){
@@ -111,7 +121,8 @@ public class MemeticEvolutionMetrics {
 
     private void saveMetrics(int memeticIterationNumber, long realInstant, long theoreticalInstant, double actualMakespan,
         long numberOfBestSolutionsCrossMutationOrigin, long numberOfBestSolutionsLSAOrigin,
-        BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA, BigDecimal diffAccMakespanLSA){
+        BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA,
+        BigDecimal diffAccMakespanLSA, BigDecimal percentageAccMakespanLSA){
 
         this.memeticIterationNumberList.add(memeticIterationNumber);
         this.realInstants.add(realInstant);
@@ -126,6 +137,7 @@ public class MemeticEvolutionMetrics {
         this.accMakespanBeforeLSAEvolution.add(accMakespanBeforeLSA);
         this.accMakespanAfterLSAEvolution.add(accMakespanAfterLSA);
         this.diffAccMakespanLSAEvolution.add(diffAccMakespanLSA);
+        this.percentageAccMakespanLSAEvolution.add(percentageAccMakespanLSA);
     }
 
     public List<Integer> getMemeticIterationNumberList() {
@@ -165,5 +177,9 @@ public class MemeticEvolutionMetrics {
 
     public List<BigDecimal> getDiffAccMakespanLSAEvolution() {
         return diffAccMakespanLSAEvolution;
+    }
+
+    public List<BigDecimal> getPercentageAccMakespanLSAEvolution() {
+        return percentageAccMakespanLSAEvolution;
     }
 }

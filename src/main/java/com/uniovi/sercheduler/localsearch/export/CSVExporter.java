@@ -34,7 +34,9 @@ public class CSVExporter {
                     ";" +
                     "Total makespan after LSA" +
                     ";" +
-                    "Diff before-after LSA" +
+                    "Diff after-before LSA" +
+                    ";" +
+                    "% after/before LSA" +
                     ";" +
                     "LSA invocations" +
                     ";" +
@@ -84,7 +86,9 @@ public class CSVExporter {
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getAccMakespanAfterLSAEvolution().get(i))
                         .append(";")
-                        .append(observer.getMemeticEvolutionMetrics().getDiffAccMakespanLSAEvolution())
+                        .append(observer.getMemeticEvolutionMetrics().getDiffAccMakespanLSAEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getPercentageAccMakespanLSAEvolution().get(i))
                         .append(";")
                         //.append()
                         .append(";")
