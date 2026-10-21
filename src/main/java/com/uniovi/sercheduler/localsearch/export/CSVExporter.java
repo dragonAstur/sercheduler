@@ -80,7 +80,7 @@ public class CSVExporter {
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getBestMakespanEvolution().get(i))
                         .append(";")
-                        //.append()
+                        .append(observer.getMemeticEvolutionMetrics().getPopAvgMakespanEvolution().get(i))
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getAccMakespanBeforeLSAEvolution().get(i))
                         .append(";")

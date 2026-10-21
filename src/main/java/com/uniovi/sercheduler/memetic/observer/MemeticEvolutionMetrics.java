@@ -28,6 +28,8 @@ public class MemeticEvolutionMetrics {
 
     private final List<Long> accEvaluatedNeighborsEvolution;
 
+    private final List<Double> popAvgMakespanEvolution;
+
 
     public MemeticEvolutionMetrics(long periodicTimeForMakespanEvolution) {
 
@@ -56,13 +58,16 @@ public class MemeticEvolutionMetrics {
         this.accEvaluatedNeighborsEvolution = new ArrayList<>();
 
         this.ratioIterationsInvocationsEvolution = new ArrayList<>();
+
+        this.popAvgMakespanEvolution = new ArrayList<>();
     }
 
     public void update(long memeticStartingTime, int memeticIterationNumber, double actualMakespan,
                        long numberOfBestSolutionsCrossMutationOrigin, long numberOfBestSolutionsLSAOrigin,
                        BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA,
                        long accLSAInvocations, long accLSAIterations, long accLSAImprovements,
-                       long accEvaluatedNeighbors){
+                       long accEvaluatedNeighbors,
+                       double popAvgMakespan){
 
         updateBestMakespan(actualMakespan);
 
@@ -117,7 +122,8 @@ public class MemeticEvolutionMetrics {
                     accLSAIterations,
                     calculateRatioIterationsInvocations(accLSAIterations, accLSAInvocations),
                     accLSAImprovements,
-                    accEvaluatedNeighbors
+                    accEvaluatedNeighbors,
+                    popAvgMakespan
             );
     }
 
@@ -147,7 +153,8 @@ public class MemeticEvolutionMetrics {
                              BigDecimal diffAccMakespanLSA, BigDecimal percentageAccMakespanLSA,
                              long accLSAInvocations, long accLSAIterations, double ratioIterationsInvocations,
                              long accLSAImprovements,
-                             long accEvaluatedNeighbors){
+                             long accEvaluatedNeighbors,
+                             double popAvgMakespan){
 
         this.memeticIterationNumberList.add(memeticIterationNumber);
         this.realInstants.add(realInstant);
@@ -172,6 +179,8 @@ public class MemeticEvolutionMetrics {
         this.accLSAImprovementsEvolution.add(accLSAImprovements);
 
         this.accEvaluatedNeighborsEvolution.add(accEvaluatedNeighbors);
+
+        this.popAvgMakespanEvolution.add(popAvgMakespan);
     }
 
     public List<Integer> getMemeticIterationNumberList() {
@@ -235,5 +244,9 @@ public class MemeticEvolutionMetrics {
 
     public List<Double> getRatioIterationsInvocationsEvolution() {
         return ratioIterationsInvocationsEvolution;
+    }
+
+    public List<Double> getPopAvgMakespanEvolution() {
+        return popAvgMakespanEvolution;
     }
 }

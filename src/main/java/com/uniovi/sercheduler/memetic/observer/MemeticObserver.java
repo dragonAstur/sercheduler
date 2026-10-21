@@ -26,6 +26,8 @@ public class MemeticObserver implements Observer {
 
     private long accEvaluatedNeighbors;
 
+    private double popAvgMakespan;
+
     public MemeticObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution){
 
         this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
@@ -131,7 +133,8 @@ public class MemeticObserver implements Observer {
                 this.accLSAInvocations,
                 this.accLSAIterations,
                 this.accLSAImprovements,
-                this.accEvaluatedNeighbors
+                this.accEvaluatedNeighbors,
+                this.popAvgMakespan
         );
     }
 
@@ -153,7 +156,8 @@ public class MemeticObserver implements Observer {
                 this.numberOfBestSolutionsCrossMutationOrigin, this.numberOfBestSolutionsLSAOrigin,
                 this.accMakespanBeforeLSA, this.accMakespanAfterLSA,
                 this.accLSAInvocations, this.accLSAIterations, this.accLSAImprovements,
-                this.accEvaluatedNeighbors);
+                this.accEvaluatedNeighbors,
+                this.popAvgMakespan);
     }
 
     @Override
@@ -212,6 +216,10 @@ public class MemeticObserver implements Observer {
 
     public void addLSAInvocations(long numberOfIterations){
         this.accLSAIterations += numberOfIterations;
+    }
+
+    public void updatePopAvgMakespan(double newPopAvgMakespan){
+        this.popAvgMakespan = newPopAvgMakespan;
     }
 
 }

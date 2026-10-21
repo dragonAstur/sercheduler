@@ -93,6 +93,12 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
 
         while(!this.termination.isMet(this.attributes)) {
 
+            observer.updatePopAvgMakespan(
+                    this.population.stream().mapToDouble(
+                            s -> s.getFitnessInfo().fitness().get("makespan")
+                    ).average().orElse(-1.0)
+            );
+
             List<SchedulePermutationSolution> matingPopulation = this.selection.select(this.population);
             List<SchedulePermutationSolution> offspringPopulation = this.variation.variate(this.population, matingPopulation);
             offspringPopulation = this.evaluation.evaluate(offspringPopulation, observer);
