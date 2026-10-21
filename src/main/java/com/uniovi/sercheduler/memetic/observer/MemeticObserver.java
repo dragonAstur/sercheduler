@@ -24,6 +24,8 @@ public class MemeticObserver implements Observer {
 
     private long accLSAIterations, accLSAImprovements, accLSAInvocations;
 
+    private long accEvaluatedNeighbors;
+
     public MemeticObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution){
 
         this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
@@ -47,6 +49,8 @@ public class MemeticObserver implements Observer {
         this.accLSAImprovements = 0;
         this.accLSAIterations = 0;
         this.accLSAInvocations = 0;
+
+        this.accEvaluatedNeighbors = 0;
     }
 
     @Override
@@ -126,7 +130,8 @@ public class MemeticObserver implements Observer {
                 this.accMakespanAfterLSA,
                 this.accLSAInvocations,
                 this.accLSAIterations,
-                this.accLSAImprovements
+                this.accLSAImprovements,
+                this.accEvaluatedNeighbors
         );
     }
 
@@ -147,7 +152,8 @@ public class MemeticObserver implements Observer {
         this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber, actualMakespan,
                 this.numberOfBestSolutionsCrossMutationOrigin, this.numberOfBestSolutionsLSAOrigin,
                 this.accMakespanBeforeLSA, this.accMakespanAfterLSA,
-                this.accLSAInvocations, this.accLSAIterations, this.accLSAImprovements);
+                this.accLSAInvocations, this.accLSAIterations, this.accLSAImprovements,
+                this.accEvaluatedNeighbors);
     }
 
     @Override
@@ -192,7 +198,12 @@ public class MemeticObserver implements Observer {
 
     @Override
     public void incrementLSAInvocation(){
+        this.accLSAInvocations += 1;
+    }
 
+    @Override
+    public void incrementEvaluatedNeighbor() {
+        this.accEvaluatedNeighbors += 1;
     }
 
     public void addLSAImprovements(long numberOfImprovements){

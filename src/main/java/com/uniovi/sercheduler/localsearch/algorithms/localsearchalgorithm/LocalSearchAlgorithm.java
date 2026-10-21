@@ -199,9 +199,7 @@ public class LocalSearchAlgorithm {
 
             neighbors = neighborLimiter.limitNeighborsNumber(neighbors);
 
-            AtomicInteger counter = new AtomicInteger();
-
-            maybeBetterNeighbor = neighborSelector.selectBestNeighborLazy(actualSolution, neighbors, evaluator, counter,
+            maybeBetterNeighbor = neighborSelector.selectBestNeighborLazy(actualSolution, neighbors, evaluator,
                     acceptanceCriterion, terminationCriterion, observer);
 
             //observer.setNumberOfGeneratedNeighbors(counter.get());

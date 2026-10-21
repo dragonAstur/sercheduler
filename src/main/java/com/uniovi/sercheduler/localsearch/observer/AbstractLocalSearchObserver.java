@@ -186,4 +186,9 @@ public abstract class AbstractLocalSearchObserver implements Observer{
     public void incrementLSAInvocation() {
 
     }
+
+    @Override
+    public void incrementEvaluatedNeighbor(){
+
+    }
 }

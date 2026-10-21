@@ -40,6 +40,8 @@ public class CSVExporter {
                     ";" +
                     "LSA iterations" +
                     ";" +
+                    "Iterations / Invocations" +
+                    ";" +
                     "LSA improvements" +
                     ";" +
                     "Evaluated neighbors" +
@@ -92,9 +94,11 @@ public class CSVExporter {
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getAccLSAIterationsEvolution().get(i))
                         .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getRatioIterationsInvocationsEvolution().get(i))
+                        .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getAccLSAImprovementsEvolution().get(i))
                         .append(";")
-                        //.append()
+                        .append(observer.getMemeticEvolutionMetrics().getAccEvaluatedNeighborsEvolution().get(i))
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getNumberOfBestSolutionsLSAOrigin().get(i))
                         .append(";")

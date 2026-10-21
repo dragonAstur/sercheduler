@@ -19,16 +19,16 @@ public class NeighborSelectorImpl implements NeighborSelector {
 
     public Optional<GeneratedNeighbor> selectBestNeighborLazy(SchedulePermutationSolution actualSolution,
                                                               Stream<GeneratedNeighbor> neighbors, LocalsearchEvaluator evaluator,
-                                                              AtomicInteger counter, AcceptanceCriterion acceptanceCriterion,
+                                                              AcceptanceCriterion acceptanceCriterion,
                                                               TerminationCriterion terminationCriterion, Observer observer) {
         return neighbors
                 .takeWhile(neighbor -> !terminationCriterion.hasTimeExceeded())
                 .filter(neighbor -> {
 
-                    counter.incrementAndGet();
-
                     //observer.updateMakespanEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"), counter.get());
                     observer.updateMemeticEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"));
+
+                    observer.incrementEvaluatedNeighbor();
 
                     evaluator.evaluate(actualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
 
