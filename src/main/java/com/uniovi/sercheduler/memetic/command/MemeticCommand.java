@@ -56,7 +56,8 @@ public class MemeticCommand {
             @Option(shortNames = 'A', defaultValue = "e") String lsaApplierName,
             @Option(shortNames = 'P', defaultValue = "100") int populationSize,
             @Option(shortNames = 'V', defaultValue = "-1") int neighborsLimit,
-            @Option(defaultValue = "false") boolean taguchi) {
+            @Option(defaultValue = "false") boolean taguchi
+    ) {
 
         return executeMemetic(workflowsPath, hostsPath, type, limitTime, seed, experimentPath, experimentConfigFile,
                 periodicTimeForMakespanEvolution, fileName, operatorConfig, lsaIterationsLimit, lsaApplierName,

@@ -17,11 +17,7 @@ public class PercentageLsaApplier implements LsaApplier {
 
     private final double percentage;
 
-    public PercentageLsaApplier(){
-        this.percentage = DEFAULT_PERCENTAGE;
-    }
-
-    public PercentageLsaApplier(double percentage){
+    public PercentageLsaApplier(double percentage) {
         this.percentage = percentage;
     }
 
@@ -29,28 +25,25 @@ public class PercentageLsaApplier implements LsaApplier {
     public void applyLSA(List<SchedulePermutationSolution> population, LocalSearchAlgorithm lsa,
                          List<NeighborhoodOperatorLazy> operatorList, MemeticObserver observer) {
 
+        //Sólo para apuntar la mejor solución
         int bestIndex =
                 MemeticAlgorithm.getBestSolutionPos(population);
 
-        //Usar el initial solution generator
         SchedulePermutationSolution bestSolution = population.get(bestIndex);
 
         observer.updateBestSolutionsOrigins(bestSolution);
 
+        //Calcular a cuántos individuos hemos de aplicar la búsqueda local
+        int numberOfApplications = calculateNumberOfApplications(population);
 
+        //Escoger aleatoriamente a los individuos a los que se les va a
+        //aplicar la búsqueda local en función de su posición
+        List<Integer> randomIndexes = calculateRandomIndexes(population);
 
-        int numberOfApplications = Math.max(1, (int) Math.round(population.size() * this.percentage));
-
-        Random random = new Random();
+        //Aplicar la búsqueda local a esos individuos de la población
         int pos;
         SchedulePermutationSolution baseSolution, enhancedSolution;
         double baseSolutionMakespan, enhancedSolutionMakespan;
-
-        List<Integer> randomIndexes = IntStream.range(0, population.size())
-                .boxed()
-                .collect(Collectors.toList());
-
-        Collections.shuffle(randomIndexes, random);
 
         for(int i = 0; i < numberOfApplications; i++){
 
@@ -60,11 +53,11 @@ public class PercentageLsaApplier implements LsaApplier {
 
             baseSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
 
+            observer.addMakespanBeforeLSA(baseSolutionMakespan);
+
             observer.updateMemeticEvolution(
                     baseSolutionMakespan
             );
-
-            observer.addMakespanBeforeLSA(baseSolutionMakespan);
 
             lsa.setInitialSolution(baseSolution);
 
@@ -74,11 +67,27 @@ public class PercentageLsaApplier implements LsaApplier {
 
             enhancedSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
 
+            observer.addMakespanAfterLSA(enhancedSolutionMakespan);
+
             observer.updateMemeticEvolution(
                     enhancedSolutionMakespan
             );
-
-            observer.addMakespanAfterLSA(enhancedSolutionMakespan);
         }
     }
+
+    private int calculateNumberOfApplications(List<SchedulePermutationSolution> population) {
+        return Math.max(1, (int) Math.round(population.size() * this.percentage));
+    }
+
+    private List<Integer> calculateRandomIndexes(List<SchedulePermutationSolution> population) {
+        Random random = new Random();
+
+        List<Integer> randomIndexes = IntStream.range(0, population.size())
+                .boxed()
+                .collect(Collectors.toList());
+
+        Collections.shuffle(randomIndexes, random);
+        return randomIndexes;
+    }
+
 }

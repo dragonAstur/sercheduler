@@ -16,18 +16,17 @@ public class ElitistLsaApplier implements LsaApplier {
         int bestIndex =
                 MemeticAlgorithm.getBestSolutionPos(population);
 
-        //Usar el initial solution generator
         SchedulePermutationSolution bestSolution = population.get(bestIndex);
 
         double bestSolutionMakespan = bestSolution.getFitnessInfo().fitness().get("makespan");
 
-        observer.updateMemeticEvolution(
-                bestSolutionMakespan
-        );
-
         observer.addMakespanBeforeLSA(bestSolutionMakespan);
 
         observer.updateBestSolutionsOrigins(bestSolution);
+
+        observer.updateMemeticEvolution(
+                bestSolutionMakespan
+        );
 
         lsa.setInitialSolution(bestSolution);
 
@@ -37,11 +36,11 @@ public class ElitistLsaApplier implements LsaApplier {
 
         population.set(bestIndex, enhancedBestSolution);
 
+        observer.addMakespanAfterLSA(enhancedBestSolutionMakespan);
+
         observer.updateMemeticEvolution(
                 enhancedBestSolutionMakespan
         );
-
-        observer.addMakespanAfterLSA(enhancedBestSolutionMakespan);
 
     }
 }

@@ -243,6 +243,10 @@ public class CommandUtils {
                                                List<NeighborhoodOperatorLazy> operatorList,
                                                int lsaIterationsLimit, MemeticObserver observer, String fileName,
                                                String memeticAlgorithmName, int neighborsLimit) {
+
+        //TODO: diseñar mejor: por un lado un método que devuelva un MemeticAlgorithmBuilder sin especificar applier,
+        // otro que en función del memeticAlgorithmName te devuelva el applier correspondiente
+
         return switch (memeticAlgorithmName.toLowerCase()) {
             case "mae" -> createMAe(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
                     random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName, neighborsLimit);
@@ -254,6 +258,9 @@ public class CommandUtils {
                     neighborsLimit);
             case "ma100" -> createMAPercentage(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
                     random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName, 1,
+                    neighborsLimit);
+            case "ma5+e" -> createMApercentageAndElitist(problem, populationSize, offspringPopulationSize, crossover, mutation, termination,
+                    random, objectives, limitTime, operatorList, lsaIterationsLimit, observer, fileName, 0.05,
                     neighborsLimit);
             default ->
                     throw new IllegalArgumentException("Could not identify this type of memetic algorithm: " + memeticAlgorithmName);
@@ -311,6 +318,34 @@ public class CommandUtils {
                 .setSelection(new ScheduleSelection(random))
                 .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
                 .setNeighborLimiter(new NeighborLimiterImpl(neighborsLimit))
+                .setObserver(observer)
+                .build();
+    }
+
+    private static MemeticAlgorithm createMApercentageAndElitist(SchedulingProblem problem, int populationSize, int offspringPopulationSize,
+                                                                 CrossoverOperator<SchedulePermutationSolution> crossover,
+                                                                 MutationOperator<SchedulePermutationSolution> mutation, Termination termination,
+                                                                 Random random, List<Objective> objectives, long limitTime,
+                                                                 List<NeighborhoodOperatorLazy> operatorList,
+                                                                 int lsaIterationsLimit, MemeticObserver observer, String fileName,
+                                                                 double percentage, int neighborsLimit){
+        return new MemeticAlgorithmBuilder(
+                "Memetic",
+                problem,
+                populationSize,
+                offspringPopulationSize,
+                crossover,
+                mutation,
+                limitTime,
+                operatorList,
+                lsaIterationsLimit,
+                fileName)
+                .setTermination(termination)
+                .setEvaluation(new MemeticSequentialEvaluation<>(problem))
+                .setSelection(new ScheduleSelection(random))
+                .setReplacement(new ScheduleReplacement(random, objectives.get(0)))
+                .setNeighborLimiter(new NeighborLimiterImpl(neighborsLimit))
+                .setLsaApplier(new PercentageAndElitistApplier(percentage))
                 .setObserver(observer)
                 .build();
     }
@@ -454,6 +489,7 @@ public class CommandUtils {
             case "5percent", "5" -> "MA5";
             case "20percent", "20" -> "MA20";
             case "100percent", "100" -> "MA100";
+            case "5+e", "5ue", "5percent&elitist", "elitist&5percent" -> "MA5+e";
             default -> throw new IllegalArgumentException("Could not find any LSA applier name that matches with " + lsaApplierName);
         };
     }
