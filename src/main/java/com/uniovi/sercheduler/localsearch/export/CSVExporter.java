@@ -20,6 +20,8 @@ public class CSVExporter {
                     ";" +
                     "Periodic time" +
                     ";" +
+                    "Periodic time (hours)" +
+                    ";" +
                     "Time instant" +
                     ";" +
                     "Actual makespan" +
@@ -73,6 +75,12 @@ public class CSVExporter {
                         .append(observer.getMemeticEvolutionMetrics().getMemeticIterationNumberList().get(i))
                         .append(";")
                         .append(observer.getPeriodicTimeForMakespanEvolution() * (i+1))
+                        .append(";")
+                        .append(
+                                Formatter.millisecondsToHourFormat(
+                                        observer.getPeriodicTimeForMakespanEvolution() * (i+1)
+                                )
+                        )
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getRealInstants().get(i))
                         .append(";")
