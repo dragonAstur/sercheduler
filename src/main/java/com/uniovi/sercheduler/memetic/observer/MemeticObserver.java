@@ -42,8 +42,8 @@ public class MemeticObserver implements Observer {
 
         this.memeticIterationNumber = 1;
 
-        this.numberOfBestSolutionsCrossMutationOrigin = -1;
-        this.numberOfBestSolutionsLSAOrigin = -1;
+        this.numberOfBestSolutionsCrossMutationOrigin = 0;
+        this.numberOfBestSolutionsLSAOrigin = 0;
 
         this.accMakespanBeforeLSA = BigDecimal.ZERO;
         this.accMakespanAfterLSA = BigDecimal.ZERO;

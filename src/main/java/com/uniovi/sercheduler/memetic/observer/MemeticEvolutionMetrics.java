@@ -138,6 +138,10 @@ public class MemeticEvolutionMetrics {
     }
 
     private BigDecimal calculatePercentageAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA){
+
+        if(accMakespanAfterLSA.compareTo(BigDecimal.ZERO) <= 0)
+            return BigDecimal.ZERO;
+
         return accMakespanAfterLSA
                 .divide(accMakespanBeforeLSA,
                         2, RoundingMode.HALF_UP);

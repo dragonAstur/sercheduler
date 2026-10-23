@@ -175,6 +175,9 @@ public class LocalSearchAlgorithm {
             List<NeighborhoodOperatorLazy> neighborhoodOperatorList,
             Observer observer
     ) {
+
+        observer.incrementLSAInvocation();
+
         FitnessCalculator fitnessCalculator = fitnessCalculatorGenerator.createFitnessCalculator();
         SchedulePermutationSolution actualSolution = initialSolutionGenerator.createInitialSolution(fitnessCalculator);
         LocalsearchEvaluator evaluator = localSearchEvaluatorGenerator.createLocalSearchEvaluator(fitnessCalculator);
