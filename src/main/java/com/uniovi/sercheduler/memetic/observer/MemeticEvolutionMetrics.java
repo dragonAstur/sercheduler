@@ -106,7 +106,10 @@ public class MemeticEvolutionMetrics {
 
         long nextTheoreticalInstant = lastTheoreticalInstant + periodicTimeForMakespanEvolution;
 
-        if (elapsedFromStart >= nextTheoreticalInstant)
+        if (elapsedFromStart >= nextTheoreticalInstant) {
+
+            BigDecimal diffAccMakespanLSA = calculateDiffAccMakespanLSA(accMakespanBeforeLSA, accMakespanAfterLSA);
+
             saveMetrics(
                     memeticIterationNumber,
                     elapsedFromStart,
@@ -116,8 +119,8 @@ public class MemeticEvolutionMetrics {
                     numberOfBestSolutionsLSAOrigin,
                     accMakespanBeforeLSA,
                     accMakespanAfterLSA,
-                    calculateDiffAccMakespanLSA(accMakespanBeforeLSA, accMakespanAfterLSA),
-                    calculatePercentageAccMakespanLSA(accMakespanBeforeLSA, accMakespanAfterLSA),
+                    diffAccMakespanLSA,
+                    calculatePercentageAccMakespanLSA(accMakespanBeforeLSA, diffAccMakespanLSA),
                     accLSAInvocations,
                     accLSAIterations,
                     calculateRatioIterationsInvocations(accLSAIterations, accLSAInvocations),
@@ -125,6 +128,7 @@ public class MemeticEvolutionMetrics {
                     accEvaluatedNeighbors,
                     popAvgMakespan
             );
+        }
     }
 
     private double calculateRatioIterationsInvocations(long accLSAIterations, long accLSAInvocations){
@@ -138,12 +142,12 @@ public class MemeticEvolutionMetrics {
     }
 
 
-    private BigDecimal calculatePercentageAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA){
+    private BigDecimal calculatePercentageAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal diffAccMakespanLSA){
 
-        if(accMakespanAfterLSA.compareTo(BigDecimal.ZERO) <= 0)
+        if(diffAccMakespanLSA.compareTo(BigDecimal.ZERO) <= 0)
             return BigDecimal.ZERO;
 
-        return accMakespanAfterLSA
+        return diffAccMakespanLSA
                 .divide(accMakespanBeforeLSA,
                         2, RoundingMode.HALF_UP);
     }
