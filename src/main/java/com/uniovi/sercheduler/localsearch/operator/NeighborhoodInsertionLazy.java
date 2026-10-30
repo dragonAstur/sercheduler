@@ -36,7 +36,7 @@ public class NeighborhoodInsertionLazy implements NeighborhoodOperatorLazy{
                                         null,
                                         insertInOneSpecificPosition(plan, position, otherPosition),
                                         actualSolution.getArbiter(),
-                                        SolutionOrigin.LSA
+                                        SolutionOrigin.INSERTION
                                 );
 
                                 int[] changedPlanPairs = position < otherPosition ?

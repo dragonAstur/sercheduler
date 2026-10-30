@@ -17,8 +17,11 @@ public class MemeticObserver implements Observer {
     private final long periodicTimeForMakespanEvolution;
     private int memeticIterationNumber;
 
-    private long numberOfBestSolutionsLSAOrigin;
-    private long numberOfBestSolutionsCrossMutationOrigin;
+    private long numberOfBestSolutionsChangeHostOrigin;
+    private long numberOfBestSolutionsInsertionOrigin;
+    private long numberOfBestSolutionsSwapOrigin;
+    private long numberOfBestSolutionsSwapHostOrigin;
+    private long numberOfBestSolutionsGeneticOrigin;
 
     private BigDecimal accMakespanBeforeLSA, accMakespanAfterLSA;
 
@@ -46,8 +49,11 @@ public class MemeticObserver implements Observer {
 
         this.memeticIterationNumber = 1;
 
-        this.numberOfBestSolutionsCrossMutationOrigin = 0;
-        this.numberOfBestSolutionsLSAOrigin = 0;
+        this.numberOfBestSolutionsGeneticOrigin = 0;
+        this.numberOfBestSolutionsChangeHostOrigin = 0;
+        this.numberOfBestSolutionsInsertionOrigin = 0;
+        this.numberOfBestSolutionsSwapOrigin = 0;
+        this.numberOfBestSolutionsSwapHostOrigin = 0;
 
         this.accMakespanBeforeLSA = BigDecimal.ZERO;
         this.accMakespanAfterLSA = BigDecimal.ZERO;
@@ -136,8 +142,11 @@ public class MemeticObserver implements Observer {
                 this.memeticStartingTime,
                 this.memeticIterationNumber,
                 lastRecordedMakespan(),
-                this.numberOfBestSolutionsCrossMutationOrigin,
-                this.numberOfBestSolutionsLSAOrigin,
+                this.numberOfBestSolutionsGeneticOrigin,
+                this.numberOfBestSolutionsChangeHostOrigin,
+                this.numberOfBestSolutionsInsertionOrigin,
+                this.numberOfBestSolutionsSwapOrigin,
+                this.numberOfBestSolutionsSwapHostOrigin,
                 this.accMakespanBeforeLSA,
                 this.accMakespanAfterLSA,
                 this.accLSAInvocations,
@@ -163,7 +172,11 @@ public class MemeticObserver implements Observer {
     public void updateMemeticEvolution(double actualMakespan) {
 
         this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber, actualMakespan,
-                this.numberOfBestSolutionsCrossMutationOrigin, this.numberOfBestSolutionsLSAOrigin,
+                this.numberOfBestSolutionsGeneticOrigin,
+                this.numberOfBestSolutionsChangeHostOrigin,
+                this.numberOfBestSolutionsInsertionOrigin,
+                this.numberOfBestSolutionsSwapOrigin,
+                this.numberOfBestSolutionsSwapHostOrigin,
                 this.accMakespanBeforeLSA, this.accMakespanAfterLSA,
                 this.accLSAInvocations, this.accLSAIterations, this.accLSAImprovements,
                 this.accEvaluatedNeighbors,
@@ -186,10 +199,26 @@ public class MemeticObserver implements Observer {
     }
 
     public void updateBestSolutionsOrigins(SchedulePermutationSolution bestSolution){
-        if(bestSolution.getOrigin().equals(SolutionOrigin.LSA))
-            this.numberOfBestSolutionsLSAOrigin += 1;
-        else
-            this.numberOfBestSolutionsCrossMutationOrigin += 1;
+        switch (bestSolution.getOrigin()){
+            case CHANGE_HOST:
+                this.numberOfBestSolutionsChangeHostOrigin += 1;
+                break;
+            case INSERTION:
+                this.numberOfBestSolutionsInsertionOrigin += 1;
+                break;
+            case SWAP:
+                this.numberOfBestSolutionsSwapOrigin += 1;
+                break;
+            case SWAP_HOST:
+                this.numberOfBestSolutionsSwapHostOrigin += 1;
+                break;
+            case RANDOM:
+            case CROSS_MUTATION:
+                this.numberOfBestSolutionsGeneticOrigin += 1;
+                break;
+            default:
+                throw new RuntimeException("No se pudo determinar el origen de la solución");
+        }
     }
 
     public void updateAccMakespanBeforeAndAfterLSA(){

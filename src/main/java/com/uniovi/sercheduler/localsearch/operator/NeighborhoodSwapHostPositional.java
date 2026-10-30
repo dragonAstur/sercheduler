@@ -33,7 +33,7 @@ public class NeighborhoodSwapHostPositional implements NeighborhoodOperatorPosit
                     null,
                     swapHostWithOneSpecificPosition(plan, position, otherPosition),
                     actualSolution.getArbiter(),
-                    SolutionOrigin.LSA
+                    SolutionOrigin.SWAP_HOST
             );
 
             List<Movement> movements = new ArrayList<>();

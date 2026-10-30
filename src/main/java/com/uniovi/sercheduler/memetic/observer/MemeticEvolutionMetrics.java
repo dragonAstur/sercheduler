@@ -16,8 +16,17 @@ public class MemeticEvolutionMetrics {
     private final List<Double> actualMakespanEvolution;
     private final List<Double> bestMakespanEvolution;
 
-    private final List<Long> numberOfBestSolutionsLSAOrigin;
-    private final List<Long> numberOfBestSolutionsCrossMutationOrigin;
+    private final List<Double> ratioOfBestSolutionsGeneticOriginEvolution;
+    private final List<Double> ratioOfBestSolutionsChangeHostOriginEvolution;
+    private final List<Double> ratioOfBestSolutionsInsertionOriginEvolution;
+    private final List<Double> ratioOfBestSolutionsSwapOriginEvolution;
+    private final List<Double> ratioOfBestSolutionsSwapHostOriginEvolution;
+
+    private final List<Long> numberOfBestSolutionsGeneticOriginEvolution;
+    private final List<Long> numberOfBestSolutionsChangeHostOriginEvolution;
+    private final List<Long> numberOfBestSolutionsInsertionOriginEvolution;
+    private final List<Long> numberOfBestSolutionsSwapOriginEvolution;
+    private final List<Long> numberOfBestSolutionsSwapHostOriginEvolution;
 
     private final List<BigDecimal> accMakespanBeforeLSAEvolution, accMakespanAfterLSAEvolution;
     private final List<BigDecimal> diffAccMakespanLSAEvolution, percentageAccMakespanLSAEvolution;
@@ -43,8 +52,17 @@ public class MemeticEvolutionMetrics {
         this.bestMakespanEvolution = new ArrayList<>();
         this.actualMakespanEvolution = new ArrayList<>();
 
-        this.numberOfBestSolutionsCrossMutationOrigin = new ArrayList<>();
-        this.numberOfBestSolutionsLSAOrigin = new ArrayList<>();
+        this.ratioOfBestSolutionsGeneticOriginEvolution = new ArrayList<>();
+        this.ratioOfBestSolutionsChangeHostOriginEvolution = new ArrayList<>();
+        this.ratioOfBestSolutionsInsertionOriginEvolution = new ArrayList<>();
+        this.ratioOfBestSolutionsSwapOriginEvolution = new ArrayList<>();
+        this.ratioOfBestSolutionsSwapHostOriginEvolution = new ArrayList<>();
+
+        this.numberOfBestSolutionsGeneticOriginEvolution = new ArrayList<>();
+        this.numberOfBestSolutionsChangeHostOriginEvolution = new ArrayList<>();
+        this.numberOfBestSolutionsInsertionOriginEvolution = new ArrayList<>();
+        this.numberOfBestSolutionsSwapOriginEvolution = new ArrayList<>();
+        this.numberOfBestSolutionsSwapHostOriginEvolution = new ArrayList<>();
 
         this.accMakespanBeforeLSAEvolution = new ArrayList<>();
         this.accMakespanAfterLSAEvolution = new ArrayList<>();
@@ -63,7 +81,9 @@ public class MemeticEvolutionMetrics {
     }
 
     public void update(long memeticStartingTime, int memeticIterationNumber, double actualMakespan,
-                       long numberOfBestSolutionsCrossMutationOrigin, long numberOfBestSolutionsLSAOrigin,
+                       long numberOfBestSolutionsGeneticOrigin,
+                       long numberOfBestSolutionsChangeHostOrigin, long numberOfBestSolutionsInsertionOrigin,
+                       long numberOfBestSolutionsSwapOrigin, long numberOfBestSolutionsSwapHostOrigin,
                        BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA,
                        long accLSAInvocations, long accLSAIterations, long accLSAImprovements,
                        long accEvaluatedNeighbors,
@@ -115,8 +135,16 @@ public class MemeticEvolutionMetrics {
                     elapsedFromStart,
                     nextTheoreticalInstant,
                     actualMakespan,
-                    numberOfBestSolutionsCrossMutationOrigin,
-                    numberOfBestSolutionsLSAOrigin,
+                    numberOfBestSolutionsGeneticOrigin,
+                    calculateRatioOriginIteration(numberOfBestSolutionsGeneticOrigin, accLSAIterations),
+                    numberOfBestSolutionsChangeHostOrigin,
+                    calculateRatioOriginIteration(numberOfBestSolutionsChangeHostOrigin, accLSAIterations),
+                    numberOfBestSolutionsInsertionOrigin,
+                    calculateRatioOriginIteration(numberOfBestSolutionsInsertionOrigin, accLSAIterations),
+                    numberOfBestSolutionsSwapOrigin,
+                    calculateRatioOriginIteration(numberOfBestSolutionsSwapOrigin, accLSAIterations),
+                    numberOfBestSolutionsSwapHostOrigin,
+                    calculateRatioOriginIteration(numberOfBestSolutionsSwapHostOrigin, accLSAIterations),
                     accMakespanBeforeLSA,
                     accMakespanAfterLSA,
                     diffAccMakespanLSA,
@@ -131,9 +159,16 @@ public class MemeticEvolutionMetrics {
         }
     }
 
+    private double calculateRatioOriginIteration(long numberOfBestSolutionsOrigin, long accLSAIterations){
+        if(accLSAIterations == 0)
+            return 0.0;
+
+        return (double) (numberOfBestSolutionsOrigin / accLSAIterations);
+    }
+
     private double calculateRatioIterationsInvocations(long accLSAIterations, long accLSAInvocations){
 
-        if(accLSAIterations == 0)
+        if(accLSAInvocations == 0)
             return 0.0;
 
         return (double) ( (accLSAIterations - accLSAInvocations) / accLSAInvocations);
@@ -161,7 +196,11 @@ public class MemeticEvolutionMetrics {
     }
 
     private void saveMetrics(int memeticIterationNumber, long realInstant, long theoreticalInstant, double actualMakespan,
-                             long numberOfBestSolutionsCrossMutationOrigin, long numberOfBestSolutionsLSAOrigin,
+                             long numberOfBestSolutionsGeneticOrigin, double ratioOfBestSolutionsGeneticOrigin,
+                             long numberOfBestSolutionsChangeHostOrigin, double ratioOfBestSolutionsChangeHostOrigin,
+                             long numberOfBestSolutionsInsertionOrigin,  double ratioOfBestSolutionsInsertionOrigin,
+                             long numberOfBestSolutionsSwapOrigin, double ratioOfBestSolutionsSwapOrigin,
+                             long numberOfBestSolutionsSwapHostOrigin, double ratioOfBestSolutionsSwapHostOrigin,
                              BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA,
                              BigDecimal diffAccMakespanLSA, BigDecimal percentageAccMakespanLSA,
                              long accLSAInvocations, long accLSAIterations, double ratioIterationsInvocations,
@@ -176,8 +215,20 @@ public class MemeticEvolutionMetrics {
         this.bestMakespanEvolution.add(this.bestMakespan);
         this.actualMakespanEvolution.add(actualMakespan);
 
-        this.numberOfBestSolutionsLSAOrigin.add(numberOfBestSolutionsLSAOrigin);
-        this.numberOfBestSolutionsCrossMutationOrigin.add(numberOfBestSolutionsCrossMutationOrigin);
+        this.numberOfBestSolutionsGeneticOriginEvolution.add(numberOfBestSolutionsGeneticOrigin);
+        this.ratioOfBestSolutionsGeneticOriginEvolution.add(ratioOfBestSolutionsGeneticOrigin);
+
+        this.numberOfBestSolutionsChangeHostOriginEvolution.add(numberOfBestSolutionsChangeHostOrigin);
+        this.ratioOfBestSolutionsChangeHostOriginEvolution.add(ratioOfBestSolutionsChangeHostOrigin);
+
+        this.numberOfBestSolutionsInsertionOriginEvolution.add(numberOfBestSolutionsInsertionOrigin);
+        this.ratioOfBestSolutionsInsertionOriginEvolution.add(ratioOfBestSolutionsInsertionOrigin);
+
+        this.numberOfBestSolutionsSwapOriginEvolution.add(numberOfBestSolutionsSwapOrigin);
+        this.ratioOfBestSolutionsSwapOriginEvolution.add(ratioOfBestSolutionsSwapOrigin);
+
+        this.numberOfBestSolutionsSwapHostOriginEvolution.add(numberOfBestSolutionsSwapHostOrigin);
+        this.ratioOfBestSolutionsSwapHostOriginEvolution.add(ratioOfBestSolutionsSwapHostOrigin);
 
         this.accMakespanBeforeLSAEvolution.add(accMakespanBeforeLSA);
         this.accMakespanAfterLSAEvolution.add(accMakespanAfterLSA);
@@ -215,13 +266,6 @@ public class MemeticEvolutionMetrics {
         return bestMakespanEvolution;
     }
 
-    public List<Long> getNumberOfBestSolutionsLSAOrigin() {
-        return numberOfBestSolutionsLSAOrigin;
-    }
-
-    public List<Long> getNumberOfBestSolutionsCrossMutationOrigin() {
-        return numberOfBestSolutionsCrossMutationOrigin;
-    }
 
     public List<BigDecimal> getAccMakespanBeforeLSAEvolution() {
         return accMakespanBeforeLSAEvolution;
@@ -261,5 +305,45 @@ public class MemeticEvolutionMetrics {
 
     public List<Double> getPopAvgMakespanEvolution() {
         return popAvgMakespanEvolution;
+    }
+
+    public List<Double> getRatioOfBestSolutionsGeneticOriginEvolution() {
+        return ratioOfBestSolutionsGeneticOriginEvolution;
+    }
+
+    public List<Double> getRatioOfBestSolutionsChangeHostOriginEvolution() {
+        return ratioOfBestSolutionsChangeHostOriginEvolution;
+    }
+
+    public List<Double> getRatioOfBestSolutionsInsertionOriginEvolution() {
+        return ratioOfBestSolutionsInsertionOriginEvolution;
+    }
+
+    public List<Double> getRatioOfBestSolutionsSwapOriginEvolution() {
+        return ratioOfBestSolutionsSwapOriginEvolution;
+    }
+
+    public List<Double> getRatioOfBestSolutionsSwapHostOriginEvolution() {
+        return ratioOfBestSolutionsSwapHostOriginEvolution;
+    }
+
+    public List<Long> getNumberOfBestSolutionsGeneticOriginEvolution() {
+        return numberOfBestSolutionsGeneticOriginEvolution;
+    }
+
+    public List<Long> getNumberOfBestSolutionsChangeHostOriginEvolution() {
+        return numberOfBestSolutionsChangeHostOriginEvolution;
+    }
+
+    public List<Long> getNumberOfBestSolutionsInsertionOriginEvolution() {
+        return numberOfBestSolutionsInsertionOriginEvolution;
+    }
+
+    public List<Long> getNumberOfBestSolutionsSwapOriginEvolution() {
+        return numberOfBestSolutionsSwapOriginEvolution;
+    }
+
+    public List<Long> getNumberOfBestSolutionsSwapHostOriginEvolution() {
+        return numberOfBestSolutionsSwapHostOriginEvolution;
     }
 }

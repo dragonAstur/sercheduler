@@ -39,7 +39,7 @@ public class NeighborhoodInsertionPositional implements NeighborhoodOperatorPosi
                     null,
                     insertInOneSpecificPosition(plan, position, newPosition),
                     actualSolution.getArbiter(),
-                    SolutionOrigin.LSA
+                    SolutionOrigin.INSERTION
             );
 
             List<Movement> movements = new ArrayList<>();

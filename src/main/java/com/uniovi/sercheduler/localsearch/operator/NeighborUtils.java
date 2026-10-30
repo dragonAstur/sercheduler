@@ -27,7 +27,7 @@ public class NeighborUtils {
                             null,
                             plan,
                             schedulePermutationSolution.getArbiter(),
-                            SolutionOrigin.LSA
+                            SolutionOrigin.RANDOM //TODO: no se utiliza pero chequear para qué era
                     )
             );
         }

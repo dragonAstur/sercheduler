@@ -48,9 +48,25 @@ public class CSVExporter {
                     ";" +
                     "Evaluated neighbors" +
                     ";" +
-                    "Best solution from LSA" +
+                    "Genetic origin" +
                     ";" +
-                    "Best solution from cross-mutation\n";
+                    "Genetic origin per iteration" +
+                    ";" +
+                    "N1 origin (Change Host)" +
+                    ";" +
+                    "N1 origin per iteration" +
+                    ";" +
+                    "N2 origin (Insertion)" +
+                    ";" +
+                    "N2 origin per iteration" +
+                    ";" +
+                    "N3 origin (Swap)" +
+                    ";" +
+                    "N3 origin per iteration" +
+                    ";" +
+                    "N4 origin (Swap Host)" +
+                    ";" +
+                    "N4 origin per iteration\n";
 
             writer.write(newLine);
 
@@ -108,9 +124,25 @@ public class CSVExporter {
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getAccEvaluatedNeighborsEvolution().get(i))
                         .append(";")
-                        .append(observer.getMemeticEvolutionMetrics().getNumberOfBestSolutionsLSAOrigin().get(i))
+                        .append(observer.getMemeticEvolutionMetrics().getNumberOfBestSolutionsGeneticOriginEvolution().get(i))
                         .append(";")
-                        .append(observer.getMemeticEvolutionMetrics().getNumberOfBestSolutionsCrossMutationOrigin().get(i))
+                        .append(observer.getMemeticEvolutionMetrics().getRatioOfBestSolutionsGeneticOriginEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getNumberOfBestSolutionsChangeHostOriginEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getRatioOfBestSolutionsChangeHostOriginEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getNumberOfBestSolutionsInsertionOriginEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getRatioOfBestSolutionsInsertionOriginEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getNumberOfBestSolutionsSwapOriginEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getRatioOfBestSolutionsSwapOriginEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getNumberOfBestSolutionsSwapHostOriginEvolution().get(i))
+                        .append(";")
+                        .append(observer.getMemeticEvolutionMetrics().getRatioOfBestSolutionsSwapHostOriginEvolution().get(i))
                         .append("\n");
             }
 

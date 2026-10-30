@@ -35,7 +35,7 @@ public class NeighborhoodSwapHostLazy implements NeighborhoodOperatorLazy{
                                         null,
                                         swapHostWithOneSpecificPosition(plan, position, otherPosition),
                                         actualSolution.getArbiter(),
-                                        SolutionOrigin.LSA
+                                        SolutionOrigin.SWAP_HOST
                                 );
 
                                 List<Movement> movements = new ArrayList<>();

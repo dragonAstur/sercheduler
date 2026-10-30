@@ -33,7 +33,7 @@ public class NeighborhoodChangeHostPositional implements NeighborhoodOperatorPos
                         null,
                         neighborPlan,
                         actualSolution.getArbiter(),
-                        SolutionOrigin.LSA
+                        SolutionOrigin.CHANGE_HOST
                 )
         ).map(generatedSolution ->{
 

@@ -36,7 +36,7 @@ public class NeighborhoodChangeHostLazy implements NeighborhoodOperatorLazy {
                                         null,
                                         neighborPlan,
                                         actualSolution.getArbiter(),
-                                        SolutionOrigin.LSA
+                                        SolutionOrigin.CHANGE_HOST
                                 ))
                             .map(generatedSolution ->{
 
