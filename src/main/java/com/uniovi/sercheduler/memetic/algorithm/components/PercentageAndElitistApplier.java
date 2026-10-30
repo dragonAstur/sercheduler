@@ -42,10 +42,8 @@ public class PercentageAndElitistApplier implements LsaApplier {
 
         observer.addActualMakespanBeforeLSA(bestSolutionMakespan);
 
-        observer.updateBestSolutionsOrigins(bestSolution);
-
         observer.updateMemeticEvolution(
-                bestSolutionMakespan
+                bestSolution
         );
 
 
@@ -61,7 +59,7 @@ public class PercentageAndElitistApplier implements LsaApplier {
         observer.addActualMakespanAfterLSA(enhancedBestSolutionMakespan);
 
         observer.updateMemeticEvolution(
-                enhancedBestSolutionMakespan
+                enhancedBestSolution
         );
 
 
@@ -84,7 +82,7 @@ public class PercentageAndElitistApplier implements LsaApplier {
             observer.addActualMakespanBeforeLSA(baseSolutionMakespan);
 
             observer.updateMemeticEvolution(
-                    baseSolutionMakespan
+                    baseSolution
             );
 
             lsa.setInitialSolution(baseSolution);
@@ -98,7 +96,7 @@ public class PercentageAndElitistApplier implements LsaApplier {
             observer.addActualMakespanAfterLSA(enhancedSolutionMakespan);
 
             observer.updateMemeticEvolution(
-                    enhancedSolutionMakespan
+                    enhancedSolution
             );
         }
 

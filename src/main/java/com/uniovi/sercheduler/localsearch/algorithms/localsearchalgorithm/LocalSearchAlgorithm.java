@@ -213,9 +213,7 @@ public class LocalSearchAlgorithm {
                 observer.incrementLSAImprovement();
             }
 
-            double actualSolutionMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
-
-            observer.updateMemeticEvolution(actualSolutionMakespan);
+            observer.updateMemeticEvolution(actualSolution);
 
 
             /*observer.setReachedMakespan(actualSolutionMakespan);

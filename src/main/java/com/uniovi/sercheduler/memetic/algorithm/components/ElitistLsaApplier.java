@@ -22,10 +22,8 @@ public class ElitistLsaApplier implements LsaApplier {
 
         observer.addActualMakespanBeforeLSA(bestSolutionMakespan);
 
-        observer.updateBestSolutionsOrigins(bestSolution);
-
         observer.updateMemeticEvolution(
-                bestSolutionMakespan
+                bestSolution
         );
 
         lsa.setInitialSolution(bestSolution);
@@ -41,7 +39,7 @@ public class ElitistLsaApplier implements LsaApplier {
         observer.updateAccMakespanBeforeAndAfterLSA();
 
         observer.updateMemeticEvolution(
-                enhancedBestSolutionMakespan
+                enhancedBestSolution
         );
 
     }

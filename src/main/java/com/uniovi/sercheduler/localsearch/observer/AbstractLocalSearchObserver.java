@@ -1,5 +1,7 @@
 package com.uniovi.sercheduler.localsearch.observer;
 
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +50,7 @@ public abstract class AbstractLocalSearchObserver implements Observer{
     }
 
     @Override
-    public void updateMemeticEvolution(double actualMakespan){
+    public void updateMemeticEvolution(SchedulePermutationSolution actualSolution){
 
     }
 

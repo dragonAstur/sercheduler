@@ -23,7 +23,7 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
             operators.add(() -> neighborhoodLazyOperator.execute(actualSolution));
         }
 
-        return shuffleStreams(operators, observer, actualSolution.getFitnessInfo().fitness().get("makespan"));
+        return shuffleStreams(operators, observer, actualSolution);
     }
 
 
@@ -45,7 +45,7 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
     }
 
     private <T> Stream<T> shuffleStreams(List<Supplier<Stream<T>>> streamSuppliers, Observer observer,
-                                         double actualSolutionMakespan) {
+                                         SchedulePermutationSolution actualSolution) {
 
         List<Iterator<T>> iterators = streamSuppliers.stream()
                 .map(Supplier::get)
@@ -73,7 +73,7 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
                         throw new NoSuchElementException();
 
                     //observer.updateMakespanEvolution(actualSolutionMakespan, 0);
-                    observer.updateMemeticEvolution(actualSolutionMakespan);
+                    observer.updateMemeticEvolution(actualSolution);
 
                     Iterator<T> chosen = available.get(rand.nextInt(available.size()));
 

@@ -1,5 +1,7 @@
 package com.uniovi.sercheduler.localsearch.observer;
 
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+
 public interface Observer {
 
     void startRun(long startingTime);
@@ -26,7 +28,9 @@ public interface Observer {
 
     void updateLSAEvolution(double actualMakespan, long actualIterationNumberOfNeighbors);
 
-    void updateMemeticEvolution(double actualMakespan); //, long actualLSAInvocations, long actualLSAImprovements);
+    void updateMemeticEvolution(SchedulePermutationSolution actualSolution); //, long actualLSAInvocations, long actualLSAImprovements);
+
+    void updateMemeticEvolution();
 
     long getPeriodicTimeForMakespanEvolution();
 

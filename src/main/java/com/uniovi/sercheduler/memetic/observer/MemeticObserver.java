@@ -13,7 +13,6 @@ public class MemeticObserver implements Observer {
     private long memeticExecutionTime;
     private final String strategyName;
     private final String operatorsName;
-    //private double reachedMakespan;
     private final long periodicTimeForMakespanEvolution;
     private int memeticIterationNumber;
 
@@ -24,7 +23,6 @@ public class MemeticObserver implements Observer {
     private long numberOfBestSolutionsGeneticOrigin;
 
     private BigDecimal accMakespanBeforeLSA, accMakespanAfterLSA;
-
     private BigDecimal actualMakespanBeforeLSA, actualMakespanAfterLSA;
 
     private long accLSAIterations, accLSAImprovements, accLSAInvocations;
@@ -34,6 +32,8 @@ public class MemeticObserver implements Observer {
     private long accEvaluatedNeighbors;
 
     private double popAvgMakespan;
+
+    private double bestMakespan;
 
     public MemeticObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution){
 
@@ -69,6 +69,8 @@ public class MemeticObserver implements Observer {
 
         this.actualMakespanBeforeLSA = BigDecimal.ZERO;
         this.actualMakespanAfterLSA = BigDecimal.ZERO;
+
+        this.bestMakespan = Double.MAX_VALUE;
     }
 
     @Override
@@ -141,7 +143,8 @@ public class MemeticObserver implements Observer {
         this.memeticEvolutionMetrics.update(
                 this.memeticStartingTime,
                 this.memeticIterationNumber,
-                lastRecordedMakespan(),
+                this.bestMakespan,
+                actualMakespan,
                 this.numberOfBestSolutionsGeneticOrigin,
                 this.numberOfBestSolutionsChangeHostOrigin,
                 this.numberOfBestSolutionsInsertionOrigin,
@@ -169,9 +172,29 @@ public class MemeticObserver implements Observer {
     }
 
     @Override
-    public void updateMemeticEvolution(double actualMakespan) {
+    public void updateMemeticEvolution() {
+        this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber,
+                this.bestMakespan,
+                lastRecordedMakespan(),
+                this.numberOfBestSolutionsGeneticOrigin,
+                this.numberOfBestSolutionsChangeHostOrigin,
+                this.numberOfBestSolutionsInsertionOrigin,
+                this.numberOfBestSolutionsSwapOrigin,
+                this.numberOfBestSolutionsSwapHostOrigin,
+                this.accMakespanBeforeLSA, this.accMakespanAfterLSA,
+                this.accLSAInvocations, this.accLSAIterations, this.accLSAImprovements,
+                this.accEvaluatedNeighbors,
+                this.popAvgMakespan);
+    }
 
-        this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber, actualMakespan,
+    @Override
+    public void updateMemeticEvolution(SchedulePermutationSolution actualSolution) {
+
+        updateBestSolution(actualSolution);
+
+        this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber,
+                this.bestMakespan,
+                actualSolution.getFitnessInfo().fitness().get("makespan"),
                 this.numberOfBestSolutionsGeneticOrigin,
                 this.numberOfBestSolutionsChangeHostOrigin,
                 this.numberOfBestSolutionsInsertionOrigin,
@@ -196,6 +219,16 @@ public class MemeticObserver implements Observer {
     @Override
     public String getOperatorsName() {
         return this.operatorsName;
+    }
+
+    private void updateBestSolution(SchedulePermutationSolution actualSolution){
+
+        double actualSolutionMakespan = actualSolution.getFitnessInfo().fitness().get("makespan");
+
+        if(this.bestMakespan > actualSolutionMakespan)
+            updateBestSolutionsOrigins(actualSolution);
+
+        this.bestMakespan = Math.min(actualSolutionMakespan, this.bestMakespan);
     }
 
     public void updateBestSolutionsOrigins(SchedulePermutationSolution bestSolution){

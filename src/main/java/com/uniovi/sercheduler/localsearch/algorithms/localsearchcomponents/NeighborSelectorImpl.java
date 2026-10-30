@@ -26,7 +26,7 @@ public class NeighborSelectorImpl implements NeighborSelector {
                 .filter(neighbor -> {
 
                     //observer.updateMakespanEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"), counter.get());
-                    observer.updateMemeticEvolution(actualSolution.getFitnessInfo().fitness().get("makespan"));
+                    observer.updateMemeticEvolution(actualSolution);
 
                     observer.incrementEvaluatedNeighbor();
 

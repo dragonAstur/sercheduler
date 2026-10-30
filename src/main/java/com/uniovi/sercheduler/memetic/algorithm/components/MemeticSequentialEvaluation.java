@@ -1,5 +1,6 @@
 package com.uniovi.sercheduler.memetic.algorithm.components;
 
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.Solution;
@@ -24,16 +25,11 @@ public class MemeticSequentialEvaluation<S extends Solution<?>> implements Memet
         Objects.requireNonNull(var10001);
         //solutionList.forEach(var10001::evaluate);
 
-        double bestMakespan = observer.lastRecordedMakespan();
-
         for(S s : solutionList){
             var10001.evaluate(s);
 
-            bestMakespan = Math.min(s.objectives()[0], bestMakespan);
-
-            observer.updateMemeticEvolution(
-                    bestMakespan
-            );
+            if(s instanceof SchedulePermutationSolution scheduleSolution)
+                observer.updateMemeticEvolution(scheduleSolution);
         }
 
         this.computedEvaluations = solutionList.size();

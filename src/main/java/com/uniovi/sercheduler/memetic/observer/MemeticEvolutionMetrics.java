@@ -1,5 +1,7 @@
 package com.uniovi.sercheduler.memetic.observer;
 
+import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +14,6 @@ public class MemeticEvolutionMetrics {
     private final List<Long> realInstants;
     private final List<Long> theoreticalInstants;
     private long lastRecordedTime;
-    private double bestMakespan;
     private final List<Double> actualMakespanEvolution;
     private final List<Double> bestMakespanEvolution;
 
@@ -48,7 +49,6 @@ public class MemeticEvolutionMetrics {
         this.realInstants = new ArrayList<>();
         this.theoreticalInstants = new ArrayList<>();
         this.lastRecordedTime = -1;
-        this.bestMakespan = Double.MAX_VALUE;
         this.bestMakespanEvolution = new ArrayList<>();
         this.actualMakespanEvolution = new ArrayList<>();
 
@@ -80,7 +80,7 @@ public class MemeticEvolutionMetrics {
         this.popAvgMakespanEvolution = new ArrayList<>();
     }
 
-    public void update(long memeticStartingTime, int memeticIterationNumber, double actualMakespan,
+    public void update(long memeticStartingTime, int memeticIterationNumber, double bestMakespan, double actualMakespan,
                        long numberOfBestSolutionsGeneticOrigin,
                        long numberOfBestSolutionsChangeHostOrigin, long numberOfBestSolutionsInsertionOrigin,
                        long numberOfBestSolutionsSwapOrigin, long numberOfBestSolutionsSwapHostOrigin,
@@ -88,8 +88,6 @@ public class MemeticEvolutionMetrics {
                        long accLSAInvocations, long accLSAIterations, long accLSAImprovements,
                        long accEvaluatedNeighbors,
                        double popAvgMakespan){
-
-        updateBestMakespan(actualMakespan);
 
 //        if(this.periodicTimeForMakespanEvolution > 0L) {
 //
@@ -134,6 +132,7 @@ public class MemeticEvolutionMetrics {
                     memeticIterationNumber,
                     elapsedFromStart,
                     nextTheoreticalInstant,
+                    bestMakespan,
                     actualMakespan,
                     numberOfBestSolutionsGeneticOrigin,
                     calculateRatioOriginIteration(numberOfBestSolutionsGeneticOrigin, accLSAIterations),
@@ -191,11 +190,10 @@ public class MemeticEvolutionMetrics {
                         6, RoundingMode.HALF_UP);
     }
 
-    private void updateBestMakespan(double actualMakespan){
-        this.bestMakespan = Math.min(actualMakespan, this.bestMakespan);
-    }
 
-    private void saveMetrics(int memeticIterationNumber, long realInstant, long theoreticalInstant, double actualMakespan,
+
+    private void saveMetrics(int memeticIterationNumber, long realInstant, long theoreticalInstant,
+                             double bestMakespan, double actualMakespan,
                              long numberOfBestSolutionsGeneticOrigin, double ratioOfBestSolutionsGeneticOrigin,
                              long numberOfBestSolutionsChangeHostOrigin, double ratioOfBestSolutionsChangeHostOrigin,
                              long numberOfBestSolutionsInsertionOrigin,  double ratioOfBestSolutionsInsertionOrigin,
@@ -212,7 +210,7 @@ public class MemeticEvolutionMetrics {
         this.realInstants.add(realInstant);
         this.theoreticalInstants.add(theoreticalInstant);
 
-        this.bestMakespanEvolution.add(this.bestMakespan);
+        this.bestMakespanEvolution.add(bestMakespan);
         this.actualMakespanEvolution.add(actualMakespan);
 
         this.numberOfBestSolutionsGeneticOriginEvolution.add(numberOfBestSolutionsGeneticOrigin);

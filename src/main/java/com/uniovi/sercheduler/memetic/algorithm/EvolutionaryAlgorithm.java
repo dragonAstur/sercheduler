@@ -1,21 +1,15 @@
 package com.uniovi.sercheduler.memetic.algorithm;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.localsearch.export.CSVExporter;
-import com.uniovi.sercheduler.localsearch.export.XLSXTableExporter;
 import com.uniovi.sercheduler.memetic.algorithm.components.*;
 import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 import org.uma.jmetal.algorithm.Algorithm;
-import org.uma.jmetal.component.catalogue.common.evaluation.Evaluation;
-import org.uma.jmetal.component.catalogue.common.solutionscreation.SolutionsCreation;
-import org.uma.jmetal.component.catalogue.common.termination.Termination;
-import org.uma.jmetal.component.catalogue.ea.replacement.Replacement;
-import org.uma.jmetal.component.catalogue.ea.selection.Selection;
-import org.uma.jmetal.component.catalogue.ea.variation.Variation;
 import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.util.observable.Observable;
 import org.uma.jmetal.util.observable.ObservableEntity;
@@ -71,9 +65,12 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
             offspringPopulation = this.evaluation.evaluate(offspringPopulation, observer);
             this.population = this.replacement.replace(this.population, offspringPopulation, observer);
 
-            observer.updateMemeticEvolution(
-                    this.population.stream().mapToDouble(x -> x.objectives()[0]).min().orElse(-1)
-            );
+            Solution<?> bestSolution = this.population.stream()
+                    .min(Comparator.comparingDouble(x -> x.objectives()[0]))
+                    .orElseThrow();
+
+            if(bestSolution instanceof SchedulePermutationSolution bestScheduleSolution)
+                observer.updateMemeticEvolution(bestScheduleSolution);
 
             this.updateProgress();
 
@@ -84,9 +81,12 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
 
         observer.endRun();
 
-        observer.updateMemeticEvolution(
-                this.population.stream().mapToDouble(x -> x.objectives()[0]).min().orElse(-1)
-        );
+        Solution<?> bestSolution = this.population.stream()
+                .min(Comparator.comparingDouble(x -> x.objectives()[0]))
+                .orElseThrow();
+
+        if(bestSolution instanceof SchedulePermutationSolution bestScheduleSolution)
+            observer.updateMemeticEvolution(bestScheduleSolution);
 
         //XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);
         CSVExporter.appendMemeticCSV(fileName, observer);
