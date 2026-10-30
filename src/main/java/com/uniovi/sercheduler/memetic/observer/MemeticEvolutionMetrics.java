@@ -132,7 +132,11 @@ public class MemeticEvolutionMetrics {
     }
 
     private double calculateRatioIterationsInvocations(long accLSAIterations, long accLSAInvocations){
-        return (double) ( (accLSAIterations - accLSAInvocations) / accLSAIterations);
+
+        if(accLSAIterations == 0)
+            return 0.0;
+
+        return (double) ( (accLSAIterations - accLSAInvocations) / accLSAInvocations);
     }
 
     private BigDecimal calculateDiffAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA){

@@ -231,7 +231,10 @@ public class MemeticObserver implements Observer {
     @Override
     public void updateLSAInvocationsAndIterations(){
         this.accLSAInvocations += this.actualLSAInvocations;
-        this.actualLSAIterations += this.actualLSAIterations;
+        this.accLSAIterations += this.actualLSAIterations;
+
+        this.actualLSAInvocations = 0;
+        this.actualLSAIterations = 0;
     }
 
     @Override
