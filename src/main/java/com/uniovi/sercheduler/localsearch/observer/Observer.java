@@ -41,4 +41,6 @@ public interface Observer {
     void incrementLSAInvocation();
 
     void incrementEvaluatedNeighbor();
+
+    void updateLSAInvocationsAndIterations();
 }

@@ -132,7 +132,7 @@ public class MemeticEvolutionMetrics {
     }
 
     private double calculateRatioIterationsInvocations(long accLSAIterations, long accLSAInvocations){
-        return (double) accLSAIterations / accLSAInvocations;
+        return (double) ( (accLSAIterations - accLSAInvocations) / accLSAIterations);
     }
 
     private BigDecimal calculateDiffAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA){
@@ -144,12 +144,12 @@ public class MemeticEvolutionMetrics {
 
     private BigDecimal calculatePercentageAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal diffAccMakespanLSA){
 
-        if(diffAccMakespanLSA.compareTo(BigDecimal.ZERO) <= 0)
+        if(accMakespanBeforeLSA.compareTo(BigDecimal.ZERO) <= 0)
             return BigDecimal.ZERO;
 
         return diffAccMakespanLSA
                 .divide(accMakespanBeforeLSA,
-                        2, RoundingMode.HALF_UP);
+                        6, RoundingMode.HALF_UP);
     }
 
     private void updateBestMakespan(double actualMakespan){

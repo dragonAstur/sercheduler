@@ -34,9 +34,9 @@ public class CSVExporter {
                     ";" +
                     "Total makespan after LSA" +
                     ";" +
-                    "Diff after-before LSA" +
+                    "Diff before-after LSA" +
                     ";" +
-                    "% after/before LSA" +
+                    "Diff/before LSA" +
                     ";" +
                     "LSA invocations" +
                     ";" +
