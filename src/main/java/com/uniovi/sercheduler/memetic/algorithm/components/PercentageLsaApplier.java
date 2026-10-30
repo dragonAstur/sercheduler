@@ -25,7 +25,7 @@ public class PercentageLsaApplier implements LsaApplier {
     public void applyLSA(List<SchedulePermutationSolution> population, LocalSearchAlgorithm lsa,
                          List<NeighborhoodOperatorLazy> operatorList, MemeticObserver observer) {
 
-        //Sólo para apuntar la mejor solución
+        //Solo para apuntar la mejor solución
         int bestIndex =
                 MemeticAlgorithm.getBestSolutionPos(population);
 
@@ -53,7 +53,7 @@ public class PercentageLsaApplier implements LsaApplier {
 
             baseSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
 
-            observer.addMakespanBeforeLSA(baseSolutionMakespan);
+            observer.addActualMakespanBeforeLSA(baseSolutionMakespan);
 
             observer.updateMemeticEvolution(
                     baseSolutionMakespan
@@ -67,12 +67,14 @@ public class PercentageLsaApplier implements LsaApplier {
 
             enhancedSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
 
-            observer.addMakespanAfterLSA(enhancedSolutionMakespan);
+            observer.addActualMakespanAfterLSA(enhancedSolutionMakespan);
 
             observer.updateMemeticEvolution(
                     enhancedSolutionMakespan
             );
         }
+
+        observer.updateAccMakespanBeforeAndAfterLSA();
     }
 
     private int calculateNumberOfApplications(List<SchedulePermutationSolution> population) {

@@ -40,7 +40,7 @@ public class PercentageAndElitistApplier implements LsaApplier {
 
         double bestSolutionMakespan = bestSolution.getFitnessInfo().fitness().get("makespan");
 
-        observer.addMakespanBeforeLSA(bestSolutionMakespan);
+        observer.addActualMakespanBeforeLSA(bestSolutionMakespan);
 
         observer.updateBestSolutionsOrigins(bestSolution);
 
@@ -58,7 +58,7 @@ public class PercentageAndElitistApplier implements LsaApplier {
 
         //todavía no se añade el elitista mejorado
 
-        observer.addMakespanAfterLSA(enhancedBestSolutionMakespan);
+        observer.addActualMakespanAfterLSA(enhancedBestSolutionMakespan);
 
         observer.updateMemeticEvolution(
                 enhancedBestSolutionMakespan
@@ -81,7 +81,7 @@ public class PercentageAndElitistApplier implements LsaApplier {
 
             baseSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
 
-            observer.addMakespanBeforeLSA(baseSolutionMakespan);
+            observer.addActualMakespanBeforeLSA(baseSolutionMakespan);
 
             observer.updateMemeticEvolution(
                     baseSolutionMakespan
@@ -95,12 +95,14 @@ public class PercentageAndElitistApplier implements LsaApplier {
 
             enhancedSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
 
-            observer.addMakespanAfterLSA(enhancedSolutionMakespan);
+            observer.addActualMakespanAfterLSA(enhancedSolutionMakespan);
 
             observer.updateMemeticEvolution(
                     enhancedSolutionMakespan
             );
         }
+
+        observer.updateAccMakespanBeforeAndAfterLSA();
 
         //Insertar en la población la solución élite mejorada
         population.add(enhancedBestSolution);
