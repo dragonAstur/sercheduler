@@ -162,7 +162,7 @@ public class MemeticEvolutionMetrics {
         if(accLSAIterations == 0)
             return 0.0;
 
-        return (double) (numberOfBestSolutionsOrigin / accLSAIterations);
+        return (double) numberOfBestSolutionsOrigin / accLSAIterations;
     }
 
     private double calculateRatioIterationsInvocations(long accLSAIterations, long accLSAInvocations){
