@@ -14,7 +14,6 @@ import com.uniovi.sercheduler.service.calculator.FitnessCalculator;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class LocalSearchAlgorithm {
@@ -222,7 +221,7 @@ public class LocalSearchAlgorithm {
 
         } while (!terminationCriterion.isMet());
 
-        observer.updateLSAInvocationsAndIterations();
+        observer.updateLSAInvocationsIterationsAndImprovements();
 
         return actualSolution;
     }

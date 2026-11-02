@@ -27,7 +27,7 @@ public class MemeticObserver implements Observer {
 
     private long accLSAIterations, accLSAImprovements, accLSAInvocations;
 
-    private long actualLSAIterations, actualLSAInvocations;
+    private long actualLSAIterations, actualLSAInvocations, actualLSAImprovements;
 
     private long accEvaluatedNeighbors;
 
@@ -64,6 +64,7 @@ public class MemeticObserver implements Observer {
 
         this.actualLSAIterations = 0;
         this.actualLSAInvocations = 0;
+        this.actualLSAImprovements = 0;
 
         this.accEvaluatedNeighbors = 0;
 
@@ -277,7 +278,7 @@ public class MemeticObserver implements Observer {
 
     @Override
     public void incrementLSAImprovement(){
-        this.accLSAImprovements += 1;
+        this.actualLSAImprovements += 1;
     }
 
     @Override
@@ -291,12 +292,14 @@ public class MemeticObserver implements Observer {
     }
 
     @Override
-    public void updateLSAInvocationsAndIterations(){
+    public void updateLSAInvocationsIterationsAndImprovements(){
         this.accLSAInvocations += this.actualLSAInvocations;
         this.accLSAIterations += this.actualLSAIterations;
+        this.accLSAImprovements += this.actualLSAImprovements;
 
         this.actualLSAInvocations = 0;
         this.actualLSAIterations = 0;
+        this.actualLSAImprovements = 0;
     }
 
     @Override

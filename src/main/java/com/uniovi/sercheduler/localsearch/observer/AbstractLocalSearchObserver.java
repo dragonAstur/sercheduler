@@ -195,7 +195,7 @@ public abstract class AbstractLocalSearchObserver implements Observer{
     }
 
     @Override
-    public void updateLSAInvocationsAndIterations() {
+    public void updateLSAInvocationsIterationsAndImprovements() {
 
     }
 
