@@ -57,9 +57,11 @@ public class PercentageLsaApplier implements LsaApplier {
 
             population.set(pos, enhancedSolution);
 
-            enhancedSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
+            //enhancedSolutionMakespan = baseSolution.getFitnessInfo().fitness().get("makespan");
 
-            observer.addActualMakespanAfterLSA(enhancedSolutionMakespan);
+            observer.addActualMakespanAfterLSA(
+                    enhancedSolution.getFitnessInfo().fitness().get("makespan")
+            );
 
             observer.updateMemeticEvolution(
                     enhancedSolution
