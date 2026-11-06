@@ -22,8 +22,8 @@ public class MemeticObserver implements Observer {
     private long numberOfBestSolutionsSwapHostOrigin;
     private long numberOfBestSolutionsGeneticOrigin;
 
-    private BigDecimal accMakespanBeforeLSA, accMakespanAfterLSA;
-    private BigDecimal actualMakespanBeforeLSA, actualMakespanAfterLSA;
+    private double accMakespanBeforeLSA, accMakespanAfterLSA;
+    private double actualMakespanBeforeLSA, actualMakespanAfterLSA;
 
     private long accLSAIterations, accLSAImprovements, accLSAInvocations;
 
@@ -55,8 +55,8 @@ public class MemeticObserver implements Observer {
         this.numberOfBestSolutionsSwapOrigin = 0;
         this.numberOfBestSolutionsSwapHostOrigin = 0;
 
-        this.accMakespanBeforeLSA = BigDecimal.ZERO;
-        this.accMakespanAfterLSA = BigDecimal.ZERO;
+        this.accMakespanBeforeLSA = 0.0;
+        this.accMakespanAfterLSA = 0.0;
 
         this.accLSAImprovements = 0;
         this.accLSAIterations = 0;
@@ -68,8 +68,8 @@ public class MemeticObserver implements Observer {
 
         this.accEvaluatedNeighbors = 0;
 
-        this.actualMakespanBeforeLSA = BigDecimal.ZERO;
-        this.actualMakespanAfterLSA = BigDecimal.ZERO;
+        this.actualMakespanBeforeLSA = 0.0;
+        this.actualMakespanAfterLSA = 0.0;
 
         this.bestMakespan = Double.MAX_VALUE;
     }
@@ -256,24 +256,20 @@ public class MemeticObserver implements Observer {
     }
 
     public void updateAccMakespanBeforeAndAfterLSA(){
-        this.accMakespanBeforeLSA = this.accMakespanBeforeLSA.add(
-                this.actualMakespanBeforeLSA
-        );
+        this.accMakespanBeforeLSA += this.actualMakespanBeforeLSA;
 
-        this.accMakespanAfterLSA = this.accMakespanAfterLSA.add(
-                this.actualMakespanAfterLSA
-        );
+        this.accMakespanAfterLSA += this.actualMakespanAfterLSA;
 
-        this.actualMakespanBeforeLSA = BigDecimal.ZERO;
-        this.actualMakespanAfterLSA = BigDecimal.ZERO;
+        this.actualMakespanBeforeLSA = 0.0;
+        this.actualMakespanAfterLSA = 0.0;
     }
 
     public void addActualMakespanAfterLSA(double makespanAfterLSA){
-        this.actualMakespanAfterLSA = this.actualMakespanAfterLSA.add(BigDecimal.valueOf(makespanAfterLSA));
+        this.actualMakespanAfterLSA += makespanAfterLSA;
     }
 
     public void addActualMakespanBeforeLSA(double makespanBeforeLSA){
-        this.actualMakespanBeforeLSA = this.actualMakespanBeforeLSA.add(BigDecimal.valueOf(makespanBeforeLSA));
+        this.actualMakespanBeforeLSA += makespanBeforeLSA;
     }
 
     @Override

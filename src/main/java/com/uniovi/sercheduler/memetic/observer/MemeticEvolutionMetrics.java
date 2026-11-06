@@ -29,8 +29,8 @@ public class MemeticEvolutionMetrics {
     private final List<Long> numberOfBestSolutionsSwapOriginEvolution;
     private final List<Long> numberOfBestSolutionsSwapHostOriginEvolution;
 
-    private final List<BigDecimal> accMakespanBeforeLSAEvolution, accMakespanAfterLSAEvolution;
-    private final List<BigDecimal> diffAccMakespanLSAEvolution, percentageAccMakespanLSAEvolution;
+    private final List<Double> accMakespanBeforeLSAEvolution, accMakespanAfterLSAEvolution;
+    private final List<Double> diffAccMakespanLSAEvolution, percentageAccMakespanLSAEvolution;
 
     private final List<Long> accLSAInvocationsEvolution, accLSAIterationsEvolution, accLSAImprovementsEvolution;
 
@@ -84,7 +84,7 @@ public class MemeticEvolutionMetrics {
                        long numberOfBestSolutionsGeneticOrigin,
                        long numberOfBestSolutionsChangeHostOrigin, long numberOfBestSolutionsInsertionOrigin,
                        long numberOfBestSolutionsSwapOrigin, long numberOfBestSolutionsSwapHostOrigin,
-                       BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA,
+                       double accMakespanBeforeLSA, double accMakespanAfterLSA,
                        long accLSAInvocations, long accLSAIterations, long accLSAImprovements,
                        long accEvaluatedNeighbors,
                        double popAvgMakespan){
@@ -126,7 +126,7 @@ public class MemeticEvolutionMetrics {
 
         if (elapsedFromStart >= nextTheoreticalInstant) {
 
-            BigDecimal diffAccMakespanLSA = calculateDiffAccMakespanLSA(accMakespanBeforeLSA, accMakespanAfterLSA);
+            double diffAccMakespanLSA = calculateDiffAccMakespanLSA(accMakespanBeforeLSA, accMakespanAfterLSA);
 
             saveMetrics(
                     memeticIterationNumber,
@@ -173,21 +173,17 @@ public class MemeticEvolutionMetrics {
         return (double) ( (accLSAIterations - accLSAInvocations) / accLSAInvocations);
     }
 
-    private BigDecimal calculateDiffAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA){
-        return accMakespanAfterLSA
-                .subtract(accMakespanBeforeLSA)
-                .abs();
+    private double calculateDiffAccMakespanLSA(double accMakespanBeforeLSA, double accMakespanAfterLSA){
+        return Math.abs(accMakespanBeforeLSA - accMakespanAfterLSA);
     }
 
 
-    private BigDecimal calculatePercentageAccMakespanLSA(BigDecimal accMakespanBeforeLSA, BigDecimal diffAccMakespanLSA){
+    private double calculatePercentageAccMakespanLSA(double accMakespanBeforeLSA, double diffAccMakespanLSA){
 
-        if(accMakespanBeforeLSA.compareTo(BigDecimal.ZERO) <= 0)
-            return BigDecimal.ZERO;
+        if(accMakespanBeforeLSA <= 0)
+            return 0.0;
 
-        return diffAccMakespanLSA
-                .divide(accMakespanBeforeLSA,
-                        6, RoundingMode.HALF_UP);
+        return diffAccMakespanLSA / accMakespanBeforeLSA;
     }
 
 
@@ -199,8 +195,8 @@ public class MemeticEvolutionMetrics {
                              long numberOfBestSolutionsInsertionOrigin,  double ratioOfBestSolutionsInsertionOrigin,
                              long numberOfBestSolutionsSwapOrigin, double ratioOfBestSolutionsSwapOrigin,
                              long numberOfBestSolutionsSwapHostOrigin, double ratioOfBestSolutionsSwapHostOrigin,
-                             BigDecimal accMakespanBeforeLSA, BigDecimal accMakespanAfterLSA,
-                             BigDecimal diffAccMakespanLSA, BigDecimal percentageAccMakespanLSA,
+                             double accMakespanBeforeLSA, double accMakespanAfterLSA,
+                             double diffAccMakespanLSA, double percentageAccMakespanLSA,
                              long accLSAInvocations, long accLSAIterations, double ratioIterationsInvocations,
                              long accLSAImprovements,
                              long accEvaluatedNeighbors,
@@ -265,19 +261,19 @@ public class MemeticEvolutionMetrics {
     }
 
 
-    public List<BigDecimal> getAccMakespanBeforeLSAEvolution() {
+    public List<Double> getAccMakespanBeforeLSAEvolution() {
         return accMakespanBeforeLSAEvolution;
     }
 
-    public List<BigDecimal> getAccMakespanAfterLSAEvolution() {
+    public List<Double> getAccMakespanAfterLSAEvolution() {
         return accMakespanAfterLSAEvolution;
     }
 
-    public List<BigDecimal> getDiffAccMakespanLSAEvolution() {
+    public List<Double> getDiffAccMakespanLSAEvolution() {
         return diffAccMakespanLSAEvolution;
     }
 
-    public List<BigDecimal> getPercentageAccMakespanLSAEvolution() {
+    public List<Double> getPercentageAccMakespanLSAEvolution() {
         return percentageAccMakespanLSAEvolution;
     }
 

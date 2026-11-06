@@ -4,6 +4,7 @@ import com.uniovi.sercheduler.memetic.observer.MemeticObserver;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Locale;
 
 public class CSVExporter {
 
@@ -112,7 +113,10 @@ public class CSVExporter {
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getDiffAccMakespanLSAEvolution().get(i))
                         .append(";")
-                        .append(observer.getMemeticEvolutionMetrics().getPercentageAccMakespanLSAEvolution().get(i))
+                        .append(String.format(Locale.US, "%.6f",
+                                        observer.getMemeticEvolutionMetrics().getPercentageAccMakespanLSAEvolution().get(i)
+                                )
+                        )
                         .append(";")
                         .append(observer.getMemeticEvolutionMetrics().getAccLSAInvocationsEvolution().get(i))
                         .append(";")
