@@ -170,7 +170,7 @@ public class MemeticEvolutionMetrics {
         if(accLSAInvocations == 0)
             return 0.0;
 
-        return (double) ( (accLSAIterations - accLSAInvocations) / accLSAInvocations);
+        return (double) ( accLSAIterations  / accLSAInvocations);   //TODO: mirar si es correcto
     }
 
     private double calculateDiffAccMakespanLSA(double accMakespanBeforeLSA, double accMakespanAfterLSA){

@@ -193,7 +193,7 @@ public class LocalSearchAlgorithm {
             observer.incrementLSAIteration();
 
             terminationCriterion.setUpgradeFound(false);
-            terminationCriterion.setActualIteration(iterationNumber++);
+            terminationCriterion.setActualIteration(++iterationNumber);
 
             chosenOperators = operatorSelector.selectOperatorsLazy(neighborhoodOperatorList);
 

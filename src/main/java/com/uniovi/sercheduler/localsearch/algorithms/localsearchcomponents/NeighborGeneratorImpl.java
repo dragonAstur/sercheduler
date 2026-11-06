@@ -13,6 +13,7 @@ import java.util.stream.StreamSupport;
 
 public class NeighborGeneratorImpl implements NeighborGenerator {
 
+    @Override
     public Stream<GeneratedNeighbor> generateNeighborsLazy(List<NeighborhoodOperatorLazy> neighborhoodLazyOperatorList,
                                                            SchedulePermutationSolution actualSolution,
                                                            Observer observer){
@@ -27,7 +28,7 @@ public class NeighborGeneratorImpl implements NeighborGenerator {
     }
 
 
-
+    @Override
     public List<GeneratedNeighbor> generateNeighborsGlobal(List<NeighborhoodOperatorGlobal> neighborhoodOperatorList,
                                                            SchedulePermutationSolution actualSolution,
                                                            TerminationCriterion terminationCriterion){
