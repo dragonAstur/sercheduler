@@ -42,11 +42,11 @@ public class NeighborhoodMulti {
 
         for(GeneratedNeighbor newNeighbor : newNeighbors){
 
-            List<Movement> movements = new ArrayList<>(originalNeighbor.movements());
-            movements.addAll(newNeighbor.movements());
-
             finalNeighbors.add(
-                    new GeneratedNeighbor(newNeighbor.generatedSolution(), movements)
+                    new GeneratedNeighbor(
+                            newNeighbor.generatedSolution(),
+                            newNeighbor.movement()
+                    )
             );
         }
 
@@ -61,11 +61,11 @@ public class NeighborhoodMulti {
 
         for(GeneratedNeighbor newNeighbor : newNeighbors){
 
-            List<Movement> movements = new ArrayList<>(originalNeighbor.movements());
-            movements.addAll(newNeighbor.movements());
-
             finalNeighbors.add(
-                    new GeneratedNeighbor(newNeighbor.generatedSolution(), movements)
+                    new GeneratedNeighbor(
+                            newNeighbor.generatedSolution(),
+                            newNeighbor.movement()
+                    )
             );
         }
 

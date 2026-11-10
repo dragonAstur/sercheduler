@@ -69,7 +69,7 @@ public class LocalsearchEvaluatorTest {
 
             double generatedSolutionMakespan = fitnessCalculator.calculateFitness(gn.generatedSolution()).fitness().get("makespan");
 
-            double makespanDifference = localsearchEvaluator.computeMakespanEnhancement(originalSolution, gn.generatedSolution(), gn.movements().get(0));
+            double makespanDifference = localsearchEvaluator.computeMakespanEnhancement(originalSolution, gn.generatedSolution(), gn.movement());
 
 
             //System.out.println("\n\nNEW GENERATED NEIGHBOR\n\tOriginal solution makespan: " + originalSolutionMakespan + "\n\tActual solution makespan: " + generatedSolutionMakespan + "\n\tDifference: " + makespanDifference + "\n\t\n\n");
@@ -133,7 +133,7 @@ public class LocalsearchEvaluatorTest {
 
             double generatedSolutionMakespan = fitnessCalculator.calculateFitness(gn.generatedSolution()).fitness().get("makespan");
 
-            double makespanDifference = localsearchEvaluator.computeMakespanEnhancement(originalSolution, gn.generatedSolution(), gn.movements().get(0));
+            double makespanDifference = localsearchEvaluator.computeMakespanEnhancement(originalSolution, gn.generatedSolution(), gn.movement());
 
 
             //System.out.println("\n\nNEW GENERATED NEIGHBOR\n\tOriginal solution makespan: " + originalSolutionMakespan + "\n\tActual solution makespan: " + generatedSolutionMakespan + "\n\tDifference: " + makespanDifference + "\n\t\n\n");
@@ -197,7 +197,7 @@ public class LocalsearchEvaluatorTest {
 
             double generatedSolutionMakespan = fitnessCalculator.calculateFitness(gn.generatedSolution()).fitness().get("makespan");
 
-            double makespanDifference = localsearchEvaluator.computeMakespanEnhancement(originalSolution, gn.generatedSolution(), gn.movements().get(0));
+            double makespanDifference = localsearchEvaluator.computeMakespanEnhancement(originalSolution, gn.generatedSolution(), gn.movement());
 
 
             //System.out.println("\n\nNEW GENERATED NEIGHBOR\n\tOriginal solution makespan: " + originalSolutionMakespan + "\n\tActual solution makespan: " + generatedSolutionMakespan + "\n\tDifference: " + makespanDifference + "\n\t\n\n");
@@ -261,7 +261,7 @@ public class LocalsearchEvaluatorTest {
 
             double generatedSolutionMakespan = fitnessCalculator.calculateFitness(gn.generatedSolution()).fitness().get("makespan");
 
-            double makespanDifference = localsearchEvaluator.computeMakespanEnhancement(originalSolution, gn.generatedSolution(), gn.movements().get(0));
+            double makespanDifference = localsearchEvaluator.computeMakespanEnhancement(originalSolution, gn.generatedSolution(), gn.movement());
 
 
             //System.out.println("\n\nNEW GENERATED NEIGHBOR\n\tOriginal solution makespan: " + originalSolutionMakespan + "\n\tActual solution makespan: " + generatedSolutionMakespan + "\n\tDifference: " + makespanDifference + "\n\t\n\n");
