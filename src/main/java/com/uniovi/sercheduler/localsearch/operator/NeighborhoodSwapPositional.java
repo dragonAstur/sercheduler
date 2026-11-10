@@ -42,9 +42,8 @@ public class NeighborhoodSwapPositional implements NeighborhoodOperatorPositiona
                     SolutionOrigin.SWAP
             );
 
-            List<Movement> movements = new ArrayList<>();
-            movements.add(new SwapMovement(position, otherPosition, NeighborUtils.getParentsPositions(plan, position)));
-            neighbors.add(new GeneratedNeighbor(generatedSolution, movements));
+            Movement movement = new SwapMovement(position, otherPosition, NeighborUtils.getParentsPositions(plan, position));
+            neighbors.add(new GeneratedNeighbor(generatedSolution, movement));
 
         }
 

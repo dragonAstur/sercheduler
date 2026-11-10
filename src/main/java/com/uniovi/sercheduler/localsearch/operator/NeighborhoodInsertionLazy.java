@@ -43,12 +43,14 @@ public class NeighborhoodInsertionLazy implements NeighborhoodOperatorLazy{
                                         IntStream.rangeClosed(position, otherPosition).toArray() :
                                         IntStream.rangeClosed(otherPosition, position).toArray();
 
-                                List<Movement> movements = new ArrayList<>();
-                                movements.add(
-                                        new InsertionMovement(changedPlanPairs, position, otherPosition, NeighborUtils.getParentsPositions(plan, position))
+                                Movement movement = new InsertionMovement(
+                                        changedPlanPairs,
+                                        position,
+                                        otherPosition,
+                                        NeighborUtils.getParentsPositions(plan, position)
                                 );
 
-                                return new GeneratedNeighbor(generatedSolution, movements);
+                                return new GeneratedNeighbor(generatedSolution, movement);
                             });
                 });
     }

@@ -46,9 +46,8 @@ public class NeighborhoodSwapLazy implements NeighborhoodOperatorLazy{
                                         SolutionOrigin.SWAP
                                 );
 
-                                List<Movement> movements = new ArrayList<>();
-                                movements.add(new SwapMovement(position, otherPosition, NeighborUtils.getParentsPositions(plan, position)));
-                                return new GeneratedNeighbor(generatedSolution, movements);
+                                Movement movement = new SwapMovement(position, otherPosition, NeighborUtils.getParentsPositions(plan, position));
+                                return new GeneratedNeighbor(generatedSolution, movement);
 
                             });
                 });

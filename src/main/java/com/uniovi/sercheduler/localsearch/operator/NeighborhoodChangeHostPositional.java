@@ -37,13 +37,11 @@ public class NeighborhoodChangeHostPositional implements NeighborhoodOperatorPos
                 )
         ).map(generatedSolution ->{
 
-                    List<Movement> movements = new ArrayList<>();
-
-                    movements.add(new ChangeHostMovement(position,
+                    Movement movement = new ChangeHostMovement(position,
                             NeighborUtils.getParentsPositions(plan, position),
-                            NeighborUtils.getChildrenPositions(plan, position)));
+                            NeighborUtils.getChildrenPositions(plan, position));
 
-                    return new GeneratedNeighbor(generatedSolution, movements);
+                    return new GeneratedNeighbor(generatedSolution, movement);
 
                 }
         ).forEach(neighbors::add);

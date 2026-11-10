@@ -36,15 +36,13 @@ public class NeighborhoodSwapHostPositional implements NeighborhoodOperatorPosit
                     SolutionOrigin.SWAP_HOST
             );
 
-            List<Movement> movements = new ArrayList<>();
-            movements.add(
-                    new SwapHostMovement(position, otherPosition,
+            Movement movement = new SwapHostMovement(position, otherPosition,
                             NeighborUtils.getParentsPositions(plan, position),
                             NeighborUtils.getChildrenPositions(plan, position),
                             NeighborUtils.getParentsPositions(plan, otherPosition),
-                            NeighborUtils.getChildrenPositions(plan, otherPosition))
+                            NeighborUtils.getChildrenPositions(plan, otherPosition)
             );
-            neighbors.add(new GeneratedNeighbor(generatedSolution, movements));
+            neighbors.add(new GeneratedNeighbor(generatedSolution, movement));
 
         }
 

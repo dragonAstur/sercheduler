@@ -38,17 +38,16 @@ public class NeighborhoodSwapHostLazy implements NeighborhoodOperatorLazy{
                                         SolutionOrigin.SWAP_HOST
                                 );
 
-                                List<Movement> movements = new ArrayList<>();
-                                movements.add(new SwapHostMovement(
+                                Movement movement = new SwapHostMovement(
                                         position,
                                         otherPosition,
                                         NeighborUtils.getParentsPositions(plan, position),
                                         NeighborUtils.getChildrenPositions(plan, position),
                                         NeighborUtils.getParentsPositions(plan, otherPosition),
                                         NeighborUtils.getChildrenPositions(plan, otherPosition)
-                                ));
+                                );
 
-                                return new GeneratedNeighbor(generatedSolution, movements);
+                                return new GeneratedNeighbor(generatedSolution, movement);
                             });
                 });
     }

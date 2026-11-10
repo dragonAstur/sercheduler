@@ -30,7 +30,7 @@ public class NeighborSelectorImpl implements NeighborSelector {
 
                     observer.incrementEvaluatedNeighbor();
 
-                    evaluator.evaluate(actualSolution, neighbor.generatedSolution(), neighbor.movements().get(neighbor.movements().size() - 1));
+                    evaluator.evaluate(actualSolution, neighbor.generatedSolution(), neighbor.movement());
 
                     return acceptanceCriterion.checkAcceptance(actualSolution, neighbor.generatedSolution());
                 })
@@ -94,7 +94,7 @@ public class NeighborSelectorImpl implements NeighborSelector {
             observer.updateLSAEvolution(Math.min(bestMakespan, bestMakespanKnown), this.numberOfGeneratedNeighbors);
 
             neighborSolution = neighbor.generatedSolution();
-            evaluator.evaluate(originalSolution, neighborSolution, neighbor.movements().get(neighbor.movements().size() - 1));
+            evaluator.evaluate(originalSolution, neighborSolution, neighbor.movement());
             neighborMakespan = neighborSolution.getFitnessInfo().fitness().get("makespan");
 
             neighborImprovingRatio = (originalMakespan - neighborMakespan) / originalMakespan * 100;

@@ -42,11 +42,14 @@ public class NeighborhoodInsertionPositional implements NeighborhoodOperatorPosi
                     SolutionOrigin.INSERTION
             );
 
-            List<Movement> movements = new ArrayList<>();
-            movements.add(
-                    new InsertionMovement(changedPlanPairs, position, newPosition, NeighborUtils.getParentsPositions(plan, position))
+            Movement movement = new InsertionMovement(
+                    changedPlanPairs,
+                    position,
+                    newPosition,
+                    NeighborUtils.getParentsPositions(plan, position)
             );
-            neighbors.add(new GeneratedNeighbor(generatedSolution, movements));
+
+            neighbors.add(new GeneratedNeighbor(generatedSolution, movement));
 
         }
 
