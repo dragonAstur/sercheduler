@@ -23,15 +23,15 @@ public class ScheduleMutation implements MutationOperator<SchedulePermutationSol
    */
   @Override
   public SchedulePermutationSolution execute(
-      SchedulePermutationSolution schedulePermutationSolution) {
+          SchedulePermutationSolution solution) {
 
-    return new SchedulePermutationSolution(
-        schedulePermutationSolution.variables().size(),
-        schedulePermutationSolution.objectives().length,
-        null,
-        operators.mutate(schedulePermutationSolution.getPlan()),
-        schedulePermutationSolution.getArbiter(),
-        SolutionOrigin.CROSS_MUTATION);
+    solution.setPlan(operators.mutate(solution.getPlan()));
+
+    solution.setFitnessInfo(null);
+
+    solution.setOrigin(SolutionOrigin.CROSS_MUTATION);
+
+    return solution;
   }
 
   /**

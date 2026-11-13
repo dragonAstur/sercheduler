@@ -20,7 +20,7 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
   List<PlanPair> plan;
  private  MultiResult multiResult;
 
- private final SolutionOrigin origin;
+ private SolutionOrigin origin;
 
   public MultiResult getMultiResult() {
     return multiResult;
@@ -107,30 +107,34 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
     this.fitnessInfo = fitnessInfo;
   }
 
-  /**
-   * Get the length of the solution.
-   *
-   * @return The size of the plan.
-   */
-  @Override
-  public int getLength() {
+    /**
+    * Get the length of the solution.
+    *
+    * @return The size of the plan.
+    */
+    @Override
+    public int getLength() {
     return plan.size();
   }
 
-  public String getArbiter() {
+    public String getArbiter() {
     return arbiter;
   }
 
-  public void setArbiter(String arbiter) {
+    public void setArbiter(String arbiter) {
     this.arbiter = arbiter;
   }
 
-  @Override
-  public List<PlanPair> variables() {
+    @Override
+    public List<PlanPair> variables() {
     return plan;
   }
 
     public SolutionOrigin getOrigin() {
         return origin;
+    }
+
+    public void setOrigin(SolutionOrigin origin) {
+        this.origin = origin;
     }
 }
