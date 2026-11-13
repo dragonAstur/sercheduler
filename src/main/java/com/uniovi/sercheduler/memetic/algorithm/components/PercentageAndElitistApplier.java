@@ -20,7 +20,7 @@ public class PercentageAndElitistApplier implements LsaApplier {
     private final double percentage;
 
     public PercentageAndElitistApplier(double percentage) {
-        this.percentage = DEFAULT_PERCENTAGE;
+        this.percentage = percentage;
     }
 
     @Override
