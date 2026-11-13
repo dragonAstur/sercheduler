@@ -63,56 +63,76 @@ public class Operators implements Serializable {
    */
   public List<PlanPair> mutate(List<PlanPair> plan) {
 
-    // Choose a random position to do the cut
+    if (plan.size() < 2) {
+      return plan;
+    }
+
+    // Choose a random position to mutate
     int position = random.nextInt(0, plan.size());
 
+    // Find the left boundary
     int positionLeft = position - 1;
 
-    // We need to know the viable range to mutate and move the task.
-
-    boolean leftNotFound = true;
-    while (positionLeft >= 0 && leftNotFound) {
-      if (plan.get(position).task().getParents().contains(plan.get(positionLeft).task())) {
-        leftNotFound = false;
-      } else {
-        positionLeft--;
+    while (positionLeft >= 0) {
+      if (plan.get(position).task()
+              .getParents()
+              .contains(plan.get(positionLeft).task())) {
+        break;
       }
+
+      positionLeft--;
     }
 
+    // Find the right boundary
     int positionRight = position + 1;
-    boolean rightNotFound = true;
 
-    while (positionRight < plan.size() - 1 && rightNotFound) {
-      if (plan.get(position).task().getChildren().contains(plan.get(positionRight).task())) {
-        rightNotFound = false;
-      } else {
-        positionRight++;
+    while (positionRight < plan.size()) {
+      if (plan.get(position).task()
+              .getChildren()
+              .contains(plan.get(positionRight).task())) {
+        break;
       }
+
+      positionRight++;
     }
 
-    // now we can get a new position
+    // Choose a new position within the viable range
+    int newPosition = random.nextInt(
+            positionLeft + 1,
+            positionRight
+    );
 
-    int newPosition = random.nextInt(positionLeft + 1, positionRight);
-    var newPlan = new ArrayList<>(List.copyOf(plan));
+    // Create a mutable copy
+    var newPlan = new ArrayList<>(plan);
 
-    // Now we need to find if we move left or right
+    // Move the selected element
+    PlanPair selectedPair = newPlan.get(position);
 
     if (newPosition < position) {
-      // Go left
-      for (int i = position - 1; i >= newPosition && i >= 0; i--) {
-        newPlan.set(i + 1, newPlan.get(i));
+
+      for (int i = position; i > newPosition; i--) {
+        newPlan.set(i, newPlan.get(i - 1));
       }
+
     } else if (newPosition > position) {
-      for (int i = position + 1; i <= newPosition; i++) {
-        newPlan.set(i - 1, newPlan.get(i));
+
+      for (int i = position; i < newPosition; i++) {
+        newPlan.set(i, newPlan.get(i + 1));
       }
     }
-    // put the mutated element in the new position
-    var newHost =
-        instanceData.hosts().values().stream()
+
+    // Assign a new host
+    var newHost = instanceData.hosts()
+            .values()
+            .stream()
             .toList()
             .get(random.nextInt(0, instanceData.hosts().size()));
-    newPlan.set(newPosition, new PlanPair(plan.get(position).task(), newHost));
+
+    newPlan.set(
+            newPosition,
+            new PlanPair(selectedPair.task(), newHost)
+    );
+
     return Collections.unmodifiableList(newPlan);
   }
 }
