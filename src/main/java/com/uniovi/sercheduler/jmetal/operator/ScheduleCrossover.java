@@ -3,7 +3,12 @@ package com.uniovi.sercheduler.jmetal.operator;
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SolutionOrigin;
 import com.uniovi.sercheduler.service.Operators;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import com.uniovi.sercheduler.service.PlanPair;
 import org.uma.jmetal.operator.crossover.CrossoverOperator;
 
 /** Crossover for schedules with topology order. */
@@ -55,35 +60,50 @@ public class ScheduleCrossover implements CrossoverOperator<SchedulePermutationS
    */
   @Override
   public List<SchedulePermutationSolution> execute(
-      List<SchedulePermutationSolution> schedulePermutationSolutions) {
+          List<SchedulePermutationSolution> schedulePermutationSolutions) {
+
     var schedule1 = schedulePermutationSolutions.get(0);
+    var schedule2 = schedulePermutationSolutions.get(1);
 
-    // I need to create two children to have in the selection
-    // an equal number of parents and children.
+    List<PlanPair> newPlan;
+    List<PlanPair> newPlan2;
 
-    var newPlan =
-        operators.doCrossover(
-            schedulePermutationSolutions.get(0).getPlan(),
-            schedulePermutationSolutions.get(1).getPlan());
+    //TODO: se emplea un random diferente al de la semilla
+    Random random = new Random();
 
-    var newPlan2 =
-        operators.doCrossover(
-            schedulePermutationSolutions.get(1).getPlan(),
-            schedulePermutationSolutions.get(0).getPlan());
+    if (random.nextDouble() < crossoverProbability) {
+
+      newPlan = operators.doCrossover(
+              schedule1.getPlan(),
+              schedule2.getPlan());
+
+      newPlan2 = operators.doCrossover(
+              schedule2.getPlan(),
+              schedule1.getPlan());
+
+    } else {
+
+      // No crossover: clone the parents' plans
+      newPlan = new ArrayList<>(schedule1.getPlan());
+      newPlan2 = new ArrayList<>(schedule2.getPlan());
+    }
+
     return List.of(
-        new SchedulePermutationSolution(
-            schedule1.variables().size(),
-            schedule1.objectives().length,
-            null,
-            newPlan,
-            schedule1.getArbiter(),
-            SolutionOrigin.CROSS_MUTATION),
-        new SchedulePermutationSolution(
-            schedule1.variables().size(),
-            schedule1.objectives().length,
-            null,
-            newPlan2,
-            schedule1.getArbiter(),
-            SolutionOrigin.CROSS_MUTATION));
+            new SchedulePermutationSolution(
+                    schedule1.variables().size(),
+                    schedule1.objectives().length,
+                    null,
+                    newPlan,
+                    schedule1.getArbiter(),
+                    SolutionOrigin.CROSS_MUTATION),
+
+            new SchedulePermutationSolution(
+                    schedule2.variables().size(),
+                    schedule2.objectives().length,
+                    null,
+                    newPlan2,
+                    schedule2.getArbiter(),
+                    SolutionOrigin.CROSS_MUTATION)
+    );
   }
 }
