@@ -135,15 +135,15 @@ public class MemeticEvolutionMetrics {
                     bestMakespan,
                     actualMakespan,
                     numberOfBestSolutionsGeneticOrigin,
-                    calculateRatioOriginIteration(numberOfBestSolutionsGeneticOrigin, accLSAIterations),
+                    calculateRatioOriginIteration(numberOfBestSolutionsGeneticOrigin, memeticIterationNumber),
                     numberOfBestSolutionsChangeHostOrigin,
-                    calculateRatioOriginIteration(numberOfBestSolutionsChangeHostOrigin, accLSAIterations),
+                    calculateRatioOriginIteration(numberOfBestSolutionsChangeHostOrigin, memeticIterationNumber),
                     numberOfBestSolutionsInsertionOrigin,
-                    calculateRatioOriginIteration(numberOfBestSolutionsInsertionOrigin, accLSAIterations),
+                    calculateRatioOriginIteration(numberOfBestSolutionsInsertionOrigin, memeticIterationNumber),
                     numberOfBestSolutionsSwapOrigin,
-                    calculateRatioOriginIteration(numberOfBestSolutionsSwapOrigin, accLSAIterations),
+                    calculateRatioOriginIteration(numberOfBestSolutionsSwapOrigin, memeticIterationNumber),
                     numberOfBestSolutionsSwapHostOrigin,
-                    calculateRatioOriginIteration(numberOfBestSolutionsSwapHostOrigin, accLSAIterations),
+                    calculateRatioOriginIteration(numberOfBestSolutionsSwapHostOrigin, memeticIterationNumber),
                     accMakespanBeforeLSA,
                     accMakespanAfterLSA,
                     diffAccMakespanLSA,
@@ -158,11 +158,11 @@ public class MemeticEvolutionMetrics {
         }
     }
 
-    private double calculateRatioOriginIteration(long numberOfBestSolutionsOrigin, long accLSAIterations){
-        if(accLSAIterations == 0)
+    private double calculateRatioOriginIteration(long numberOfBestSolutionsOrigin, long accMemeticIterations){
+        if(accMemeticIterations == 0)
             return 0.0;
 
-        return (double) numberOfBestSolutionsOrigin / accLSAIterations;
+        return (double) numberOfBestSolutionsOrigin / accMemeticIterations;
     }
 
     private double calculateRatioIterationsInvocations(long accLSAIterations, long accLSAInvocations){
