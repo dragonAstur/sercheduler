@@ -71,6 +71,7 @@ public class XLSXTableExporter {
         headerRow.createCell(6).setCellValue("Best makespan in this run");
     }
 
+    /*
     public static void appendMemeticEvolutionSheet(String fileName, MemeticObserver observer){
 
         try (Workbook workbook = new XSSFWorkbook(new FileInputStream(fileName + ".xlsx"))) {
@@ -101,6 +102,7 @@ public class XLSXTableExporter {
         }
 
     }
+    */
 
     public static void createInstanceSheet(String fileName, String instanceName){
 

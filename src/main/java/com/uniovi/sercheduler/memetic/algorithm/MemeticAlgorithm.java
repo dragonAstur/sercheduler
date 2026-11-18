@@ -124,7 +124,7 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
         observer.endRun();
 
         //XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);
-        CSVExporter.appendMemeticCSV(fileName, observer);
+        //CSVExporter.appendMemeticCSV(fileName, observer);
 
     }
 

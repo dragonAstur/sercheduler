@@ -77,8 +77,11 @@ public class GeneticCommand {
 
     int id = CommandUtils.generateRunId();
 
+    String strategyName = "none";
+    String operatorConfig = "none";
+
     fileName = CommandUtils.createFileName(fileName, "GA", limitTime, periodicTimeForMakespanEvolution,
-            experimentConfig, "none", "none", "none", id, populationSize, 0,
+            experimentConfig, operatorConfig, strategyName, "none", id, populationSize, 0,
             false);
 
     var benchmarks = experimentConfig.workflows();
@@ -101,7 +104,12 @@ public class GeneticCommand {
     MemeticObserver observer;
 
     //XLSXTableExporter.createMemeticWorkbook(fileName);
-    CSVExporter.createMemeticCSV(fileName);
+    CSVExporter exporter =
+            new CSVExporter(
+                    fileName,
+                    strategyName,
+                    operatorConfig,
+                    periodicTimeForMakespanEvolution);
 
     for (var benchmark : benchmarks) {
 
@@ -133,7 +141,8 @@ public class GeneticCommand {
           for (int run = 0; run < experimentConfig.independentRuns(); run++) {
 
             Algorithm<List<SchedulePermutationSolution>> algorithm;
-            observer = new MemeticObserver("N/A", "N/A", periodicTimeForMakespanEvolution);
+            observer = new MemeticObserver("N/A", "N/A",
+                    periodicTimeForMakespanEvolution, exporter);
 
             //AlgoFlag flag = AlgoFlag.MONO;
             //TODO: aquí se examinaba la flag concreta especificada
@@ -165,6 +174,8 @@ public class GeneticCommand {
       doJmetalAnalysis(experimentConfig, experiment);
 
       CommandUtils.computeStatistics(experiment, objectives);
+
+      exporter.close();
 
     } catch (IOException e) {
       throw new RuntimeException(e);

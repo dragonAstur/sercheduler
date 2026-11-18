@@ -1,6 +1,7 @@
 package com.uniovi.sercheduler.memetic.observer;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
+import com.uniovi.sercheduler.localsearch.export.MetricsListener;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,11 +10,15 @@ import java.math.RoundingMode;
 
 public class MemeticEvolutionMetrics {
 
-    private final List<Integer> memeticIterationNumberList;
     private final long periodicTimeForMakespanEvolution;
-    private final List<Long> realInstants;
+    //private long lastRecordedTime;
     private final List<Long> theoreticalInstants;
-    private long lastRecordedTime;
+
+    private final MetricsListener metricsListener;
+
+    /*
+    private final List<Integer> memeticIterationNumberList;
+    private final List<Long> realInstants;
     private final List<Double> actualMakespanEvolution;
     private final List<Double> bestMakespanEvolution;
 
@@ -38,17 +43,21 @@ public class MemeticEvolutionMetrics {
 
     private final List<Long> accEvaluatedNeighborsEvolution;
 
-    private final List<Double> popAvgMakespanEvolution;
+    private final List<Double> popAvgMakespanEvolution;*/
 
 
-    public MemeticEvolutionMetrics(long periodicTimeForMakespanEvolution) {
+    public MemeticEvolutionMetrics(long periodicTimeForMakespanEvolution, MetricsListener metricsListener) {
 
         this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
+        this.theoreticalInstants = new ArrayList<>();
 
+        this.metricsListener = metricsListener;
+
+        //this.lastRecordedTime = -1;
+
+        /*
         this.memeticIterationNumberList = new ArrayList<>();
         this.realInstants = new ArrayList<>();
-        this.theoreticalInstants = new ArrayList<>();
-        this.lastRecordedTime = -1;
         this.bestMakespanEvolution = new ArrayList<>();
         this.actualMakespanEvolution = new ArrayList<>();
 
@@ -78,6 +87,7 @@ public class MemeticEvolutionMetrics {
         this.ratioIterationsInvocationsEvolution = new ArrayList<>();
 
         this.popAvgMakespanEvolution = new ArrayList<>();
+        */
     }
 
     public void update(long memeticStartingTime, int memeticIterationNumber, double bestMakespan, double actualMakespan,
@@ -202,9 +212,50 @@ public class MemeticEvolutionMetrics {
                              long accEvaluatedNeighbors,
                              double popAvgMakespan){
 
+        this.theoreticalInstants.add(theoreticalInstant);
+
+        metricsListener.onMetrics(
+                memeticIterationNumber,
+                realInstant,
+                theoreticalInstant,
+
+                bestMakespan,
+                actualMakespan,
+
+                numberOfBestSolutionsGeneticOrigin,
+                ratioOfBestSolutionsGeneticOrigin,
+
+                numberOfBestSolutionsChangeHostOrigin,
+                ratioOfBestSolutionsChangeHostOrigin,
+
+                numberOfBestSolutionsInsertionOrigin,
+                ratioOfBestSolutionsInsertionOrigin,
+
+                numberOfBestSolutionsSwapOrigin,
+                ratioOfBestSolutionsSwapOrigin,
+
+                numberOfBestSolutionsSwapHostOrigin,
+                ratioOfBestSolutionsSwapHostOrigin,
+
+                accMakespanBeforeLSA,
+                accMakespanAfterLSA,
+
+                diffAccMakespanLSA,
+                percentageAccMakespanLSA,
+
+                accLSAInvocations,
+                accLSAIterations,
+                ratioIterationsInvocations,
+
+                accLSAImprovements,
+                accEvaluatedNeighbors,
+
+                popAvgMakespan
+        );
+
+        /*
         this.memeticIterationNumberList.add(memeticIterationNumber);
         this.realInstants.add(realInstant);
-        this.theoreticalInstants.add(theoreticalInstant);
 
         this.bestMakespanEvolution.add(bestMakespan);
         this.actualMakespanEvolution.add(actualMakespan);
@@ -239,17 +290,21 @@ public class MemeticEvolutionMetrics {
         this.accEvaluatedNeighborsEvolution.add(accEvaluatedNeighbors);
 
         this.popAvgMakespanEvolution.add(popAvgMakespan);
+        */
     }
 
+
+    public List<Long> getTheoreticalInstants() {
+        return theoreticalInstants;
+    }
+
+    /*
     public List<Integer> getMemeticIterationNumberList() {
         return memeticIterationNumberList;
     }
 
     public List<Long> getRealInstants() {
         return realInstants;
-    }
-    public List<Long> getTheoreticalInstants() {
-        return theoreticalInstants;
     }
 
     public List<Double> getActualMakespanEvolution() {
@@ -339,5 +394,5 @@ public class MemeticEvolutionMetrics {
 
     public List<Long> getNumberOfBestSolutionsSwapHostOriginEvolution() {
         return numberOfBestSolutionsSwapHostOriginEvolution;
-    }
+    }*/
 }

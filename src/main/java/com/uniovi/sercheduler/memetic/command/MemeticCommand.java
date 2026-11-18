@@ -75,8 +75,10 @@ public class MemeticCommand {
 
         String memeticAlgorithmName = CommandUtils.generateMAName(lsaApplierName);
 
+        String strategyName = "HC";
+
         fileName = CommandUtils.createFileName(fileName, memeticAlgorithmName, limitTime, periodicTimeForMakespanEvolution,
-                experimentConfig, operatorConfig, "HC", String.valueOf(lsaIterationsLimit), id, populationSize,
+                experimentConfig, operatorConfig, strategyName, String.valueOf(lsaIterationsLimit), id, populationSize,
                 neighborsLimit, isTaguchi);
 
         var benchmarks = experimentConfig.workflows();
@@ -99,7 +101,12 @@ public class MemeticCommand {
         MemeticObserver observer;
 
         //XLSXTableExporter.createMemeticWorkbook(fileName);
-        CSVExporter.createMemeticCSV(fileName);
+        CSVExporter exporter =
+                new CSVExporter(
+                        fileName,
+                        strategyName,
+                        operatorConfig,
+                        periodicTimeForMakespanEvolution);
 
 
         for (var benchmark : benchmarks) {
@@ -132,7 +139,8 @@ public class MemeticCommand {
                     for (int run = 0; run < experimentConfig.independentRuns(); run++) {
 
                         Algorithm<List<SchedulePermutationSolution>> algorithm;
-                        observer = new MemeticObserver("HC", operatorConfig, periodicTimeForMakespanEvolution);
+                        observer = new MemeticObserver("HC", operatorConfig,
+                                periodicTimeForMakespanEvolution, exporter);
 
                         List<NeighborhoodOperatorLazy> operatorList = getOperatorsList(operatorConfig, problem);
 
@@ -165,6 +173,8 @@ public class MemeticCommand {
             CommandUtils.doJmetalAnalysis(experimentConfig, experiment);
 
             CommandUtils.computeStatistics(experiment, objectives);
+
+            exporter.close();
 
         } catch (IOException e) {
             throw new RuntimeException(e);

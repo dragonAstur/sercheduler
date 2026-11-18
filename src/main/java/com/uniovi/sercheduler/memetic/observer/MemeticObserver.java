@@ -2,6 +2,7 @@ package com.uniovi.sercheduler.memetic.observer;
 
 import com.uniovi.sercheduler.jmetal.problem.SchedulePermutationSolution;
 import com.uniovi.sercheduler.jmetal.problem.SolutionOrigin;
+import com.uniovi.sercheduler.localsearch.export.MetricsListener;
 import com.uniovi.sercheduler.localsearch.observer.Observer;
 
 import java.math.BigDecimal;
@@ -35,7 +36,10 @@ public class MemeticObserver implements Observer {
 
     private double bestMakespan;
 
-    public MemeticObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution){
+    private double lastRecordedMakespan;
+
+    public MemeticObserver(String strategyName, String operatorsName, long periodicTimeForMakespanEvolution,
+                           MetricsListener metricsListener){
 
         this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
 
@@ -72,13 +76,17 @@ public class MemeticObserver implements Observer {
         this.actualMakespanAfterLSA = 0.0;
 
         this.bestMakespan = Double.MAX_VALUE;
+
+        this.lastRecordedMakespan = Double.MAX_VALUE;
+
+
+        this.memeticEvolutionMetrics = new MemeticEvolutionMetrics(this.periodicTimeForMakespanEvolution,
+                metricsListener);
     }
 
     @Override
     public void startRun(long startingTime) {
         this.memeticStartingTime = startingTime;
-
-        this.memeticEvolutionMetrics = new MemeticEvolutionMetrics(this.periodicTimeForMakespanEvolution);
     }
 
     @Override
@@ -86,10 +94,6 @@ public class MemeticObserver implements Observer {
 
         this.memeticExecutionTime = System.currentTimeMillis() - getStartingTime();
 
-    }
-
-    public MemeticEvolutionMetrics getMemeticEvolutionMetrics() {
-        return this.memeticEvolutionMetrics;
     }
 
     @Override
@@ -140,7 +144,8 @@ public class MemeticObserver implements Observer {
     @Override
     public void updateLSAEvolution(double actualMakespan, long actualIterationNumberOfNeighbors) {
 
-        //TODO: revisar qué makespan poner aquí
+        this.lastRecordedMakespan = actualMakespan;
+
         this.memeticEvolutionMetrics.update(
                 this.memeticStartingTime,
                 this.memeticIterationNumber,
@@ -162,14 +167,7 @@ public class MemeticObserver implements Observer {
     }
 
     public double lastRecordedMakespan(){
-
-        int lastMakespanRecordedPos = this.memeticEvolutionMetrics.getActualMakespanEvolution().size()-1;
-        double lastMakespanRecorded = Double.MAX_VALUE;
-
-        if(lastMakespanRecordedPos != -1)
-            lastMakespanRecorded = this.memeticEvolutionMetrics.getActualMakespanEvolution().get(lastMakespanRecordedPos);
-
-        return lastMakespanRecorded;
+        return this.lastRecordedMakespan;
     }
 
     @Override

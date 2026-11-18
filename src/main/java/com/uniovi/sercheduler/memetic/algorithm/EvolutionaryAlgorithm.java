@@ -89,7 +89,7 @@ public class EvolutionaryAlgorithm<S extends Solution<?>> implements Algorithm<L
             observer.updateMemeticEvolution(bestScheduleSolution);
 
         //XLSXTableExporter.appendMemeticEvolutionSheet(fileName, observer);
-        CSVExporter.appendMemeticCSV(fileName, observer);
+        //CSVExporter.appendMemeticCSV(fileName, observer);
     }
 
     protected void initProgress() {
