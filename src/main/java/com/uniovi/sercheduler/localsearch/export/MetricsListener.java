@@ -10,6 +10,8 @@ public interface MetricsListener {
             double bestMakespan,
             double actualMakespan,
 
+            long numberOfBestSolutionsRandomOrigin,
+
             long numberOfBestSolutionsGeneticOrigin,
             double ratioOfBestSolutionsGeneticOrigin,
 

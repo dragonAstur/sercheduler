@@ -90,7 +90,11 @@ public class MemeticEvolutionMetrics {
         */
     }
 
-    public void update(long memeticStartingTime, int memeticIterationNumber, double bestMakespan, double actualMakespan,
+    public void update(long memeticStartingTime,
+                       int memeticIterationNumber,
+                       double bestMakespan,
+                       double actualMakespan,
+                       long numberOfBestSolutionsRandomOrigin,
                        long numberOfBestSolutionsGeneticOrigin,
                        long numberOfBestSolutionsChangeHostOrigin, long numberOfBestSolutionsInsertionOrigin,
                        long numberOfBestSolutionsSwapOrigin, long numberOfBestSolutionsSwapHostOrigin,
@@ -144,6 +148,7 @@ public class MemeticEvolutionMetrics {
                     nextTheoreticalInstant,
                     bestMakespan,
                     actualMakespan,
+                    numberOfBestSolutionsRandomOrigin,
                     numberOfBestSolutionsGeneticOrigin,
                     calculateRatioOriginIteration(numberOfBestSolutionsGeneticOrigin, memeticIterationNumber),
                     numberOfBestSolutionsChangeHostOrigin,
@@ -198,8 +203,12 @@ public class MemeticEvolutionMetrics {
 
 
 
-    private void saveMetrics(int memeticIterationNumber, long realInstant, long theoreticalInstant,
-                             double bestMakespan, double actualMakespan,
+    private void saveMetrics(int memeticIterationNumber,
+                             long realInstant,
+                             long theoreticalInstant,
+                             double bestMakespan,
+                             double actualMakespan,
+                             long numberOfBestSolutionsRandomOrigin,
                              long numberOfBestSolutionsGeneticOrigin, double ratioOfBestSolutionsGeneticOrigin,
                              long numberOfBestSolutionsChangeHostOrigin, double ratioOfBestSolutionsChangeHostOrigin,
                              long numberOfBestSolutionsInsertionOrigin,  double ratioOfBestSolutionsInsertionOrigin,
@@ -221,6 +230,8 @@ public class MemeticEvolutionMetrics {
 
                 bestMakespan,
                 actualMakespan,
+
+                numberOfBestSolutionsRandomOrigin,
 
                 numberOfBestSolutionsGeneticOrigin,
                 ratioOfBestSolutionsGeneticOrigin,

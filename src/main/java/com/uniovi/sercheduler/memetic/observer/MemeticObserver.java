@@ -22,6 +22,7 @@ public class MemeticObserver implements Observer {
     private long numberOfBestSolutionsSwapOrigin;
     private long numberOfBestSolutionsSwapHostOrigin;
     private long numberOfBestSolutionsGeneticOrigin;
+    private long numberOfBestSolutionsRandomOrigin;
 
     private double accMakespanBeforeLSA, accMakespanAfterLSA;
     private double actualMakespanBeforeLSA, actualMakespanAfterLSA;
@@ -58,6 +59,7 @@ public class MemeticObserver implements Observer {
         this.numberOfBestSolutionsInsertionOrigin = 0;
         this.numberOfBestSolutionsSwapOrigin = 0;
         this.numberOfBestSolutionsSwapHostOrigin = 0;
+        this.numberOfBestSolutionsRandomOrigin = 0;
 
         this.accMakespanBeforeLSA = 0.0;
         this.accMakespanAfterLSA = 0.0;
@@ -151,6 +153,7 @@ public class MemeticObserver implements Observer {
                 this.memeticIterationNumber,
                 this.bestMakespan,
                 actualMakespan,
+                this.numberOfBestSolutionsRandomOrigin,
                 this.numberOfBestSolutionsGeneticOrigin,
                 this.numberOfBestSolutionsChangeHostOrigin,
                 this.numberOfBestSolutionsInsertionOrigin,
@@ -172,9 +175,12 @@ public class MemeticObserver implements Observer {
 
     @Override
     public void updateMemeticEvolution() {
-        this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber,
+        this.memeticEvolutionMetrics.update(
+                this.memeticStartingTime,
+                this.memeticIterationNumber,
                 this.bestMakespan,
                 lastRecordedMakespan(),
+                this.numberOfBestSolutionsRandomOrigin,
                 this.numberOfBestSolutionsGeneticOrigin,
                 this.numberOfBestSolutionsChangeHostOrigin,
                 this.numberOfBestSolutionsInsertionOrigin,
@@ -194,6 +200,7 @@ public class MemeticObserver implements Observer {
         this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber,
                 this.bestMakespan,
                 actualSolution.getFitnessInfo().fitness().get("makespan"),
+                this.numberOfBestSolutionsRandomOrigin,
                 this.numberOfBestSolutionsGeneticOrigin,
                 this.numberOfBestSolutionsChangeHostOrigin,
                 this.numberOfBestSolutionsInsertionOrigin,
@@ -245,6 +252,8 @@ public class MemeticObserver implements Observer {
                 this.numberOfBestSolutionsSwapHostOrigin += 1;
                 break;
             case RANDOM:
+                this.numberOfBestSolutionsRandomOrigin += 1;
+                break;
             case CROSS_MUTATION:
                 this.numberOfBestSolutionsGeneticOrigin += 1;
                 break;

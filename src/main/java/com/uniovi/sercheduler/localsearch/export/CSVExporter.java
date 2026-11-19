@@ -74,7 +74,8 @@ public class CSVExporter implements MetricsListener, Closeable {
                         "N3 origin (Swap);" +
                         "N3 origin per iteration;" +
                         "N4 origin (Swap Host);" +
-                        "N4 origin per iteration\n"
+                        "N4 origin per iteration;" +
+                        "Random origin\n"
         );
 
         writer.flush();
@@ -88,6 +89,8 @@ public class CSVExporter implements MetricsListener, Closeable {
 
             double bestMakespan,
             double actualMakespan,
+
+            long numberOfBestSolutionsRandomOrigin,
 
             long numberOfBestSolutionsGeneticOrigin,
             double ratioOfBestSolutionsGeneticOrigin,
@@ -150,7 +153,8 @@ public class CSVExporter implements MetricsListener, Closeable {
                     .append(numberOfBestSolutionsSwapOrigin).append(";")
                     .append(ratioOfBestSolutionsSwapOrigin).append(";")
                     .append(numberOfBestSolutionsSwapHostOrigin).append(";")
-                    .append(ratioOfBestSolutionsSwapHostOrigin)
+                    .append(ratioOfBestSolutionsSwapHostOrigin).append(";")
+                    .append(numberOfBestSolutionsRandomOrigin)
                     .append('\n');
 
             writer.write(line.toString());
