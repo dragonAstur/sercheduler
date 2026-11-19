@@ -221,7 +221,7 @@ public class LocalSearchAlgorithm {
 
         } while (!terminationCriterion.isMet());
 
-        observer.updateLSAInvocationsIterationsAndImprovements();
+        observer.updateLSAEvaluatedneighborsInvocationsIterationsAndImprovements();
 
         return actualSolution;
     }

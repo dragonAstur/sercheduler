@@ -33,6 +33,8 @@ public class MemeticObserver implements Observer {
 
     private long accEvaluatedNeighbors;
 
+    private long actualEvaluatedNeighbors;
+
     private double popAvgMakespan;
 
     private double bestMakespan;
@@ -73,6 +75,8 @@ public class MemeticObserver implements Observer {
         this.actualLSAImprovements = 0;
 
         this.accEvaluatedNeighbors = 0;
+
+        this.actualEvaluatedNeighbors = 0;
 
         this.actualMakespanBeforeLSA = 0.0;
         this.actualMakespanAfterLSA = 0.0;
@@ -197,7 +201,8 @@ public class MemeticObserver implements Observer {
 
         updateBestSolution(actualSolution);
 
-        this.memeticEvolutionMetrics.update(this.memeticStartingTime, this.memeticIterationNumber,
+        this.memeticEvolutionMetrics.update(this.memeticStartingTime,
+                this.memeticIterationNumber,
                 this.bestMakespan,
                 actualSolution.getFitnessInfo().fitness().get("makespan"),
                 this.numberOfBestSolutionsRandomOrigin,
@@ -295,19 +300,21 @@ public class MemeticObserver implements Observer {
     }
 
     @Override
-    public void updateLSAInvocationsIterationsAndImprovements(){
+    public void updateLSAEvaluatedneighborsInvocationsIterationsAndImprovements(){
         this.accLSAInvocations += this.actualLSAInvocations;
         this.accLSAIterations += this.actualLSAIterations;
         this.accLSAImprovements += this.actualLSAImprovements;
+        this.accEvaluatedNeighbors += this.actualEvaluatedNeighbors;
 
         this.actualLSAInvocations = 0;
         this.actualLSAIterations = 0;
         this.actualLSAImprovements = 0;
+        this.actualEvaluatedNeighbors = 0;
     }
 
     @Override
     public void incrementEvaluatedNeighbor() {
-        this.accEvaluatedNeighbors += 1;
+        this.actualEvaluatedNeighbors += 1;
     }
 
     public void addLSAImprovements(long numberOfImprovements){
