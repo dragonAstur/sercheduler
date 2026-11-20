@@ -11,6 +11,7 @@ import com.uniovi.sercheduler.service.PlanPair;
 import com.uniovi.sercheduler.service.TaskSchedule;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class LocalsearchEvaluator {
@@ -20,10 +21,19 @@ public class LocalsearchEvaluator {
 
     private InstanceData instanceData;
 
+    private final Map<String, Double> availableBuffer;
+    private final Map<String, TaskSchedule> scheduleBuffer;
+
     public LocalsearchEvaluator(Map<String, Map<String, Double>> computationMatrix, Map<String, Map<String, Long>> networkMatrix, InstanceData instanceData) {
-        this.computationMatrix = new HashMap<>(computationMatrix);
-        this.networkMatrix = new HashMap<>(networkMatrix);
+        this.computationMatrix = Map.copyOf(computationMatrix);
+        this.networkMatrix = Map.copyOf(networkMatrix);
         this.instanceData = instanceData;
+
+        this.availableBuffer =
+                new HashMap<>(instanceData.hosts().size());
+
+        this.scheduleBuffer =
+                new HashMap<>(instanceData.workflow().size());
     }
 
     public void evaluate(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
@@ -48,18 +58,48 @@ public class LocalsearchEvaluator {
     }
 
 
-    public double computeMakespanEnhancement(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
+//    public double computeMakespanEnhancement(SchedulePermutationSolution originalSolution, SchedulePermutationSolution generatedSolution, Movement movement){
+//
+//        if(originalSolution.getFitnessInfo() == null)
+//            throw new IllegalArgumentException("The solution must have been evaluated first.");
+//
+//        Map<String, TaskSchedule> originalSchedule = obtainOriginalSchedule(originalSolution);
+//
+//        if(movement.changedHostPositions().length != 0)
+//            updateOriginalScheduleDurations(originalSchedule, generatedSolution.getPlan(), movement.changedHostPositions());
+//
+//        return originalSolution.getFitnessInfo().fitness().get("makespan")
+//                - computeNewFitnessInfo(originalSchedule, generatedSolution.getPlan(), movement.getFirstChangePosition()).fitness().get("makespan");
+//    }
 
-        if(originalSolution.getFitnessInfo() == null)
-            throw new IllegalArgumentException("The solution must have been evaluated first.");
+    public double computeMakespanEnhancement(
+            SchedulePermutationSolution originalSolution,
+            SchedulePermutationSolution generatedSolution,
+            Movement movement) {
 
-        Map<String, TaskSchedule> originalSchedule = obtainOriginalSchedule(originalSolution);
+        if (originalSolution.getFitnessInfo() == null)
+            throw new IllegalArgumentException(
+                    "The solution must have been evaluated first.");
 
-        if(movement.changedHostPositions().length != 0)
-            updateOriginalScheduleDurations(originalSchedule, generatedSolution.getPlan(), movement.changedHostPositions());
+        Map<String, TaskSchedule> originalSchedule =
+                obtainOriginalSchedule(originalSolution);
 
-        return originalSolution.getFitnessInfo().fitness().get("makespan")
-                - computeNewFitnessInfo(originalSchedule, generatedSolution.getPlan(), movement.getFirstChangePosition()).fitness().get("makespan");
+        if (movement.changedHostPositions().length != 0)
+            updateOriginalScheduleDurations(
+                    originalSchedule,
+                    generatedSolution.getPlan(),
+                    movement.changedHostPositions());
+
+        double newMakespan =
+                computeNewMakespan(
+                        originalSchedule,
+                        generatedSolution.getPlan(),
+                        movement.getFirstChangePosition());
+
+        return originalSolution.getFitnessInfo()
+                .fitness()
+                .get("makespan")
+                - newMakespan;
     }
 
     private void updateOriginalScheduleDurations(Map<String, TaskSchedule> originalSchedule, List<PlanPair> plan, int[] changedHostPositions) {
@@ -117,16 +157,24 @@ public class LocalsearchEvaluator {
 
 
     private static Map<String, TaskSchedule> obtainOriginalSchedule(SchedulePermutationSolution originalSolution) {
-        List<TaskSchedule> originalOrderedSchedule = new ArrayList<>(originalSolution.getFitnessInfo().schedule());
-        return originalOrderedSchedule.stream().collect(Collectors.toMap(ts -> ts.task().getName(), ts -> ts));
+        return originalSolution.getFitnessInfo()
+                .schedule()
+                .stream()
+                .collect(Collectors.toMap(
+                        ts -> ts.task().getName(),
+                        Function.identity()
+                ));
     }
 
     private FitnessInfo computeNewFitnessInfo(Map<String, TaskSchedule> originalSchedule, List<PlanPair> newPlan, int firstChangePosition){
 
         double newMakespan = 0D;
 
-        Map<String, Double> available = new HashMap<>(instanceData.hosts().size());
-        Map<String, TaskSchedule> newSchedule = new HashMap<>(instanceData.workflow().size());
+        availableBuffer.clear();
+        scheduleBuffer.clear();
+
+        Map<String, Double> available = availableBuffer;
+        Map<String, TaskSchedule> newSchedule = scheduleBuffer;
 
         for(int i = 0; i < newPlan.size(); i ++){
 
@@ -167,13 +215,26 @@ public class LocalsearchEvaluator {
                 Map.of("makespan", newMakespan, "energy", 0.0), newOrderedSchedule, "incremental evaluator");
     }
 
-    private double computeParentsMaxEft(Map<String, TaskSchedule> newSchedule, Task task) {
-        return newSchedule.values().stream()
-                .filter(ts -> task.getParents().contains(ts.task()))
-                .mapToDouble(TaskSchedule::eft)
-                .max()
-                .orElse(0D);
+    //Puede que este nuevo cambio sea muy importante, se pasó de O(N^2) a O(E)
+    private double computeParentsMaxEft(
+            Map<String, TaskSchedule> newSchedule,
+            Task task) {
+
+        double max = 0;
+
+        for (Task parent : task.getParents()) {
+
+            TaskSchedule parentSchedule =
+                    newSchedule.get(parent.getName());
+
+            if(parentSchedule != null) {
+                max = Math.max(max, parentSchedule.eft());
+            }
+        }
+
+        return max;
     }
+
 
     private double computeDurationOfATask(List<PlanPair> plan, int position, int[] parentsPositions) {
 
@@ -213,5 +274,72 @@ public class LocalsearchEvaluator {
         var bandwidth = Math.min(host.getNetworkSpeed(), parentHost.getNetworkSpeed());
 
         return Math.min(bandwidth, parentHost.getDiskSpeed());
+    }
+
+    private double computeNewMakespan(
+            Map<String, TaskSchedule> originalSchedule,
+            List<PlanPair> newPlan,
+            int firstChangePosition) {
+
+        double newMakespan = 0D;
+
+        Map<String, Double> available =
+                new HashMap<>(instanceData.hosts().size());
+
+        Map<String, TaskSchedule> newSchedule =
+                new HashMap<>(instanceData.workflow().size());
+
+        for (int i = 0; i < newPlan.size(); i++) {
+
+            Task t = newPlan.get(i).task();
+            Host h = newPlan.get(i).host();
+
+            double duration =
+                    originalSchedule.get(t.getName()).eft()
+                            - originalSchedule.get(t.getName()).ast();
+
+            if (i >= firstChangePosition) {
+
+                double readyHost =
+                        available.getOrDefault(h.getName(), 0D);
+
+                double parentsMaxEft =
+                        computeParentsMaxEft(newSchedule, t);
+
+                double newAst =
+                        Math.max(readyHost, parentsMaxEft);
+
+                double newEft =
+                        newAst + duration;
+
+                available.put(h.getName(), newEft);
+
+                newSchedule.put(
+                        t.getName(),
+                        new TaskSchedule(t, newAst, newEft, h));
+
+                newMakespan =
+                        Math.max(newMakespan, newEft);
+
+            } else {
+
+                double originalEft =
+                        originalSchedule.get(t.getName()).eft();
+
+                double originalAst =
+                        originalSchedule.get(t.getName()).ast();
+
+                available.put(h.getName(), originalEft);
+
+                newSchedule.put(
+                        t.getName(),
+                        new TaskSchedule(t, originalAst, originalEft, h));
+
+                newMakespan =
+                        Math.max(newMakespan, originalEft);
+            }
+        }
+
+        return newMakespan;
     }
 }
