@@ -44,7 +44,7 @@ public class LocalsearchEvaluator {
         Map<String, TaskSchedule> originalSchedule = obtainOriginalSchedule(originalSolution);
 
         if(movement.changedHostPositions().length != 0)
-            updateOriginalScheduleDurations(originalSchedule, generatedSolution.getPlan(), movement.changedHostPositions());
+            updateOriginalScheduleDurations(originalSchedule, originalSchedule, generatedSolution.getPlan(), movement.changedHostPositions());
 
         FitnessInfo newFitnessInfo = computeNewFitnessInfo(originalSchedule, generatedSolution.getPlan(), movement.getFirstChangePosition());
 
@@ -86,7 +86,7 @@ public class LocalsearchEvaluator {
 
         if (movement.changedHostPositions().length != 0)
             updateOriginalScheduleDurations(
-                    originalSchedule,
+                    originalSchedule, originalSchedule,
                     generatedSolution.getPlan(),
                     movement.changedHostPositions());
 
@@ -102,7 +102,76 @@ public class LocalsearchEvaluator {
                 - newMakespan;
     }
 
-    private void updateOriginalScheduleDurations(Map<String, TaskSchedule> originalSchedule, List<PlanPair> plan, int[] changedHostPositions) {
+    public PreparedEvaluation prepare(SchedulePermutationSolution originalSolution) {
+        if (originalSolution.getFitnessInfo() == null)
+            throw new IllegalArgumentException("The solution must have been evaluated first.");
+        return new PreparedEvaluation(obtainOriginalSchedule(originalSolution), instanceData);
+    }
+
+    public double computeMakespan(PreparedEvaluation prepared, List<PlanPair> plan, Movement movement) {
+        prepared.overrides.clear();
+        int[] changedHostPositions = movement.changedHostPositions();
+        if (changedHostPositions.length != 0)
+            updateOriginalScheduleDurations(prepared.originalSchedule, prepared.overrides, plan, changedHostPositions);
+
+        Arrays.fill(prepared.taskEndTimes, 0D);
+        Arrays.fill(prepared.hostAvailable, 0D);
+        double makespan = 0D;
+
+        for (int i = 0; i < plan.size(); i++) {
+            Task task = plan.get(i).task();
+            Host host = plan.get(i).host();
+            TaskSchedule original = originalTaskSchedule(prepared.originalSchedule, prepared.overrides, task.getName());
+            int taskIndex = prepared.taskIndexes.get(task.getName());
+            int hostIndex = prepared.hostIndexes.get(host.getName());
+            double eft;
+
+            if (i >= movement.getFirstChangePosition()) {
+                double parentsMaxEft = 0D;
+                for (Task parent : task.getParents()) {
+                    parentsMaxEft = Math.max(parentsMaxEft,
+                            prepared.taskEndTimes[prepared.taskIndexes.get(parent.getName())]);
+                }
+                double ast = Math.max(prepared.hostAvailable[hostIndex], parentsMaxEft);
+                eft = ast + (original.eft() - original.ast());
+            } else {
+                eft = original.eft();
+            }
+
+            prepared.taskEndTimes[taskIndex] = eft;
+            prepared.hostAvailable[hostIndex] = eft;
+            makespan = Math.max(makespan, eft);
+        }
+        return makespan;
+    }
+
+    public static final class PreparedEvaluation {
+        private final Map<String, TaskSchedule> originalSchedule;
+        private final Map<String, TaskSchedule> overrides = new HashMap<>();
+        private final Map<String, Integer> taskIndexes = new HashMap<>();
+        private final Map<String, Integer> hostIndexes = new HashMap<>();
+        private final double[] taskEndTimes;
+        private final double[] hostAvailable;
+
+        private PreparedEvaluation(Map<String, TaskSchedule> originalSchedule, InstanceData instanceData) {
+            this.originalSchedule = originalSchedule;
+            for (String task : instanceData.workflow().keySet())
+                taskIndexes.put(task, taskIndexes.size());
+            for (String host : instanceData.hosts().keySet())
+                hostIndexes.put(host, hostIndexes.size());
+            taskEndTimes = new double[taskIndexes.size()];
+            hostAvailable = new double[hostIndexes.size()];
+        }
+    }
+
+    private static TaskSchedule originalTaskSchedule(Map<String, TaskSchedule> originalSchedule,
+                                                     Map<String, TaskSchedule> overrides, String taskName) {
+        return overrides.getOrDefault(taskName, originalSchedule.get(taskName));
+    }
+
+    private void updateOriginalScheduleDurations(Map<String, TaskSchedule> originalSchedule,
+                                                 Map<String, TaskSchedule> overrides,
+                                                 List<PlanPair> plan, int[] changedHostPositions) {
 
         for(int taskPos : changedHostPositions){
 
@@ -110,12 +179,12 @@ public class LocalsearchEvaluator {
 
             int[] taskParentsPos = NeighborUtils.getParentsPositions(plan, taskPos);
 
-            double newEft = originalSchedule.get(task.getName()).ast()
+            double newEft = originalTaskSchedule(originalSchedule, overrides, task.getName()).ast()
                     + computeDurationOfATask(plan, taskPos, taskParentsPos);
 
-            TaskSchedule originalTaskSchedule = originalSchedule.get(task.getName());
+            TaskSchedule originalTaskSchedule = originalTaskSchedule(originalSchedule, overrides, task.getName());
 
-            originalSchedule.put(task.getName(),
+            overrides.put(task.getName(),
                 new TaskSchedule(originalTaskSchedule.task(), originalTaskSchedule.ast(), newEft, originalTaskSchedule.host()));
 
             //Updating children communications with this task
@@ -123,7 +192,7 @@ public class LocalsearchEvaluator {
 
                 Task childTask = plan.get(childPos).task();
 
-                TaskSchedule originalChildTaskSchedule = originalSchedule.get(childTask.getName());
+                TaskSchedule originalChildTaskSchedule = originalTaskSchedule(originalSchedule, overrides, childTask.getName());
 
                 double oldCommunicationTime = computeCommunicationTime(originalChildTaskSchedule.task(), originalChildTaskSchedule.host(),
                         originalTaskSchedule.task(), originalTaskSchedule.host());
@@ -141,7 +210,7 @@ public class LocalsearchEvaluator {
 
                 double newChildEft = originalChildTaskSchedule.eft() - oldCommunicationTime + newCommunicationTime;
 
-                originalSchedule.put(childTask.getName(),
+                overrides.put(childTask.getName(),
                         new TaskSchedule(originalChildTaskSchedule.task(), originalChildTaskSchedule.ast(), newChildEft, originalChildTaskSchedule.host()));
             }
         }
