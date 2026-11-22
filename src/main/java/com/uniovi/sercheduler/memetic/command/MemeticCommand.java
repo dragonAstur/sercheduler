@@ -105,8 +105,7 @@ public class MemeticCommand {
                 new CSVExporter(
                         fileName,
                         strategyName,
-                        operatorConfig,
-                        periodicTimeForMakespanEvolution);
+                        operatorConfig);
 
 
         for (var benchmark : benchmarks) {

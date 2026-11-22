@@ -17,17 +17,14 @@ public class CSVExporter implements MetricsListener, Closeable {
 
     private final String strategyName;
     private final String operatorsName;
-    private final long periodicTimeForMakespanEvolution;
 
     public CSVExporter(
             String fileName,
             String strategyName,
-            String operatorsName,
-            long periodicTimeForMakespanEvolution) {
+            String operatorsName) {
 
         this.strategyName = strategyName;
         this.operatorsName = operatorsName;
-        this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
 
         try {
 

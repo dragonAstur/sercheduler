@@ -108,8 +108,7 @@ public class GeneticCommand {
             new CSVExporter(
                     fileName,
                     strategyName,
-                    operatorConfig,
-                    periodicTimeForMakespanEvolution);
+                    operatorConfig);
 
     for (var benchmark : benchmarks) {
 

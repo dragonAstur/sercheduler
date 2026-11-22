@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 public class MemeticObserver implements Observer {
 
-    private MemeticEvolutionMetrics memeticEvolutionMetrics;
+    private final MemeticEvolutionMetrics memeticEvolutionMetrics;
     private long memeticStartingTime;
     private long memeticExecutionTime;
     private final String strategyName;
