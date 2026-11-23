@@ -10,7 +10,10 @@ import org.uma.jmetal.solution.AbstractSolution;
 import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.solution.permutationsolution.PermutationSolution;
 
-/** Defines a schedule solution. */
+/**
+ * Defines a schedule solution. Its plan determines equality and hash code, so it must not be
+ * modified while the solution is used as a hash-based collection key.
+ */
 public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
     implements PermutationSolution<PlanPair> {
 
@@ -33,7 +36,7 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
   /**
    * Default constructor.
    *
-   * @param numberOfVariables Number of variables.
+   * @param numberOfVariables Non-negative number of variables; the plan stores their values.
    * @param numberOfObjectives Number of objectives.
    * @param fitnessInfo Contains all information about the problem.
    * @param plan List of the possible schedule.
@@ -44,7 +47,7 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
       FitnessInfo fitnessInfo,
       List<PlanPair> plan,
       String arbiter) {
-    super(numberOfVariables, numberOfObjectives);
+    super(inheritedVariableCount(numberOfVariables), numberOfObjectives);
     this.fitnessInfo = fitnessInfo;
     this.plan = plan;
     this.arbiter = arbiter;
@@ -58,7 +61,7 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
             List<PlanPair> plan,
             String arbiter,
             SolutionOrigin origin) {
-        super(numberOfVariables, numberOfObjectives);
+        super(inheritedVariableCount(numberOfVariables), numberOfObjectives);
         this.fitnessInfo = fitnessInfo;
         this.plan = plan;
         this.arbiter = arbiter;
@@ -129,6 +132,19 @@ public class SchedulePermutationSolution extends AbstractSolution<PlanPair>
     public List<PlanPair> variables() {
     return plan;
   }
+
+    @Override
+    public int hashCode() {
+        return variables().hashCode();
+    }
+
+    private static int inheritedVariableCount(int numberOfVariables) {
+        if (numberOfVariables < 0) {
+            throw new IllegalArgumentException("Illegal Capacity: " + numberOfVariables);
+        }
+        // variables() is backed by plan, not AbstractSolution's list.
+        return 0;
+    }
 
     public SolutionOrigin getOrigin() {
         return origin;
