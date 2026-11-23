@@ -21,6 +21,11 @@ public class NeighborSelectorImpl implements NeighborSelector {
                                                               Stream<GeneratedNeighbor> neighbors, LocalsearchEvaluator evaluator,
                                                               AcceptanceCriterion acceptanceCriterion,
                                                               TerminationCriterion terminationCriterion, Observer observer) {
+        // Custom criteria or evaluators may depend on the complete evaluated solution.
+        AcceptanceCriterionImpl makespanCriterion = acceptanceCriterion.getClass() == AcceptanceCriterionImpl.class
+                && evaluator.getClass() == LocalsearchEvaluator.class
+                ? (AcceptanceCriterionImpl) acceptanceCriterion : null;
+        LocalsearchEvaluator.PreparedEvaluation prepared = makespanCriterion == null ? null : evaluator.prepare(actualSolution);
         return neighbors
                 .takeWhile(neighbor -> !terminationCriterion.hasTimeExceeded())
                 .filter(neighbor -> {
@@ -30,8 +35,14 @@ public class NeighborSelectorImpl implements NeighborSelector {
 
                     observer.incrementEvaluatedNeighbor();
 
+                    if (makespanCriterion != null) {
+                        double makespan = evaluator.computeMakespan(prepared, neighbor.generatedSolution().getPlan(), neighbor.movement());
+                        if (!makespanCriterion.checkMakespanAcceptance(actualSolution.getFitnessInfo().fitness().get("makespan"), makespan))
+                            return false;
+                        evaluator.evaluate(actualSolution, neighbor.generatedSolution(), neighbor.movement());
+                        return true;
+                    }
                     evaluator.evaluate(actualSolution, neighbor.generatedSolution(), neighbor.movement());
-
                     return acceptanceCriterion.checkAcceptance(actualSolution, neighbor.generatedSolution());
                 })
                 .findFirst();   //this breaks laziness

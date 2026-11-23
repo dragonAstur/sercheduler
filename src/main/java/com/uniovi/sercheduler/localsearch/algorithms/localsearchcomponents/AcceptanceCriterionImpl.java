@@ -8,7 +8,12 @@ public class AcceptanceCriterionImpl implements AcceptanceCriterion {
     private final double UPGRADE_THRESHOLD = 0.01;
 
     public boolean checkAcceptance(SchedulePermutationSolution actualSolution, SchedulePermutationSolution bestNeighborSolution){
-        return actualSolution.getFitnessInfo().fitness().get("makespan") - bestNeighborSolution.getFitnessInfo().fitness().get("makespan") > UPGRADE_THRESHOLD;
+        return checkMakespanAcceptance(actualSolution.getFitnessInfo().fitness().get("makespan"),
+                bestNeighborSolution.getFitnessInfo().fitness().get("makespan"));
+    }
+
+    boolean checkMakespanAcceptance(double actualMakespan, double neighborMakespan) {
+        return actualMakespan - neighborMakespan > UPGRADE_THRESHOLD;
     }
 
 }
