@@ -12,7 +12,7 @@ public class MemeticEvolutionMetrics {
 
     private final long periodicTimeForMakespanEvolution;
     //private long lastRecordedTime;
-    private final List<Long> theoreticalInstants;
+    private long lastTheoreticalInstant;
 
     private final MetricsListener metricsListener;
 
@@ -49,7 +49,8 @@ public class MemeticEvolutionMetrics {
     public MemeticEvolutionMetrics(long periodicTimeForMakespanEvolution, MetricsListener metricsListener) {
 
         this.periodicTimeForMakespanEvolution = periodicTimeForMakespanEvolution;
-        this.theoreticalInstants = new ArrayList<>();
+
+        this.lastTheoreticalInstant = 0;
 
         this.metricsListener = metricsListener;
 
@@ -131,12 +132,8 @@ public class MemeticEvolutionMetrics {
 
         long elapsedFromStart = actualTime - memeticStartingTime;
 
-        long lastTheoreticalInstant =
-                theoreticalInstants.isEmpty()
-                        ? 0
-                        : theoreticalInstants.get(theoreticalInstants.size() - 1);
-
-        long nextTheoreticalInstant = lastTheoreticalInstant + periodicTimeForMakespanEvolution;
+        long nextTheoreticalInstant =
+                lastTheoreticalInstant + periodicTimeForMakespanEvolution;
 
         if (elapsedFromStart >= nextTheoreticalInstant) {
 
@@ -221,7 +218,7 @@ public class MemeticEvolutionMetrics {
                              long accEvaluatedNeighbors,
                              double popAvgMakespan){
 
-        this.theoreticalInstants.add(theoreticalInstant);
+        this.lastTheoreticalInstant = theoreticalInstant;
 
         metricsListener.onMetrics(
                 memeticIterationNumber,
@@ -304,12 +301,12 @@ public class MemeticEvolutionMetrics {
         */
     }
 
-
+    /*
     public List<Long> getTheoreticalInstants() {
         return theoreticalInstants;
     }
 
-    /*
+
     public List<Integer> getMemeticIterationNumberList() {
         return memeticIterationNumberList;
     }
