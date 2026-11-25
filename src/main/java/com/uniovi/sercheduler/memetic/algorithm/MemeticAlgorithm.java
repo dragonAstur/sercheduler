@@ -104,6 +104,8 @@ public class MemeticAlgorithm implements Algorithm<List<SchedulePermutationSolut
             offspringPopulation = this.evaluation.evaluate(offspringPopulation, observer);
             this.population = this.replacement.replace(this.population, offspringPopulation);
 
+            offspringPopulation = null;     //GC will collect it sooner
+
             observer.updateMemeticEvolution(
                     this.population.get( getBestSolutionPos(this.population) )
             );
