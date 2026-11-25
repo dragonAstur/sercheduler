@@ -457,7 +457,7 @@ public class CommandUtils {
     }
 
     public static int generateRunId(){
-        return new Random().nextInt(10000000) + 1;
+        return new Random().nextInt(1000000000) + 1;
     }
 
     public static String createFileName(String originalFileName, String algorithmName, Long limitTime, long periodicTimeForMakespanEvolution,
